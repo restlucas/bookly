@@ -3,13 +3,14 @@
 import { CalendarInput } from "@/components/input/calendar";
 import { RangeInput } from "@/components/input/range";
 import { SelectInput } from "@/components/input/select";
-import {
-  categoryOptions,
-  spokenLanguages,
-  typeService,
-} from "@/utils/common-data";
+import { spokenLanguages, typeService } from "@/utils/common-data";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Filter(props: any) {
+  const params = useSearchParams();
+  const [filter, setFilter] = useState({} as any);
+
   function handleSubmit(event: any) {
     event.preventDefault();
   }
@@ -20,14 +21,15 @@ export default function Filter(props: any) {
       className="space-y-6 rounded-md bg-background-200 p-8"
     >
       <h3 className="text-xl font-bold text-vibrant-green-100">Filtragem</h3>
+      <p>{params}</p>
 
-      <SelectInput label="Categoria" options={categoryOptions} />
-      <SelectInput label="Especialidade" options={categoryOptions} />
-      <SelectInput label="Localização" options={categoryOptions} />
-      <CalendarInput />
+      {/* <SelectInput label="Categoria" options={categoryOptions} />
+      <SelectInput label="Especialidade" options={categoryOptions} /> */}
+      {/* <SelectInput label="Localização" options={categoryOptions} /> */}
+      {/* <CalendarInput />
       <RangeInput />
-      <SelectInput label="Tipo de atendimento" options={typeService} />
-      <SelectInput label="Idioma falado" options={spokenLanguages} />
+      <SelectInput label="Tipo de atendimento" options={typeService} /> */}
+      {/* <SelectInput label="Idioma falado" options={spokenLanguages} /> */}
 
       <button
         type="submit"

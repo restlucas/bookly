@@ -8,7 +8,6 @@ export function RangeInput() {
   const [selectedValue, setSelectedValue] = useState(500);
 
   function handleRangeValue(event: any) {
-    console.log(event.target.value);
     setSelectedValue(event.target.value);
   }
 

@@ -150,7 +150,7 @@ export default function Home() {
         <div className="flex items-center justify-center">
           <div className="grid w-3/4 grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, index) => {
-              return <CommentsCard />;
+              return <CommentsCard key={index} />;
             })}
           </div>
         </div>

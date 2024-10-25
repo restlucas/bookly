@@ -3,7 +3,7 @@
 import { ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 
-export function AppointmentHistory() {
+export function schedulingHistory() {
   return (
     <table className="font-regular w-full text-left text-sm shadow-md rtl:text-right">
       <thead className="bg-background-300 text-xs uppercase">
@@ -13,9 +13,6 @@ export function AppointmentHistory() {
           <th className="px-6 py-3">Ocupação</th>
           <th className="px-6 py-3">Valor</th>
           <th className="px-6 py-3">Status</th>
-          {/* <th scope="col" className="px-6 py-3">
-                <span className="sr-only">StatusCircle</span>
-              </th> */}
         </tr>
       </thead>
       <tbody>
@@ -28,7 +25,7 @@ export function AppointmentHistory() {
               <td className="px-6 py-4">22/10/2024</td>
               <td className="px-6 py-4">
                 <Link
-                  href="./appointment/professionals/1"
+                  href="./professionals/1"
                   className="flex cursor-pointer items-center justify-start gap-2 duration-100 hover:underline"
                 >
                   <span>Metro Boomin</span>

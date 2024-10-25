@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
+model Account {
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  type               String    @map("provider_type")  
+  provider           String    @map("provider_id")  
+  providerAccountId  String    @map("provider_account_id")
+  refreshToken       String?
+  accessToken        String?   @map("access_token")
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id          String          @id @default(cuid())
+  name        String      
+  profiles    Profile[]
+
+  professions Profession[]
+}
+
+model Profession {
+  id          String       @id @default(cuid())
+  name        String    
+  categoryId  String
+  profiles    Profile[]
+
+  category   Category  @relation(fields: [categoryId], references: [id])
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  phone         String?
+  image         String?
+  birth         String?
+  gender        String?
+  address       String?
+  role          String?
+  favorites     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  profile      Profile?
+  reviews      Review[]
+  scheduling   Scheduling[]
+  accounts     Account[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                   String @id @default(cuid())
+  userId               String @unique
+  professionId         String?
+  professionCategoryId String?
+  bio                  String?
+  serviceType          String?
+  serviceValue         String?
+  tags                 String?
+  
+  reviews             Review[]
+  professionalScheduling ProfessionalScheduling?
+  scheduling   Scheduling[]
+
+  user    User    @relation(fields: [userId], references: [id])
+  profession   Profession?    @relation(fields: [professionId], references: [id])
+  professionCategory   Category?    @relation(fields: [professionCategoryId], references: [id])
+}
+
+model ProfessionalScheduling {
+  id                 String @id @default(cuid())
+  profileId     String @unique
+  weekDay            Int
+  timeStartInMinutes Int
+  timeEndInMinutes   Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  Profile    Profile    @relation(fields: [profileId], references: [id])
+
+}
+
+model Review {
+  id                  String @id @default(cuid())
+  userId              String
+  profileId           String
+  comment             String?
+  rating              String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  profile    Profile    @relation(fields: [profileId], references: [id])
+}
+
+model Scheduling {
+  id             String   @id @default(uuid())
+  date           DateTime
+  userId         String @unique
+  ProfileId      String @unique
+  observations   String?
+  created_at     DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  Profile    Profile    @relation(fields: [ProfileId], references: [id])
+}
+
+
