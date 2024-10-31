@@ -8,9 +8,9 @@ export default function Login() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="grid h-screen grid-cols-2">
+    <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex items-center justify-center bg-background-200">
-        <div className="h-auto w-3/5 space-y-4">
+        <div className="h-auto w-3/5 space-y-6">
           <h1 className="my-4 text-3xl font-bold text-vibrant-green-100">
             Bookly
           </h1>
@@ -19,7 +19,7 @@ export default function Login() {
             Bem-vindo de volta! Por favor, escolha o método de login
           </p>
 
-          <div className="grid w-full grid-cols-2 gap-2">
+          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-4">
             <button
               onClick={() => signIn("google")}
               className="text-title flex items-center justify-center gap-2 rounded-xl border-2 border-background-300 py-4 duration-150 hover:border-vibrant-green-200 hover:bg-background-100"
@@ -36,23 +36,11 @@ export default function Login() {
             </button>
             <button
               onClick={() => signIn("linkedin")}
-              className="text-title col-span-2 flex w-[calc(50%_-_0.5rem)] items-center justify-center gap-2 justify-self-center rounded-xl border-2 border-background-300 py-4 duration-150 hover:border-vibrant-green-200 hover:bg-background-100"
+              className="text-title flex w-full items-center justify-center gap-2 justify-self-center rounded-xl border-2 border-background-300 py-4 duration-150 hover:border-vibrant-green-200 hover:bg-background-100 lg:col-span-2 lg:w-[calc(50%_-_0.5rem)]"
             >
               <LinkedinLogo color="#0A78B5" weight="duotone" size={26} />
               <span>Linkedin</span>
             </button>
-          </div>
-
-          <div className="border-t-[1px] border-background-300" />
-
-          <div className="flex items-center justify-center">
-            <span className="text-slate-500">Não tem uma conta?</span>
-            <Link
-              href="/register"
-              className="text-primary ml-1 hover:text-vibrant-green-100"
-            >
-              Crie uma conta!
-            </Link>
           </div>
         </div>
       </div>

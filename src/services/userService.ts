@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getWeekDays } from "@/utils/get-week-days";
 
 interface UserProps {
   name?: string;
@@ -17,7 +17,6 @@ interface UserProps {
 interface ServiceResponse<T> {
   type: "success" | "error";
   data?: T;
-  error?: string;
   message?: string;
 }
 
@@ -35,6 +34,7 @@ export async function getUserById(id: string) {
       birth: true,
       phone: true,
       gender: true,
+      favorites: true,
     },
   });
 }
@@ -105,7 +105,7 @@ export async function updateUser(
 
     return {
       type: "error",
-      error: error.message || "Erro ao atualizar o usuário",
+      message: "Erro ao atualizar o usuário",
     };
   }
 }
@@ -129,10 +129,22 @@ export async function updateUserRole(
           userId: id,
         },
       });
+
+      await Promise.all(
+        Array.from({ length: 6 }).map(async (_, index) => {
+          await prisma.schedule.create({
+            data: {
+              profileId: newProfessional.id,
+              weekDay: index,
+            },
+          });
+        }),
+      );
     }
 
     return {
       type: "success",
+      message: "Sucesso ao atualizar role do usuário!",
       data: updatedUserRole,
     };
   } catch (error: any) {
@@ -140,7 +152,35 @@ export async function updateUserRole(
 
     return {
       type: "error",
-      error: error.message || "Error on user update",
+      message: "Error ao atualizar usuário",
+    };
+  }
+}
+
+// Update user favorites
+export async function updateUserFavorites(
+  id: string,
+  favorites: string,
+): Promise<ServiceResponse<any>> {
+  try {
+    const updateUserFavorites = await prisma.user.update({
+      where: { id },
+      data: {
+        favorites,
+      },
+    });
+
+    return {
+      type: "success",
+      message: "Favoritos salvos com sucesso!",
+      data: updateUserFavorites,
+    };
+  } catch (error) {
+    console.error("Error on favorites user field:", error);
+
+    return {
+      type: "error",
+      message: "Erro ao atualizar usuário",
     };
   }
 }

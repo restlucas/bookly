@@ -5,7 +5,7 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   value?: string;
   type?: string;
-  onChange: (e) => void;
+  onChange?: (e) => void;
 }
 
 export function TextInput({

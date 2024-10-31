@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-import { cookies } from "next/headers";
-
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
@@ -37,36 +35,19 @@ export const authOptions: NextAuthOptions = {
         });
 
         token.accessToken = account.access_token;
-        token.user_id = userInfo.id;
-        token.role = userInfo.role;
-        // token = {
-        //   ...token,
-        //   role: userInfo.role,
-        //   phone: userInfo.phone,
-        //   birth: userInfo.birth,
-        //   gender: userInfo.gender,
-        //   address: userInfo.address,
-        // };
+        token.user_id = userInfo?.id;
+        token.role = userInfo?.role;
       }
+
       return token;
     },
 
     async session({ session, user, token }) {
-      if (user) {
-        session.user.id = user.id;
-      }
-
-      session.user.id = token.user_id;
-      session.user.role = token.role;
-      // session.user = {
-      //   ...session.user,
-      //   role: token.role,
-      //   id: token.user_id,
-      //   phone: token.phone,
-      //   birth: token.birth,
-      //   gender: token.gender,
-      //   address: token.address,
-      // };
+      session.user = {
+        ...session.user,
+        id: token.user_id,
+        role: token.role,
+      };
 
       return session;
     },

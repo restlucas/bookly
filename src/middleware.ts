@@ -5,8 +5,10 @@ const protectedRoutes = [
   "/scheduling",
   "/dashboard",
   "/profile",
-  "professionals",
-  "/panel",
+  "/schedule",
+  "/professionals",
+  "/favorites",
+  "/account",
 ];
 
 export async function middleware(req: any) {

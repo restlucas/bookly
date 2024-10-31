@@ -1,7 +1,7 @@
 export const serviceType = [
   { id: "in-person", name: "Presencial" },
   { id: "online", name: "Online" },
-  { id: "both", name: "Presencial e Online" },
+  { id: "in-person_online", name: "Presencial e Online" },
 ];
 
 export const spokenLanguages = [
@@ -11,7 +11,7 @@ export const spokenLanguages = [
 ];
 
 export const usersType = [
-  { id: "client", name: "Cliente" },
+  { id: "personal", name: "Pessoal" },
   { id: "professional", name: "Profissional" },
 ];
 
@@ -27,12 +27,24 @@ export const menus = [
     id: "dashboard",
     name: "Dashboard",
     href: "/dashboard",
-    access: ["client", "professional"],
+    access: ["personal", "professional"],
   },
   {
     id: "professionals",
     name: "Profissionais",
     href: "/professionals",
-    access: ["client", "professional"],
+    access: ["personal", "professional"],
+  },
+  {
+    id: "scheduling",
+    name: "Agendamentos",
+    href: "/scheduling",
+    access: ["personal", "professional"],
+  },
+  {
+    id: "schedule",
+    name: "Programação",
+    href: "/schedule",
+    access: ["professional"],
   },
 ];

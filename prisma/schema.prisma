@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -24,8 +24,8 @@ model Account {
   type               String    @map("provider_type")  
   provider           String    @map("provider_id")  
   providerAccountId  String    @map("provider_account_id")
-  refreshToken       String?
-  accessToken        String?   @map("access_token")
+  refreshToken       String?   @db.Text
+  accessToken        String?   @db.Text @map("access_token")
   accessTokenExpires DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
@@ -48,8 +48,9 @@ model Session {
 model Category {
   id          String          @id @default(cuid())
   name        String      
-  profiles    Profile[]
+  createdAt   DateTime  @default(now())
 
+  profiles    Profile[]
   professions Profession[]
 }
 
@@ -57,9 +58,11 @@ model Profession {
   id          String       @id @default(cuid())
   name        String    
   categoryId  String
+  createdAt   DateTime  @default(now())
+
   profiles    Profile[]
 
-  category   Category  @relation(fields: [categoryId], references: [id])
+  category    Category  @relation(fields: [categoryId], references: [id])
 }
 
 
@@ -88,34 +91,39 @@ model User {
 }
 
 model Profile {
-  id                   String @id @default(cuid())
-  userId               String @unique
-  professionId         String?
-  professionCategoryId String?
-  bio                  String?
-  serviceType          String?
-  serviceValue         String?
-  tags                 String?
+  id                      String @id @default(cuid())
+  userId                  String @unique
+  professionId            String?
+  professionCategoryId    String?
+  bio                     String?
+  serviceType             String?
+  serviceValue            String?
+  serviceTimeInMinutes    Int @default(30)
+  tags                    String?
+  createdAt               DateTime @default(now())
   
-  reviews             Review[]
-  professionalScheduling ProfessionalScheduling?
-  scheduling   Scheduling[]
+  reviews                 Review[]
+  professionalSchedule    Schedule[]
+  professionalAbsence     Absence[]
+  scheduling              Scheduling[]
 
-  user    User    @relation(fields: [userId], references: [id])
-  profession   Profession?    @relation(fields: [professionId], references: [id])
-  professionCategory   Category?    @relation(fields: [professionCategoryId], references: [id])
+
+  user                    User    @relation(fields: [userId], references: [id])
+  profession              Profession?    @relation(fields: [professionId], references: [id])
+  professionCategory      Category?    @relation(fields: [professionCategoryId], references: [id])
 }
 
-model ProfessionalScheduling {
-  id                 String @id @default(cuid())
-  profileId     String @unique
-  weekDay            Int
-  timeStartInMinutes Int
-  timeEndInMinutes   Int
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+model Schedule {
+  id                  String @id @default(cuid())
+  profileId           String
+  weekDay             Int
+  enabled             Boolean @default(false)
+  timeStartInMinutes  Int @default(480)
+  timeEndInMinutes    Int @default(1080)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  Profile    Profile    @relation(fields: [profileId], references: [id])
+  profile             Profile    @relation(fields: [profileId], references: [id])
 
 }
 
@@ -128,20 +136,52 @@ model Review {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  user    User    @relation(fields: [userId], references: [id])
-  profile    Profile    @relation(fields: [profileId], references: [id])
+  user                User    @relation(fields: [userId], references: [id])
+  profile             Profile    @relation(fields: [profileId], references: [id])
 }
 
 model Scheduling {
-  id             String   @id @default(uuid())
-  date           DateTime
-  userId         String @unique
-  ProfileId      String @unique
-  observations   String?
-  created_at     DateTime @default(now())
+  id              String   @id @default(cuid())
+  date            DateTime
+  userId          String
+  profileId       String
+  statusId        String
+  observations    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id])
-  Profile    Profile    @relation(fields: [ProfileId], references: [id])
+  user            User    @relation(fields: [userId], references: [id])
+  profile         Profile    @relation(fields: [profileId], references: [id])
+  status          Status    @relation(fields: [statusId], references: [id])
 }
 
+model Status {
+  id            String @id @default(cuid())
+  name          String
+  createdAt     DateTime @default(now())
 
+  scheduling    Scheduling[]
+}
+
+model Absence {
+  id                  String @id @default(cuid())
+  profileId           String
+  absenceOptionId     String
+  startTime           String
+  endTime             String
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  profile             Profile    @relation(fields: [profileId], references: [id])
+  absenceOption       AbsenceOptions    @relation(fields: [absenceOptionId], references: [id])
+}
+
+model AbsenceOptions {
+  id            String @id @default(cuid())
+  name          String
+  description   String
+  createdAt     DateTime @default(now())
+
+  absence       Absence[]
+}

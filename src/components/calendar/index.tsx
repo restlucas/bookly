@@ -1,13 +1,22 @@
 "use client";
 
+import { getCalendar } from "@/utils/calendar";
 import { getWeekDays } from "@/utils/get-week-days";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import {
+  endOfMonth,
+  getDate,
+  getDay,
+  getDaysInMonth,
+  getMonth,
+  getYear,
+} from "date-fns";
 import { useState } from "react";
 
-export function Calendar() {
-  const shortWeekDays = getWeekDays({ short: true });
-
+export function Calendar(schedule: any) {
   const [isSelectedDate, setIsSelectedDate] = useState(false);
+  const shortWeekDays = getWeekDays({ short: true });
+  const calendarWeeks = getCalendar();
 
   function handleSelectDate() {
     setIsSelectedDate(true);
@@ -42,7 +51,26 @@ export function Calendar() {
             </tr>
           </thead>
           <tbody className="before:block before:leading-3 before:text-transparent before:content-['.']">
-            <tr>
+            {calendarWeeks.map((week, index) => {
+              return (
+                <tr key={index} className="box-border">
+                  {week.map((day, index) => {
+                    return (
+                      <td key={index} className="box-border">
+                        <button
+                          onClick={handleSelectDate}
+                          disabled={day.disabled}
+                          className={`aspect-square w-full cursor-pointer rounded-sm text-center text-sm ${day.disabled ? "disabled:text-slate-700" : "hover:bg-background-300/60"}`}
+                        >
+                          {getDate(new Date(day.date))}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+            {/* <tr>
               {Array.from({ length: 7 }).map((_, index) => {
                 return (
                   <td key={index} className="box-border">
@@ -91,7 +119,7 @@ export function Calendar() {
                   </td>
                 );
               })}
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
@@ -101,7 +129,7 @@ export function Calendar() {
         className={`border-l-[1px] border-background-300 ${!isSelectedDate ? "flex items-center justify-center" : "pl-6"}`}
       >
         {!isSelectedDate ? (
-          <h4 className="text-center text-slate-400/90">
+          <h4 className="w-4/5 text-center text-sm text-slate-400/90">
             Selecione uma data para ver os horários disponíveis 😊
           </h4>
         ) : (

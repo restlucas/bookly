@@ -12,3 +12,17 @@ body {
     text-wrap: balance;
   }
 }
+
+#lineClamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2; /* Ajuste o número de linhas conforme necessário */
+}
+
+#lineClampTwo {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 4; /* Ajuste o número de linhas conforme necessário */
+}
