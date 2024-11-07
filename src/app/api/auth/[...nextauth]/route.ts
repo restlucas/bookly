@@ -1,3 +1,4 @@
+import NextAuth from 'next-auth/next'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { PrismaClient } from '@prisma/client'
 import GoogleProvider from 'next-auth/providers/google'
@@ -10,7 +11,7 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
   },
   pages: {
     signIn: '/login',
@@ -22,19 +23,16 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    // Callback para redirecionamento
     async redirect({ url, baseUrl }) {
       if (url === baseUrl || url.startsWith(baseUrl)) {
         return `${baseUrl}/dashboard`
       }
       return url
     },
-
-    // Callback para JWT
     async jwt({ token, user, account }) {
       if (account) {
         const userInfo = await prisma.user.findUnique({
-          where: { email: user?.email ?? '' }, // Garantindo que user.email seja sempre uma string
+          where: { email: user?.email ?? '' },
           select: {
             id: true,
             userType: {
@@ -49,11 +47,8 @@ export const authOptions = {
         token.user_id = userInfo?.id
         token.role = userInfo?.userType?.slug
       }
-
       return token
     },
-
-    // Callback para sessão
     async session({ session, token }) {
       if (token.user_id) {
         session.user = {
@@ -62,23 +57,20 @@ export const authOptions = {
           role: token.role,
         }
       }
-
       return session
     },
-
-    // Callback para signIn
     async signIn({ user, account }) {
       if (account.provider === 'google') {
         let existingUser = await prisma.user.findUnique({
           where: {
-            email: user?.email ?? '', // Garantindo que user.email seja sempre uma string
+            email: user?.email ?? '',
           },
         })
 
         if (!existingUser) {
           existingUser = await prisma.user.create({
             data: {
-              email: user?.email ?? '', // Garantindo que user.email seja sempre uma string
+              email: user?.email ?? '',
               name: user?.name ?? '',
               image: user?.image ?? '',
             },
@@ -100,8 +92,7 @@ export const authOptions = {
   },
 }
 
-// Handler do NextAuth configurado com as opções
-const handler = authOptions
+// Use NextAuth com as opções de autenticação e exporte GET e POST
+const handler = NextAuth(authOptions)
 
-// Exportando os manipuladores GET e POST
 export { handler as GET, handler as POST }
