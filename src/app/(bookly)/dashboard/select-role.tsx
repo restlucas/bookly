@@ -31,7 +31,7 @@ export function SelectRole() {
     fetchUserTypes()
   }, [])
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { AbsenceFormData } from '@/utils/validators'
 
 // Get absence by userId
 export async function getAbsence(userId: string) {
@@ -48,7 +49,7 @@ export async function getOptions() {
 }
 
 // Create absence
-export async function createAbsence(data: any) {
+export async function createAbsence(data: AbsenceFormData) {
   try {
     const { id: professionalId } = await prisma.professional.findUnique({
       where: {
@@ -57,6 +58,7 @@ export async function createAbsence(data: any) {
     })
 
     const { userId, ...newData } = data
+    console.log(userId)
 
     const formatedData = { ...newData, professionalId }
 

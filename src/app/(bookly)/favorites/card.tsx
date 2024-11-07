@@ -2,7 +2,22 @@ import { ArrowSquareUpRight } from '@phosphor-icons/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export function Card({ professional }: any) {
+interface ProfessionalProps {
+  professional: {
+    id: string
+    address: string
+    image: string
+    name: string
+    professional: {
+      bio?: string
+      occupation: {
+        name: string
+      }
+    }
+  }
+}
+
+export function Card({ professional }: ProfessionalProps) {
   return (
     <Link
       href={`/professionals/${professional.id}`}

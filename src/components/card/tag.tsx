@@ -1,4 +1,4 @@
-export function TagCard({ key, tag }: any) {
+export function TagCard({ key, tag }: { key: string; tag: string }) {
   return (
     <div
       key={key}

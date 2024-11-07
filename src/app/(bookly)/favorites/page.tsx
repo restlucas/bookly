@@ -1,37 +1,37 @@
-"use client";
+'use client'
 
-import { UserContext } from "@/contexts/UserContext";
-import { getUserFavorites } from "@/services/userService";
-import { useContext, useEffect, useState } from "react";
-import { Card } from "./card";
+import { UserContext } from '@/contexts/UserContext'
+import { getUserFavorites } from '@/services/userService'
+import { useContext, useEffect, useState } from 'react'
+import { Card } from './card'
 
 interface FavoriteProps {
-  id: string;
-  address: string;
-  image: string;
-  name: string;
+  id: string
+  address: string
+  image: string
+  name: string
   professional: {
-    bio?: string;
+    bio?: string
     occupation: {
-      name: string;
-    };
-  };
+      name: string
+    }
+  }
 }
 
 export default function Favorites() {
-  const { user } = useContext(UserContext);
-  const [favorites, setFavorites] = useState<FavoriteProps[]>();
+  const { user } = useContext(UserContext)
+  const [favorites, setFavorites] = useState<FavoriteProps[]>()
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      const response = await getUserFavorites(user.id);
-      setFavorites(response);
-    };
+      const response = await getUserFavorites(user.id)
+      setFavorites(response)
+    }
 
     if (user.id) {
-      fetchFavorites();
+      fetchFavorites()
     }
-  }, [user]);
+  }, [user])
   return (
     <section className="mb-8 flex flex-col gap-6">
       <div className="w-full rounded-md bg-background-200 p-8">
@@ -40,8 +40,8 @@ export default function Favorites() {
         </h2>
         <div className="grid-cols-auto-fill grid grid-cols-1 gap-4 xl:grid-cols-4">
           {favorites
-            ? favorites.map((favorited, index) => {
-                return <Card key={index} professional={favorited} />;
+            ? favorites.map((professional, index) => {
+                return <Card key={index} professional={professional} />
               })
             : Array.from({ length: 4 }).map((_, index) => {
                 return (
@@ -49,10 +49,10 @@ export default function Favorites() {
                     key={index}
                     className="h-40 w-full animate-pulse cursor-pointer rounded-md border-2 border-slate-700 bg-background-300 p-4 shadow-md"
                   />
-                );
+                )
               })}
         </div>
       </div>
     </section>
-  );
+  )
 }

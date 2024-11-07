@@ -4,15 +4,12 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   name: string
   value?: string
-  type?: string
   onChange: (e) => void
 }
 
 export function DateInput({
-  label,
   name,
   value = '',
-  type = 'text',
   onChange,
   ...rest
 }: TextInputProps) {

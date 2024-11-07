@@ -1,30 +1,30 @@
-"use client";
+'use client'
 
-import SubmitButton from "@/components/button/submit";
-import { CheckboxInput } from "@/components/input/checkbox";
-import { SelectInput } from "@/components/input/select";
-import { TextInput } from "@/components/input/text";
-import { UserContext } from "@/contexts/UserContext";
-import { updateUser } from "@/services/userService";
-import { gendersType } from "@/utils/common-data";
-import { formatPhone } from "@/utils/format-functions";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { AccountFormData, validateAccountForm } from "@/utils/validators";
-import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import SubmitButton from '@/components/button/submit'
+import { CheckboxInput } from '@/components/input/checkbox'
+import { SelectInput } from '@/components/input/select'
+import { TextInput } from '@/components/input/text'
+import { UserContext } from '@/contexts/UserContext'
+import { updateUser } from '@/services/userService'
+import { gendersType } from '@/utils/common-data'
+import { formatPhone } from '@/utils/format-functions'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { AccountFormData, validateAccountForm } from '@/utils/validators'
+import Image from 'next/image'
+import { useContext, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
 
 export function AccountForm() {
-  const { user } = useContext(UserContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useContext(UserContext)
+  const [isLoading, setIsLoading] = useState(false)
   const [accountForm, setAccountForm] = useState<AccountFormData>({
-    name: "",
-    image: "",
-    phone: "",
-    birth: "",
-    gender: "",
-    address: "",
-  });
+    name: '',
+    image: '',
+    phone: '',
+    birth: '',
+    gender: '',
+    address: '',
+  })
 
   useEffect(() => {
     if (user) {
@@ -35,37 +35,37 @@ export function AccountForm() {
         birth: user.birth,
         gender: user.gender,
         address: user.address,
-      });
+      })
     }
-  }, [user]);
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
-    const formattedValue = name === "phone" ? formatPhone(value) : value;
+    const formattedValue = name === 'phone' ? formatPhone(value) : value
 
     setAccountForm((prevState) => ({
       ...prevState,
       [name]: formattedValue,
-    }));
-  };
+    }))
+  }
 
-  async function handleSubmit(e: any) {
-    e.preventDefault();
-    const validationErrors = validateAccountForm(accountForm);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const validationErrors = validateAccountForm(accountForm)
 
     if (Object.keys(validationErrors).length > 0) {
-      Object.values(validationErrors).map((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+      Object.values(validationErrors).forEach((error) => {
+        toast.error(error, toastDefaultValues)
+      })
     } else {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await updateUser(user.id, accountForm);
-      toast[response.type](response.message, toastDefaultValues);
-      setIsLoading(false);
+      const response = await updateUser(user.id, accountForm)
+      toast[response.type](response.message, toastDefaultValues)
+      setIsLoading(false)
     }
   }
 
@@ -81,8 +81,8 @@ export function AccountForm() {
                   <Image
                     src={
                       accountForm.image
-                        ? accountForm.image.replace("s96", "s500")
-                        : ""
+                        ? accountForm.image.replace('s96', 's500')
+                        : ''
                     }
                     alt="Profile pic"
                     fill
@@ -103,7 +103,7 @@ export function AccountForm() {
                     <TextInput
                       label="Nome completo"
                       name="name"
-                      value={accountForm.name || ""}
+                      value={accountForm.name || ''}
                       onChange={handleChange}
                     />
                     <TextInput
@@ -116,7 +116,7 @@ export function AccountForm() {
                     <TextInput
                       label="Número de telefone"
                       name="phone"
-                      value={accountForm.phone || ""}
+                      value={accountForm.phone || ''}
                       placeholder="Não preenchido"
                       maxLength={15}
                       onChange={handleChange}
@@ -125,21 +125,21 @@ export function AccountForm() {
                       label="Data de nascimento"
                       name="birth"
                       type="date"
-                      value={accountForm.birth || ""}
+                      value={accountForm.birth || ''}
                       placeholder="11/11/2000"
                       onChange={handleChange}
                     />
                     <SelectInput
                       label="Gênero"
                       name="gender"
-                      value={accountForm.gender || ""}
+                      value={accountForm.gender || ''}
                       options={gendersType}
                       onChange={handleChange}
                     />
                     <TextInput
                       label="Endereço"
                       name="address"
-                      value={accountForm.address || ""}
+                      value={accountForm.address || ''}
                       placeholder="Não preenchido"
                       onChange={handleChange}
                     />
@@ -213,5 +213,5 @@ export function AccountForm() {
       </form>
       <ToastContainer closeOnClick theme="dark" />
     </>
-  );
+  )
 }

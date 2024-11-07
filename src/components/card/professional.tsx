@@ -1,13 +1,30 @@
 'use client'
 
-import { BookmarkSimple, MapPin } from '@phosphor-icons/react'
+import { MapPin } from '@phosphor-icons/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FavoriteButton } from '../button/favorite'
 import { useContext } from 'react'
 import { UserContext } from '@/contexts/UserContext'
 
-export function ProfessionalCard({ professional }: any) {
+interface ProfessionalCardProps {
+  key?: string
+  professional: {
+    name: string
+    image: string
+    professional: {
+      occupation: {
+        name: string
+      }
+      bio: string
+      serviceValue: string
+    }
+    address: string
+    id: string
+  }
+}
+
+export function ProfessionalCard({ professional }: ProfessionalCardProps) {
   const { user } = useContext(UserContext)
 
   return (
@@ -45,7 +62,6 @@ export function ProfessionalCard({ professional }: any) {
           <FavoriteButton
             professionalId={professional.id}
             marked={user.favorites && user.favorites.includes(professional.id)}
-            background={false}
           />
         </div>
 

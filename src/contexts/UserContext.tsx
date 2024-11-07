@@ -53,7 +53,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     }
 
     fetchUser()
-  }, [session])
+  }, [status, session])
 
   function updateRole(role: string) {
     setUser((prevState) => ({

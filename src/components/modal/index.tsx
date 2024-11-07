@@ -28,7 +28,7 @@ export default function Modal({
       document.addEventListener('keydown', handleEscape)
       return () => document.removeEventListener('keydown', handleEscape)
     }
-  }, [onClose])
+  }, [closable, onClose])
 
   if (!isOpen) return null
 

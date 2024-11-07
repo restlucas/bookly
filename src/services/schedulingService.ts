@@ -1,12 +1,25 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { SchedulingFormData } from '@/utils/validators'
 import dayjs from 'dayjs'
 
 interface ServiceResponse<T> {
   type: 'success' | 'error'
   data?: T
   message?: string
+}
+
+interface SchedulingData {
+  id: string
+  userId: string
+  serviceTypeId: string
+  createdAt: Date
+  date: Date
+  professionalId: string
+  statusId: string
+  observations: string | null
+  updatedAt: Date
 }
 
 export async function getServiceType() {
@@ -17,15 +30,15 @@ export async function getServiceType() {
 
 export async function createScheduling(
   userId: string,
-  schedulingData: any,
-): Promise<ServiceResponse<any>> {
+  schedulingData: SchedulingFormData,
+): Promise<ServiceResponse<SchedulingData>> {
   try {
     const { userProfessionalId, date, hour, serviceTypeSlug } = schedulingData
 
     // Get professional id
     const { id: professionalId } = await prisma.professional.findFirstOrThrow({
       where: {
-        userId: userProfessionalId,
+        userId: String(userProfessionalId),
       },
       select: {
         id: true,
@@ -75,12 +88,16 @@ export async function createScheduling(
       message: 'Sucesso ao criar agendamento!',
       data: response,
     }
-  } catch (error: any) {
-    console.error('Erro ao criar agendamento:', error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Erro ao criar agendamento:', error)
 
-    return {
-      type: 'error',
-      message: 'Erro ao criar agendamento',
+      return {
+        type: 'error',
+        message: 'Erro ao criar agendamento',
+      }
+    } else {
+      console.error('Erro desconhecido', error)
     }
   }
 }
@@ -88,7 +105,7 @@ export async function createScheduling(
 export async function updateSchedulingStatus(
   operation: { name: string; title: string; nextStep: string },
   schedulingId: string,
-): Promise<ServiceResponse<any>> {
+): Promise<ServiceResponse<SchedulingData>> {
   try {
     const { id: statusId } = await prisma.status.findFirst({
       where: {
@@ -110,12 +127,16 @@ export async function updateSchedulingStatus(
       message: 'Status alterado com sucesso!',
       data: response,
     }
-  } catch (error: any) {
-    console.error('Erro ao atualizar status:', error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Erro ao atualizar status:', error)
 
-    return {
-      type: 'error',
-      message: 'Erro ao atualizar status',
+      return {
+        type: 'error',
+        message: 'Erro ao atualizar status',
+      }
+    } else {
+      console.error('Erro desconhecido', error)
     }
   }
 }
@@ -123,7 +144,7 @@ export async function updateSchedulingStatus(
 export async function updateSchedulingObservations(
   comment: string,
   schedulingId: string,
-): Promise<ServiceResponse<any>> {
+): Promise<ServiceResponse<SchedulingData>> {
   try {
     const response = await prisma.scheduling.update({
       where: {
@@ -139,12 +160,16 @@ export async function updateSchedulingObservations(
       message: 'Comentário salvo com sucesso!',
       data: response,
     }
-  } catch (error: any) {
-    console.error('Erro ao salvar comentário:', error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Erro ao salvar comentário:', error)
 
-    return {
-      type: 'error',
-      message: 'Erro ao salvar comentário',
+      return {
+        type: 'error',
+        message: 'Erro ao salvar comentário',
+      }
+    } else {
+      console.error('Erro desconhecido', error)
     }
   }
 }

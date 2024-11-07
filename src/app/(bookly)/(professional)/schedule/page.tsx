@@ -1,135 +1,146 @@
-"use client";
+'use client'
 
-import { getWeekDays } from "@/utils/get-week-days";
-import { XSquare } from "@phosphor-icons/react";
-import { useContext, useEffect, useState } from "react";
-import { TextInput } from "@/components/input/text";
-import { SelectInput } from "@/components/input/select";
-import { DateInput } from "@/components/input/date";
-import SubmitButton from "@/components/button/submit";
-import { getSchedule, updateSchedule } from "@/services/professionalService";
-import { UserContext } from "@/contexts/UserContext";
+import { getWeekDays } from '@/utils/get-week-days'
+import { XSquare } from '@phosphor-icons/react'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { TextInput } from '@/components/input/text'
+import { SelectInput } from '@/components/input/select'
+import { DateInput } from '@/components/input/date'
+import SubmitButton from '@/components/button/submit'
+import { getSchedule, updateSchedule } from '@/services/professionalService'
+import { UserContext } from '@/contexts/UserContext'
 import {
   createAbsence,
   deleteAbsence,
   getAbsence,
   getOptions,
-} from "@/services/absenceService";
-import dayjs from "dayjs";
-import { toast, ToastContainer } from "react-toastify";
-import toastDefaultValues from "@/utils/toast-default-values";
+} from '@/services/absenceService'
+import { toast, ToastContainer } from 'react-toastify'
+import toastDefaultValues from '@/utils/toast-default-values'
 import {
   AbsenceFormData,
   ScheduleFormData,
   validateAbsenceForm,
   validateScheduleForm,
-} from "@/utils/validators";
+} from '@/utils/validators'
 
 interface AbsenceOptionsProps {
-  id: string;
-  name: string;
-  description: string;
+  id: string
+  name: string
+  description?: string
+  slug?: string
 }
 
 interface AbsenceListProps {
-  id: string;
-  professionalId: string;
-  startTime: string;
-  endTime: string;
+  id: string
+  professionalId: string
+  startTime: string
+  endTime: string
   absenceOption: {
-    name: string;
-    description: string;
-  };
+    name: string
+    description: string
+  }
+}
+
+interface Interval {
+  id: string
+  timeStartInMinutes: number
+  timeEndInMinutes: number
+  enabled: boolean
+  weekDay: number // Adicionando weekDay
 }
 
 export default function ProfessionalSchedule() {
-  const { user } = useContext(UserContext);
-  const weekDays = getWeekDays({ short: false });
+  const { user } = useContext(UserContext)
+  const weekDays = getWeekDays({ short: false })
 
-  const [absenceOptions, setAbsenceOptions] = useState<AbsenceOptionsProps[]>();
-  const [absenceList, setAbsenceList] = useState<AbsenceListProps[]>();
+  const [absenceOptions, setAbsenceOptions] = useState<AbsenceOptionsProps[]>()
+  const [absenceList, setAbsenceList] = useState<AbsenceListProps[]>()
 
   const [isLoading, setIsLoading] = useState({
     schedule: false,
     absence: false,
     absenceList: true,
-  });
-  const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>();
+  })
+  const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>()
   const [absenceForm, setAbsenceForm] = useState<AbsenceFormData>({
-    userId: "",
-    absenceOptionId: "",
-    startTime: "",
-    endTime: "",
-  });
+    userId: '',
+    absenceOptionId: '',
+    startTime: '',
+    endTime: '',
+  })
+
+  const formatTime = (totalMinutes: number) => {
+    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0')
+    const minutes = String(totalMinutes % 60).padStart(2, '0')
+    return `${hours}:${minutes}`
+  }
+
+  const getProfessionalSchedule = useCallback(
+    async (userId: string) => {
+      const response = await getSchedule(userId)
+
+      response.intervals = weekDays.map((weekDayName, index) => ({
+        ...response.intervals[index],
+        name: weekDayName,
+      }))
+
+      setScheduleForm(response)
+    },
+    [weekDays],
+  )
+
+  const getAbsenceOptions = useCallback(async () => {
+    const response = await getOptions()
+    setAbsenceOptions(response)
+  }, [])
+
+  const getAbsences = useCallback(async (userId: string) => {
+    const response = await getAbsence(userId)
+    setAbsenceList(response)
+  }, [])
 
   useEffect(() => {
     if (user.id) {
-      getProfessionalSchedule(user.id);
-      getAbsenceOptions();
-      getAbsences(user.id);
+      getProfessionalSchedule(user.id)
+      getAbsenceOptions()
+      getAbsences(user.id)
 
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: false,
-      }));
+      }))
 
       setAbsenceForm((prevState) => ({
         ...prevState,
         userId: user.id,
-      }));
+      }))
     }
-  }, [user]);
-
-  const formatTime = (totalMinutes: number) => {
-    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-    const minutes = String(totalMinutes % 60).padStart(2, "0");
-    return `${hours}:${minutes}`;
-  };
-
-  async function getProfessionalSchedule(userId: string) {
-    const response = await getSchedule(userId);
-
-    response.intervals = weekDays.map((weekDayName, index) => ({
-      ...response.intervals[index],
-      name: weekDayName,
-    }));
-
-    setScheduleForm(response);
-  }
-
-  async function getAbsenceOptions() {
-    const response = await getOptions();
-    setAbsenceOptions(response);
-  }
-
-  async function getAbsences(userId: string) {
-    const response = await getAbsence(userId);
-    setAbsenceList(response);
-  }
+  }, [user, getProfessionalSchedule, getAbsenceOptions, getAbsences])
 
   async function removeAbsence(absenceId: string, absenceName: string) {
     const optionResponse = confirm(
       `Deseja cancelar a ausência por motivo de: ${absenceName}?`,
-    );
+    )
 
     if (optionResponse) {
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: true,
-      }));
+      }))
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await deleteAbsence(user.id, absenceId);
+      await deleteAbsence(user.id, absenceId)
 
       setAbsenceList((prevState) =>
         prevState.filter((item) => item.id !== absenceId),
-      );
+      )
 
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: false,
-      }));
+      }))
     }
   }
 
@@ -138,100 +149,105 @@ export default function ProfessionalSchedule() {
     intervalId: string,
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
-    const { name, value, checked } = event.target;
+    const { name, value, checked } = event.target
 
-    if (form === "scheduleForm") {
-      setScheduleForm((prevState: any) => {
-        const updateInterval = (updateFn) =>
+    if (form === 'scheduleForm') {
+      setScheduleForm((prevState: ScheduleFormData) => {
+        const updateInterval = (updateFn: (interval: Interval) => Interval) =>
           prevState.intervals.map((interval) =>
             interval.id === intervalId ? updateFn(interval) : interval,
-          );
+          )
 
-        const actions = {
-          timeStartInMinutes: () =>
-            updateInterval((interval) => ({
+        const actions: Record<string, () => ScheduleFormData> = {
+          timeStartInMinutes: () => ({
+            ...prevState,
+            intervals: updateInterval((interval) => ({
               ...interval,
               timeStartInMinutes:
-                parseInt(value.split(":")[0], 10) * 60 +
-                parseInt(value.split(":")[1], 10),
+                parseInt(value.split(':')[0], 10) * 60 +
+                parseInt(value.split(':')[1], 10),
             })),
-          timeEndInMinutes: () =>
-            updateInterval((interval) => ({
+          }),
+          timeEndInMinutes: () => ({
+            ...prevState,
+            intervals: updateInterval((interval) => ({
               ...interval,
               timeEndInMinutes:
-                parseInt(value.split(":")[0], 10) * 60 +
-                parseInt(value.split(":")[1], 10),
+                parseInt(value.split(':')[0], 10) * 60 +
+                parseInt(value.split(':')[1], 10),
             })),
-          enabled: () =>
-            updateInterval((interval) => ({ ...interval, enabled: checked })),
+          }),
+          enabled: () => ({
+            ...prevState,
+            intervals: updateInterval((interval) => ({
+              ...interval,
+              enabled: checked,
+            })),
+          }),
           default: () => ({ ...prevState, serviceTime: value }),
-        };
+        }
 
-        return {
-          ...prevState,
-          intervals: name in actions ? actions[name]() : prevState.intervals,
-          ...(name === "serviceTime" && { serviceTime: value }),
-        };
-      });
+        return actions[name] ? actions[name]() : prevState
+      })
     } else {
-      setAbsenceForm((prevState) => ({
+      setAbsenceForm((prevState: AbsenceFormData) => ({
         ...prevState,
         [name]: value,
-      }));
+      }))
     }
   }
 
-  async function handleSubmitSchedule(e: any) {
-    e.preventDefault();
-    const validationErrors = validateScheduleForm(scheduleForm);
+  async function handleSubmitSchedule(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const validationErrors = validateScheduleForm(scheduleForm)
 
     if (Object.keys(validationErrors).length > 0) {
-      Object.values(validationErrors).map((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+      Object.values(validationErrors).forEach((error) => {
+        toast.error(error, toastDefaultValues)
+      })
     } else {
       setIsLoading((prevState) => ({
         ...prevState,
         schedule: true,
-      }));
+      }))
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await updateSchedule(user.id, scheduleForm);
+      const response = await updateSchedule(user.id, scheduleForm)
 
-      toast[response.type](response.message, toastDefaultValues);
+      toast[response.type](response.message, toastDefaultValues)
       setIsLoading((prevState) => ({
         ...prevState,
         schedule: false,
-      }));
+      }))
     }
   }
 
-  async function handleSubmitAbsence(e: any) {
-    e.preventDefault();
-    const validationErrors = validateAbsenceForm(absenceForm);
+  async function handleSubmitAbsence(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const validationErrors = validateAbsenceForm(absenceForm)
 
     if (Object.keys(validationErrors).length > 0) {
-      Object.values(validationErrors).map((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+      Object.values(validationErrors).forEach((error) => {
+        toast.error(error, toastDefaultValues)
+      })
     } else {
       setIsLoading((prevState) => ({
         ...prevState,
         absence: true,
-      }));
+      }))
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await createAbsence(absenceForm);
+      const response = await createAbsence(absenceForm)
 
-      setAbsenceList((prevState) => [...prevState, response.data]);
-      toast[response.type](response.message, toastDefaultValues);
+      setAbsenceList((prevState) => [...prevState, response.data])
+      toast[response.type](response.message, toastDefaultValues)
 
       setIsLoading((prevState) => ({
         ...prevState,
         absence: false,
-      }));
+      }))
     }
   }
 
@@ -262,7 +278,7 @@ export default function ProfessionalSchedule() {
                   return (
                     <div
                       key={index}
-                      className={`${index !== 6 ? "border-b-[1px] border-slate-700" : ""} flex items-center justify-between gap-2 px-4 py-3`}
+                      className={`${index !== 6 ? 'border-b-[1px] border-slate-700' : ''} flex items-center justify-between gap-2 px-4 py-3`}
                     >
                       <div className="flex flex-1 items-center justify-start gap-2">
                         <input
@@ -271,19 +287,19 @@ export default function ProfessionalSchedule() {
                           className="h-5 w-5 cursor-pointer rounded"
                           checked={interval.enabled}
                           onChange={(e) =>
-                            handleChange("scheduleForm", interval.id, e)
+                            handleChange('scheduleForm', interval.id, e)
                           }
                         />
 
                         <label
-                          className={`${interval.enabled ? "" : "text-slate-500 line-through"}`}
+                          className={`${interval.enabled ? '' : 'text-slate-500 line-through'}`}
                         >
                           {interval.name}
                         </label>
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <input
-                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          className={`${interval.enabled ? 'cursor-pointer' : 'cursor-not-allowed text-slate-500 line-through'} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
                           type="time"
                           name="timeStartInMinutes"
                           step={600}
@@ -291,23 +307,23 @@ export default function ProfessionalSchedule() {
                           maxLength={5}
                           disabled={!interval.enabled}
                           onChange={(e) =>
-                            handleChange("scheduleForm", interval.id, e)
+                            handleChange('scheduleForm', interval.id, e)
                           }
                         />
                         <input
-                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-[0.3] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          className={`${interval.enabled ? 'cursor-pointer' : 'cursor-not-allowed text-slate-500 line-through'} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-[0.3] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
                           type="time"
                           name="timeEndInMinutes"
                           value={formatTime(interval.timeEndInMinutes)}
                           maxLength={5}
                           disabled={!interval.enabled}
                           onChange={(e) =>
-                            handleChange("scheduleForm", interval.id, e)
+                            handleChange('scheduleForm', interval.id, e)
                           }
                         />
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -321,7 +337,7 @@ export default function ProfessionalSchedule() {
                   name="serviceTime"
                   value={scheduleForm.serviceTime}
                   required
-                  onChange={(e) => handleChange("scheduleForm", "", e)}
+                  onChange={(e) => handleChange('scheduleForm', '', e)}
                 />
               </div>
             </div>
@@ -344,7 +360,7 @@ export default function ProfessionalSchedule() {
                   return (
                     <div
                       key={index}
-                      className={`${index !== 6 ? "border-b-[1px] border-slate-700" : ""} flex h-[65px] items-center justify-between gap-2 px-4 py-3`}
+                      className={`${index !== 6 ? 'border-b-[1px] border-slate-700' : ''} flex h-[65px] items-center justify-between gap-2 px-4 py-3`}
                     >
                       <div className="flex flex-1 items-center justify-start gap-2">
                         <div className="h-5 w-5 rounded" />
@@ -354,7 +370,7 @@ export default function ProfessionalSchedule() {
                         <div className="p-2" />
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -364,7 +380,7 @@ export default function ProfessionalSchedule() {
               </h3>
               <div className="w-1/2">
                 <div className="h-[44px] animate-pulse rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400">
-                  {" "}
+                  {' '}
                 </div>
               </div>
             </div>
@@ -387,7 +403,7 @@ export default function ProfessionalSchedule() {
                   name="absenceOptionId"
                   value={absenceForm.absenceOptionId}
                   options={absenceOptions}
-                  onChange={(e) => handleChange("absenceForm", "", e)}
+                  onChange={(e) => handleChange('absenceForm', '', e)}
                 />
                 <div>
                   <label>Período ausência</label>
@@ -395,13 +411,13 @@ export default function ProfessionalSchedule() {
                     <DateInput
                       name="startTime"
                       value={absenceForm.startTime}
-                      onChange={(e) => handleChange("absenceForm", "", e)}
+                      onChange={(e) => handleChange('absenceForm', '', e)}
                     />
                     <span>até</span>
                     <DateInput
                       name="endTime"
                       value={absenceForm.endTime}
-                      onChange={(e) => handleChange("absenceForm", "", e)}
+                      onChange={(e) => handleChange('absenceForm', '', e)}
                     />
                   </div>
                 </div>
@@ -474,7 +490,7 @@ export default function ProfessionalSchedule() {
                           </button>
                         </td>
                       </tr>
-                    );
+                    )
                   })
                 ) : (
                   <tr>
@@ -490,5 +506,5 @@ export default function ProfessionalSchedule() {
       </div>
       <ToastContainer closeOnClick theme="dark" />
     </section>
-  );
+  )
 }

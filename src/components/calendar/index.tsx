@@ -1,5 +1,6 @@
 'use client'
 
+import { SchedulingDateProps } from '@/app/(bookly)/professionals/[professional_id]/page'
 import {
   getAvailability,
   getBlockedDates,
@@ -30,12 +31,23 @@ interface BlockedDates {
   blockedDates: number[]
 }
 
+interface CalendarProps {
+  professionalId: string
+  schedulingDate: SchedulingDateProps
+  setSchedulingDate: (data: {
+    date: string
+    hour: {
+      time_formatted: string
+      time_in_minutes: number
+    }
+  }) => void
+}
+
 export function Calendar({
   professionalId,
   schedulingDate,
   setSchedulingDate,
-}: any) {
-  const [isSelectedDate, setIsSelectedDate] = useState(false)
+}: CalendarProps) {
   const shortWeekDays = getWeekDays({ short: true })
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)

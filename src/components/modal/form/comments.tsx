@@ -20,7 +20,6 @@ interface ModalProps {
 
 export function CommentsFormModal({
   selectedScheduling,
-  closable = true,
   setShowModal,
 }: ModalProps) {
   const [comments, setComments] = useState<string>()
@@ -32,11 +31,11 @@ export function CommentsFormModal({
     }
   }, [selectedScheduling])
 
-  function handleChange(e: any) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setComments(e.target.value)
   }
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
 

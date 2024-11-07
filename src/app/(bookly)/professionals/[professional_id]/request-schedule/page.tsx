@@ -4,7 +4,7 @@ import { SelectInput } from '@/components/input/select'
 import { TextInput } from '@/components/input/text'
 import { getProfessional } from '@/services/professionalService'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { DateInput } from '@/components/input/date'
 import Image from 'next/image'
 import { UserContext } from '@/contexts/UserContext'
@@ -67,39 +67,41 @@ export default function FinishSchedule() {
     serviceTypeSlug: '',
   })
 
-  useEffect(() => {
-    const fetchServiceType = async () => {
-      const response = await getServiceType()
-      setServiceTypeOptions(response)
+  const fetchServiceType = useCallback(async () => {
+    const response = await getServiceType()
+    setServiceTypeOptions(response)
+  }, [])
+
+  const fetchData = useCallback(async () => {
+    const professionalData = await getProfessional(String(professionalId))
+    const typeOfService = professionalData.professional.serviceType
+
+    if (typeOfService.name === 'Presencial e Online') {
+      setServiceTypeOptions((prevState) =>
+        prevState.filter((option) => option.id !== typeOfService.id),
+      )
+    } else {
+      setServiceTypeOptions((prevState) =>
+        prevState.filter((option) => option.id === typeOfService.id),
+      )
     }
 
-    const fetchData = async () => {
-      const professionalData = await getProfessional(String(professionalId))
-      const typeOfService = professionalData.professional.serviceType
-
-      typeOfService.name === 'Presencial e Online'
-        ? setServiceTypeOptions((prevState) =>
-            prevState.filter((option) => option.id !== typeOfService.id),
-          )
-        : setServiceTypeOptions((prevState) =>
-            prevState.filter((option) => option.id === typeOfService.id),
-          )
-
-      setSelectedProfessional(professionalData)
-    }
-
-    fetchServiceType()
-    fetchData()
+    setSelectedProfessional(professionalData)
   }, [professionalId])
 
-  function handleChange(e: any) {
+  useEffect(() => {
+    fetchServiceType()
+    fetchData()
+  }, [professionalId, fetchServiceType, fetchData])
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setScheduling((prevState) => ({
       ...prevState,
       serviceTypeSlug: e.target.value,
     }))
   }
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
 
@@ -159,7 +161,7 @@ export default function FinishSchedule() {
               <label>Data do agendamento</label>
               <DateInput
                 name="selectedDate"
-                onChange={(e) => handleChange}
+                onChange={() => handleChange}
                 value={params.get('selected_date')}
                 disabled={true}
               />

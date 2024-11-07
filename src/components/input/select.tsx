@@ -1,13 +1,18 @@
-"use client";
+'use client'
 
 interface SelectInputProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
-  name: string;
-  options: any;
-  value: string;
-  usingSlug?: boolean;
-  onChange: (e) => void;
+  label: string
+  name: string
+  options: {
+    id: string
+    slug?: string
+    description?: string
+    name: string
+  }[]
+  value: string
+  usingSlug?: boolean
+  onChange: (e) => void
 }
 
 export function SelectInput({
@@ -39,9 +44,9 @@ export function SelectInput({
               >
                 {option.name}
               </option>
-            );
+            )
           })}
       </select>
     </div>
-  );
+  )
 }

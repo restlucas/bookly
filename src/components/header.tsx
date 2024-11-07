@@ -10,7 +10,7 @@ import { menus } from '@/utils/common-data'
 import { usePathname, useRouter } from 'next/navigation'
 
 export function Header() {
-  const { user, isLoading } = useContext(UserContext)
+  const { user } = useContext(UserContext)
   const router = useRouter()
   const pathname = usePathname()
 

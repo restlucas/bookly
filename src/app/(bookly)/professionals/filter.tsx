@@ -7,7 +7,7 @@ import {
 } from '@/services/professionService'
 import { getServiceType } from '@/services/schedulingService'
 import { Trash } from '@phosphor-icons/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 interface CategoriesProps {
@@ -30,8 +30,12 @@ interface ServiceTypesProps {
   slug: string
 }
 
-export default function Filter(props: any) {
-  const params = useSearchParams()
+interface FilterProps {
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export default function Filter({ searchParams }: FilterProps) {
+  console.log(searchParams)
   const router = useRouter()
 
   const [categories, setCategories] = useState<CategoriesProps[]>()

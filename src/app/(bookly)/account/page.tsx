@@ -1,4 +1,3 @@
-import { SchedulingHistory } from '@/components/table/scheduling-history'
 import { AccountForm } from './form'
 
 export default function Account() {

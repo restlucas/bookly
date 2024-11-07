@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { getWeekDays } from '@/utils/get-week-days'
+import { User } from '@prisma/client'
 
 interface UserProps {
   name?: string
@@ -96,7 +96,7 @@ export async function getUserFavorites(id: string) {
 export async function updateUser(
   id: string,
   data: UserProps,
-): Promise<ServiceResponse<any>> {
+): Promise<ServiceResponse<User>> {
   try {
     const updatedUser = await prisma.user.update({
       where: { id },
@@ -108,12 +108,16 @@ export async function updateUser(
       message: 'Informações salvas com sucesso!',
       data: updatedUser,
     }
-  } catch (error: any) {
-    console.error('Erro ao atualizar o usuário:', error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Erro ao atualizar o usuário:', error)
 
-    return {
-      type: 'error',
-      message: 'Erro ao atualizar o usuário',
+      return {
+        type: 'error',
+        message: 'Erro ao atualizar o usuário',
+      }
+    } else {
+      console.error('Erro desconhecido', error)
     }
   }
 }
@@ -122,7 +126,7 @@ export async function updateUser(
 export async function updateUserRole(
   id: string,
   roleSlug: string,
-): Promise<ServiceResponse<any>> {
+): Promise<ServiceResponse<User>> {
   try {
     const { id: userTypeId } = await prisma.userType.findFirst({
       where: {
@@ -161,12 +165,16 @@ export async function updateUserRole(
       message: 'Sucesso ao atualizar role do usuário!',
       data: updatedUserRole,
     }
-  } catch (error: any) {
-    console.error('Error on update user role:', error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error on update user role:', error)
 
-    return {
-      type: 'error',
-      message: 'Error ao atualizar usuário',
+      return {
+        type: 'error',
+        message: 'Error ao atualizar usuário',
+      }
+    } else {
+      console.error('Erro desconhecido', error)
     }
   }
 }
@@ -175,7 +183,7 @@ export async function updateUserRole(
 export async function updateUserFavorites(
   id: string,
   favorites: string,
-): Promise<ServiceResponse<any>> {
+): Promise<ServiceResponse<User>> {
   try {
     const updateUserFavorites = await prisma.user.update({
       where: { id },

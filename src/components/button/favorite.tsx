@@ -4,11 +4,17 @@ import { UserContext } from '@/contexts/UserContext'
 import { BookmarkSimple } from '@phosphor-icons/react'
 import { useContext } from 'react'
 
+interface FavoriteButtonProps {
+  professionalId: string
+  marked: boolean
+  variant?: boolean
+}
+
 export function FavoriteButton({
   professionalId,
   marked = false,
   variant = false,
-}: any) {
+}: FavoriteButtonProps) {
   const { handleFavorite } = useContext(UserContext)
 
   return (

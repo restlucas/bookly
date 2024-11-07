@@ -12,10 +12,10 @@ import {
 } from '@phosphor-icons/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { FavoriteButton } from '@/components/button/favorite'
 import { UserContext } from '@/contexts/UserContext'
-import dayjs from 'dayjs'
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher'
 
 interface ProfessionalProps {
   name: string
@@ -46,7 +46,7 @@ interface ProfessionalProps {
   phone: string
 }
 
-interface SchedulingDateProps {
+export interface SchedulingDateProps {
   date: string
   hour: {
     time_formatted: string
@@ -55,9 +55,10 @@ interface SchedulingDateProps {
 }
 
 export default function ProfessionalProfile({
-  params: { professional_id },
-}: any) {
-  const professionalId = professional_id
+  params: { professionalId },
+}: {
+  params: Params
+}) {
   const { user } = useContext(UserContext)
   const [professional, setProfessional] = useState<ProfessionalProps>()
   const [schedulingDate, setSchedulingDate] = useState<SchedulingDateProps>({
@@ -68,14 +69,14 @@ export default function ProfessionalProfile({
     },
   })
 
-  useEffect(() => {
-    const fetchProfessional = async (professionalId) => {
-      const response = await getProfessional(professionalId)
-      setProfessional(response)
-    }
-
-    fetchProfessional(professionalId)
+  const fetchProfessional = useCallback(async (professionalId) => {
+    const response = await getProfessional(professionalId)
+    setProfessional(response)
   }, [])
+
+  useEffect(() => {
+    fetchProfessional(professionalId)
+  }, [fetchProfessional, professionalId])
 
   return (
     <div>
@@ -106,7 +107,6 @@ export default function ProfessionalProfile({
                         user.favorites.includes(String(professionalId))
                       }
                       variant={true}
-                      background={false}
                     />
                   </div>
                   <Image

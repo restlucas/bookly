@@ -56,11 +56,11 @@ export const validateScheduleForm = (
     errors.serviceTime = 'O tempo de atendimento deve ser informado.'
   }
 
-  data.intervals.map((interval) => {
-    interval.timeStartInMinutes > interval.timeEndInMinutes
-      ? (errors.intervals =
-          'O horário de início deve ser maior que o horário de fim.')
-      : ''
+  data.intervals.forEach((interval) => {
+    if (interval.timeStartInMinutes > interval.timeEndInMinutes) {
+      errors.intervals =
+        'O horário de início deve ser maior que o horário de fim.'
+    }
   })
 
   return errors

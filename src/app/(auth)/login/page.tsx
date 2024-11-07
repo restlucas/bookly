@@ -1,12 +1,9 @@
 'use client'
 
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { GithubLogo, GoogleLogo, LinkedinLogo } from '@phosphor-icons/react'
-import Link from 'next/link'
 
 export default function Login() {
-  const { data: session, status } = useSession()
-
   return (
     <div className="grid h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex items-center justify-center bg-background-200">
@@ -44,7 +41,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-      {/* <aside className="bg-[url('/login.jpg')] bg-cover bg-center bg-no-repeat" /> */}
     </div>
   )
 }
