@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { List, MapPin, SignOut, X } from "@phosphor-icons/react";
+import { List, SignOut, X } from "@phosphor-icons/react";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { useContext, useState } from "react";
@@ -21,6 +21,28 @@ export function Header() {
     router.push(`${menu}`);
   }
 
+  if (!user.userType)
+    return (
+      <div className="mx-8 flex items-center justify-between py-4 md:mx-16">
+        <h1 className="my-4 text-3xl font-bold text-vibrant-green-100">
+          Bookly
+        </h1>
+
+        <div className="hidden animate-pulse lg:block">
+          <div className="flex items-center justify-center gap-4">
+            <div className="group relative flex cursor-pointer items-center justify-center gap-2">
+              <div className="h-7 w-20 rounded-md bg-background-200" />
+              <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 border-transparent bg-background-200" />
+            </div>
+          </div>
+        </div>
+
+        <div className="block animate-pulse lg:hidden">
+          <div className="h-12 w-12 rounded-md bg-background-200" />
+        </div>
+      </div>
+    );
+
   return (
     <div>
       <nav className="mx-8 flex items-center justify-between py-4 md:mx-16">
@@ -34,7 +56,7 @@ export function Header() {
               <ul className="left-1/2 hidden -translate-x-1/2 transform space-x-8 py-4 md:absolute md:flex">
                 {menus.map((menu) => {
                   return (
-                    menu.access.includes(user.role) && (
+                    menu.access.includes(user.userType.slug) && (
                       <li
                         key={menu.id}
                         className={`duration-100 hover:underline ${pathname.includes(menu.href) && "font-bold text-vibrant-green-100"}`}
@@ -73,9 +95,9 @@ export function Header() {
                       >
                         Favoritos
                       </Link>
-                      {user.role === "professional" && (
+                      {user.userType.slug === "professional" && (
                         <Link
-                          href="/profile"
+                          href="/professional-profile"
                           className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
                         >
                           Perfil profissional
@@ -120,7 +142,7 @@ export function Header() {
                     <ul className="flex w-full flex-col items-start justify-center gap-8">
                       {menus.map((menu) => {
                         return (
-                          menu.access.includes(user.role) && (
+                          menu.access.includes(user.userType.slug) && (
                             <li
                               key={menu.id}
                               className={`text-lg duration-100 hover:underline ${pathname.includes(menu.href) && "font-bold text-vibrant-green-100"}`}
@@ -147,7 +169,7 @@ export function Header() {
                     >
                       Favoritos
                     </button>
-                    {user.role === "professional" && (
+                    {user.userType.slug === "professional" && (
                       <button
                         onClick={() => handleMenu("profile")}
                         className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"

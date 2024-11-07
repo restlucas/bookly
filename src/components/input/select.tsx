@@ -6,6 +6,7 @@ interface SelectInputProps
   name: string;
   options: any;
   value: string;
+  usingSlug?: boolean;
   onChange: (e) => void;
 }
 
@@ -14,6 +15,7 @@ export function SelectInput({
   name,
   options,
   value,
+  usingSlug = false,
   onChange,
   ...rest
 }: SelectInputProps) {
@@ -31,7 +33,10 @@ export function SelectInput({
         {options &&
           options.map((option, index) => {
             return (
-              <option key={option.id} value={option.id}>
+              <option
+                key={option.id}
+                value={usingSlug ? option.slug : option.id}
+              >
                 {option.name}
               </option>
             );

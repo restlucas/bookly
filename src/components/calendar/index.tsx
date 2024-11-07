@@ -1,26 +1,119 @@
 "use client";
 
-import { getCalendar } from "@/utils/calendar";
+import {
+  getAvailability,
+  getBlockedDates,
+} from "@/services/professionalService";
 import { getWeekDays } from "@/utils/get-week-days";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
-import {
-  endOfMonth,
-  getDate,
-  getDay,
-  getDaysInMonth,
-  getMonth,
-  getYear,
-} from "date-fns";
-import { useState } from "react";
+import dayjs from "dayjs";
+import { useEffect, useMemo, useState } from "react";
 
-export function Calendar(schedule: any) {
+interface CalendarDay {
+  date: dayjs.Dayjs;
+  disabled: boolean;
+}
+
+interface CalendarWeek {
+  week: number;
+  days: CalendarDay[];
+}
+type CalendarWeeks = CalendarWeek[];
+
+interface Availability {
+  possibleTimes: { time_formatted: string; time_in_minutes: number }[];
+  availableTimes: { time_formatted: string; time_in_minutes: number }[];
+}
+
+interface BlockedDates {
+  blockedWeekDays: number[];
+  blockedDates: number[];
+}
+
+export function Calendar({
+  professionalId,
+  schedulingDate,
+  setSchedulingDate,
+}: any) {
   const [isSelectedDate, setIsSelectedDate] = useState(false);
   const shortWeekDays = getWeekDays({ short: true });
-  const calendarWeeks = getCalendar();
 
-  function handleSelectDate() {
-    setIsSelectedDate(true);
-  }
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(dayjs().startOf("month"));
+  const [availability, setAvailability] = useState<Availability | null>(null);
+  const [blockedDates, setBlockedDates] = useState<BlockedDates>();
+
+  const isDateSelected = Boolean(selectedDate);
+  const weekDay = selectedDate ? dayjs(selectedDate).format("dddd") : "";
+  const describedDate = selectedDate
+    ? dayjs(selectedDate).format("DD[ de ]MMMM")
+    : "";
+  const currentMonth = currentDate.format("MMMM");
+  const currentYear = currentDate.format("YYYY");
+
+  const calendarWeeks = useMemo(() => {
+    if (!blockedDates) return [];
+
+    const daysInMonth = Array.from(
+      { length: currentDate.daysInMonth() },
+      (_, i) => currentDate.set("date", i + 1),
+    );
+    const previousDays = Array.from({ length: currentDate.day() }, (_, i) =>
+      currentDate.subtract(i + 1, "day"),
+    ).reverse();
+    const lastDay = currentDate.endOf("month");
+    const nextDays = Array.from({ length: 6 - lastDay.day() }, (_, i) =>
+      lastDay.add(i + 1, "day"),
+    );
+
+    const allDays = [...previousDays, ...daysInMonth, ...nextDays];
+    const calendarDays = allDays.map((date) => ({
+      date,
+      disabled:
+        date.isBefore(dayjs(), "day") ||
+        blockedDates.blockedWeekDays.includes(date.day()) ||
+        blockedDates.blockedDates.includes(date.date()),
+    }));
+
+    return calendarDays.reduce<CalendarWeeks>((weeks, day, i) => {
+      const isNewWeek = i % 7 === 0;
+      if (isNewWeek)
+        weeks.push({ week: i / 7 + 1, days: calendarDays.slice(i, i + 7) });
+      return weeks;
+    }, []);
+  }, [currentDate, blockedDates]);
+
+  const handleDateNavigation = (direction: "previous" | "next") => {
+    setCurrentDate(
+      currentDate[direction === "previous" ? "subtract" : "add"](1, "month"),
+    );
+  };
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (selectedDate) {
+        const response = await getAvailability(
+          String(professionalId),
+          dayjs(selectedDate).format("YYYY-MM-DD"),
+        );
+
+        setAvailability(response);
+      }
+    };
+
+    fetchAvailability();
+  }, [selectedDate, professionalId]);
+
+  useEffect(() => {
+    const fetchBlockedDates = async () => {
+      const response = await getBlockedDates(String(professionalId), {
+        year: currentDate.year(),
+        month: currentDate.month() + 1,
+      });
+      setBlockedDates(response);
+    };
+    fetchBlockedDates();
+  }, [currentDate, professionalId]);
 
   return (
     <div className="grid grid-cols-[70%_30%] gap-4">
@@ -28,13 +121,19 @@ export function Calendar(schedule: any) {
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h4 className="font-medium">
-            Outubro <span className="text-slate-400">2024</span>
+            {currentMonth} <span className="text-slate-400">{currentYear}</span>
           </h4>
           <div className="flex gap-2 text-slate-400">
-            <button className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md">
+            <button
+              onClick={() => handleDateNavigation("previous")}
+              className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md"
+            >
               <CaretLeft className="h-5 w-5" />
             </button>
-            <button className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md">
+            <button
+              onClick={() => handleDateNavigation("next")}
+              className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md"
+            >
               <CaretRight className="h-5 w-5" />
             </button>
           </div>
@@ -51,18 +150,18 @@ export function Calendar(schedule: any) {
             </tr>
           </thead>
           <tbody className="before:block before:leading-3 before:text-transparent before:content-['.']">
-            {calendarWeeks.map((week, index) => {
+            {calendarWeeks.map(({ week, days }) => {
               return (
-                <tr key={index} className="box-border">
-                  {week.map((day, index) => {
+                <tr key={week} className="box-border">
+                  {days.map(({ date, disabled }) => {
                     return (
-                      <td key={index} className="box-border">
+                      <td key={date.toString()} className="box-border">
                         <button
-                          onClick={handleSelectDate}
-                          disabled={day.disabled}
-                          className={`aspect-square w-full cursor-pointer rounded-sm text-center text-sm ${day.disabled ? "disabled:text-slate-700" : "hover:bg-background-300/60"}`}
+                          onClick={() => setSelectedDate(date.toDate())}
+                          disabled={disabled}
+                          className={`aspect-square w-full cursor-pointer rounded-sm text-center text-sm ${disabled ? "disabled:text-slate-700" : "hover:bg-background-300/60"}`}
                         >
-                          {getDate(new Date(day.date))}
+                          {date.get("date")}
                         </button>
                       </td>
                     );
@@ -70,87 +169,44 @@ export function Calendar(schedule: any) {
                 </tr>
               );
             })}
-            {/* <tr>
-              {Array.from({ length: 7 }).map((_, index) => {
-                return (
-                  <td key={index} className="box-border">
-                    <button
-                      onClick={handleSelectDate}
-                      className="aspect-square w-full cursor-pointer rounded-sm bg-background-300 text-center text-sm hover:bg-background-300/60"
-                    >
-                      {index}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-            <tr>
-              {Array.from({ length: 7 }).map((_, index) => {
-                return (
-                  <td key={index} className="box-border">
-                    <button
-                      disabled
-                      className="aspect-square w-full cursor-pointer rounded-sm text-center text-sm disabled:text-slate-700"
-                    >
-                      {index}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-            <tr>
-              {Array.from({ length: 7 }).map((_, index) => {
-                return (
-                  <td key={index} className="box-border">
-                    <button className="aspect-square w-full cursor-pointer rounded-sm text-center text-sm">
-                      {index}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-            <tr>
-              {Array.from({ length: 7 }).map((_, index) => {
-                return (
-                  <td key={index} className="box-border">
-                    <button className="aspect-square w-full cursor-pointer rounded-sm text-center text-sm">
-                      {index}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr> */}
           </tbody>
         </table>
       </div>
 
       {/* Schedules */}
       <div
-        className={`border-l-[1px] border-background-300 ${!isSelectedDate ? "flex items-center justify-center" : "pl-6"}`}
+        className={`border-l-[1px] border-background-300 ${!isDateSelected ? "flex items-center justify-center" : "pl-6"}`}
       >
-        {!isSelectedDate ? (
+        {!isDateSelected ? (
           <h4 className="w-4/5 text-center text-sm text-slate-400/90">
             Selecione uma data para ver os horários disponíveis 😊
           </h4>
         ) : (
           <div className="flex h-full flex-col">
             <h4 className="mb-4 text-sm">
-              terça feira, <br />{" "}
-              <span className="text-vibrant-green-100">22 de outubro</span>
+              {weekDay}, <br />{" "}
+              <span className="text-vibrant-green-100">{describedDate}</span>
             </h4>
 
             <div className="relative flex-1">
               <div className="absolute bottom-0 right-0 top-0 flex w-full flex-col gap-2 overflow-y-scroll [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-vibrant-green-200 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-background-200 [&::-webkit-scrollbar]:w-1">
-                {Array.from({ length: 10 }).map((_, index) => {
-                  return (
-                    <button
-                      key={index}
-                      className="cursor-pointer rounded-sm bg-background-300 py-1 hover:bg-background-300/60"
-                    >
-                      0{index}:00h
-                    </button>
-                  );
-                })}
+                {availability &&
+                  availability.availableTimes.map((item, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() =>
+                          setSchedulingDate({
+                            date: dayjs(selectedDate).format("YYYY-MM-DD"),
+                            hour: item,
+                          })
+                        }
+                        className={`${schedulingDate.date === dayjs(selectedDate).format("YYYY-MM-DD") && schedulingDate.hour.time_in_minutes === item.time_in_minutes ? "border-2 border-vibrant-green-100" : ""} cursor-pointer rounded-sm border-2 border-transparent bg-background-300 py-1 hover:bg-background-300/60`}
+                      >
+                        {item.time_formatted}
+                      </button>
+                    );
+                  })}
               </div>
             </div>
           </div>

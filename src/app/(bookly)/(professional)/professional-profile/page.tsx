@@ -1,6 +1,6 @@
-import { ProfileForm } from "./form";
+import { ProfessionalProfileForm } from "./form";
 
-export default function Profile() {
+export default function ProfessionalProfile() {
   return (
     <section className="mb-8">
       <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
@@ -8,7 +8,7 @@ export default function Profile() {
           Perfil profissional
         </h2>
 
-        <ProfileForm />
+        <ProfessionalProfileForm />
       </div>
     </section>
   );

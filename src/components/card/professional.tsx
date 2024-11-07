@@ -23,15 +23,15 @@ export function ProfessionalCard({ professional }: any) {
       <div className="flex-1 flex-col gap-2 space-y-2">
         <div className="flex items-center justify-start gap-2">
           <h3 className="text-xl font-bold">{professional.name}</h3>
-          <span className="hidden md:block">⭐⭐⭐⭐⭐</span>
+          <span className="hidden md:block">⭐ (0)</span>
         </div>
         <h6 className="text-vibrant-green-100">
-          {professional.profile.profession
-            ? professional.profile.profession.name
+          {professional.professional.occupation
+            ? professional.professional.occupation.name
             : ""}
         </h6>
         <p id="lineClampTwo" className="max-h-full w-full flex-1">
-          {professional.profile.bio ? professional.profile.bio : ""}
+          {professional.professional.bio ? professional.professional.bio : ""}
         </p>
       </div>
       <div className="flex h-40 flex-col items-end justify-between">
@@ -39,7 +39,7 @@ export function ProfessionalCard({ professional }: any) {
           <div className="hidden items-center justify-start gap-2 text-slate-400 md:flex">
             <div className="flex items-center justify-start gap-1">
               <MapPin size={15} />
-              <span>Telêmaco Borba</span>
+              <span>{professional.address}</span>
             </div>
           </div>
           <FavoriteButton
@@ -53,8 +53,8 @@ export function ProfessionalCard({ professional }: any) {
           <span className="text-base md:text-xl">
             A partir de:{" "}
             <span className="font-bold text-vibrant-green-100">
-              {professional.profile.serviceValue
-                ? professional.profile.serviceValue
+              {professional.professional.serviceValue
+                ? professional.professional.serviceValue
                 : "não informado"}
             </span>
           </span>

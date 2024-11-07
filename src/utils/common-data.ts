@@ -1,18 +1,7 @@
-export const serviceType = [
-  { id: "in-person", name: "Presencial" },
-  { id: "online", name: "Online" },
-  { id: "in-person_online", name: "Presencial e Online" },
-];
-
 export const spokenLanguages = [
   { id: "portuguese", name: "Português" },
   { id: "english", name: "Inglês" },
   { id: "spanish", name: "Espanhol" },
-];
-
-export const usersType = [
-  { id: "personal", name: "Pessoal" },
-  { id: "professional", name: "Profissional" },
 ];
 
 export const gendersType = [

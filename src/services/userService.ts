@@ -11,13 +11,17 @@ interface UserProps {
   birth?: string;
   gender?: string;
   address?: string;
-  role?: string;
 }
 
 interface ServiceResponse<T> {
   type: "success" | "error";
   data?: T;
   message?: string;
+}
+
+// Get user types
+export async function getUserTypes() {
+  return await prisma.userType.findMany();
 }
 
 // Get user by id
@@ -29,12 +33,18 @@ export async function getUserById(id: string) {
       name: true,
       email: true,
       image: true,
-      role: true,
       address: true,
       birth: true,
       phone: true,
       gender: true,
       favorites: true,
+      userType: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 }
@@ -59,15 +69,12 @@ export async function getUserFavorites(id: string) {
           select: {
             id: true,
             name: true,
-            email: true,
-            phone: true,
             image: true,
             address: true,
-            profile: {
+            professional: {
               select: {
                 bio: true,
-                tags: true,
-                profession: {
+                occupation: {
                   select: {
                     name: true,
                   },
@@ -81,6 +88,7 @@ export async function getUserFavorites(id: string) {
 
     return favoritedProfessionals;
   }
+
   return null;
 }
 
@@ -113,28 +121,34 @@ export async function updateUser(
 // Update user role
 export async function updateUserRole(
   id: string,
-  role: string,
+  roleSlug: string,
 ): Promise<ServiceResponse<any>> {
   try {
-    const updatedUserRole = await prisma.user.update({
-      where: { id },
-      data: {
-        role,
+    const { id: userTypeId } = await prisma.userType.findFirst({
+      where: {
+        slug: roleSlug,
       },
     });
 
-    if (role === "professional") {
-      const newProfessional = await prisma.profile.create({
+    const updatedUserRole = await prisma.user.update({
+      where: { id },
+      data: {
+        userTypeId,
+      },
+    });
+
+    if (roleSlug === "professional") {
+      const newProfessional = await prisma.professional.create({
         data: {
           userId: id,
         },
       });
 
       await Promise.all(
-        Array.from({ length: 6 }).map(async (_, index) => {
+        Array.from({ length: 7 }).map(async (_, index) => {
           await prisma.schedule.create({
             data: {
-              profileId: newProfessional.id,
+              professionalId: newProfessional.id,
               weekDay: index,
             },
           });

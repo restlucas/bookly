@@ -20,7 +20,7 @@ export function DateInput({
     <div className="">
       <div className="flex items-center justify-start gap-4">
         <input
-          className="w-40 rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400"
+          className="w-full rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400"
           value={value}
           name={name}
           type="date"

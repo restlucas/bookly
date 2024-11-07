@@ -48,21 +48,27 @@ model Session {
 model Category {
   id          String          @id @default(cuid())
   name        String      
+  slug        String
   createdAt   DateTime  @default(now())
 
-  profiles    Profile[]
-  professions Profession[]
+  professional  Professional[]
+  occupations   Occupation[]
+
+  @@map("categories")
 }
 
-model Profession {
+model Occupation {
   id          String       @id @default(cuid())
   name        String    
   categoryId  String
+  slug        String
   createdAt   DateTime  @default(now())
 
-  profiles    Profile[]
+  professional Professional[]
 
   category    Category  @relation(fields: [categoryId], references: [id])
+
+  @@map("occupations")
 }
 
 
@@ -76,46 +82,51 @@ model User {
   birth         String?
   gender        String?
   address       String?
-  role          String?
+  userTypeId    String?
   favorites     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  profile      Profile?
-  reviews      Review[]
-  scheduling   Scheduling[]
-  accounts     Account[]
-  sessions     Session[]
+  professional  Professional?
+  reviews       Review[]
+  scheduling    Scheduling[]
+  accounts      Account[]
+  sessions      Session[]
+
+  userType      UserType?    @relation(fields: [userTypeId], references: [id])
 
   @@map("users")
 }
 
-model Profile {
+model Professional {
   id                      String @id @default(cuid())
   userId                  String @unique
-  professionId            String?
-  professionCategoryId    String?
-  bio                     String?
-  serviceType             String?
+  categoryId              String?
+  occupationId            String?
+  bio                     String? @db.Text
+  serviceTypeId           String?
   serviceValue            String?
-  serviceTimeInMinutes    Int @default(30)
+  serviceTimeInMinutes    Int @default(60)
   tags                    String?
   createdAt               DateTime @default(now())
   
+  schedule                Schedule[]
   reviews                 Review[]
-  professionalSchedule    Schedule[]
   professionalAbsence     Absence[]
   scheduling              Scheduling[]
 
 
   user                    User    @relation(fields: [userId], references: [id])
-  profession              Profession?    @relation(fields: [professionId], references: [id])
-  professionCategory      Category?    @relation(fields: [professionCategoryId], references: [id])
+  occupation              Occupation?    @relation(fields: [occupationId], references: [id])
+  category                Category?    @relation(fields: [categoryId], references: [id])
+  serviceType             ServiceType?    @relation(fields: [serviceTypeId], references: [id])
+
+  @@map("professionals")
 }
 
 model Schedule {
   id                  String @id @default(cuid())
-  profileId           String
+  professionalId      String
   weekDay             Int
   enabled             Boolean @default(false)
   timeStartInMinutes  Int @default(480)
@@ -123,36 +134,43 @@ model Schedule {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  profile             Profile    @relation(fields: [profileId], references: [id])
+  professional        Professional    @relation(fields: [professionalId], references: [id])
 
+  @@map("schedules")
 }
 
 model Review {
   id                  String @id @default(cuid())
   userId              String
-  profileId           String
+  professionalId      String
   comment             String?
   rating              String
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
   user                User    @relation(fields: [userId], references: [id])
-  profile             Profile    @relation(fields: [profileId], references: [id])
+  professional        Professional    @relation(fields: [professionalId], references: [id])
+
+  @@map("reviews")
 }
 
 model Scheduling {
   id              String   @id @default(cuid())
   date            DateTime
   userId          String
-  profileId       String
+  professionalId  String
+  serviceTypeId   String
   statusId        String
   observations    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())
 
   user            User    @relation(fields: [userId], references: [id])
-  profile         Profile    @relation(fields: [profileId], references: [id])
+  professional    Professional    @relation(fields: [professionalId], references: [id])
   status          Status    @relation(fields: [statusId], references: [id])
+  serviceType     ServiceType @relation(fields: [serviceTypeId], references: [id])
+
+  @@map("schedulings")
 }
 
 model Status {
@@ -161,11 +179,13 @@ model Status {
   createdAt     DateTime @default(now())
 
   scheduling    Scheduling[]
+
+  @@map("status")
 }
 
 model Absence {
   id                  String @id @default(cuid())
-  profileId           String
+  professionalId      String
   absenceOptionId     String
   startTime           String
   endTime             String
@@ -173,8 +193,10 @@ model Absence {
   createdAt           DateTime @default(now())
   updatedAt           DateTime  @updatedAt
   
-  profile             Profile    @relation(fields: [profileId], references: [id])
+  professional        Professional    @relation(fields: [professionalId], references: [id])
   absenceOption       AbsenceOptions    @relation(fields: [absenceOptionId], references: [id])
+
+  @@map("absences")
 }
 
 model AbsenceOptions {
@@ -184,4 +206,27 @@ model AbsenceOptions {
   createdAt     DateTime @default(now())
 
   absence       Absence[]
+
+  @@map("absenceOptions")
+}
+
+model ServiceType {
+  id    String @id @default(cuid())
+  name  String
+  slug  String
+
+  professional  Professional[]
+  scheduling    Scheduling[]
+
+  @@map("serviceTypes")
+}
+
+model UserType {
+  id    String @id @default(cuid())
+  name  String
+  slug  String
+
+  user  User[]
+
+  @@map("userTypes")
 }

@@ -7,24 +7,17 @@ import { TextInput } from "@/components/input/text";
 import { UserContext } from "@/contexts/UserContext";
 import { updateUser } from "@/services/userService";
 import { gendersType } from "@/utils/common-data";
+import { formatPhone } from "@/utils/format-functions";
 import toastDefaultValues from "@/utils/toast-default-values";
+import { AccountFormData, validateAccountForm } from "@/utils/validators";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
-interface AccountFormProps {
-  name: string;
-  image: string;
-  phone?: string;
-  birth?: string;
-  gender?: string;
-  address?: string;
-}
-
 export function AccountForm() {
   const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [accountForm, setAccountForm] = useState<AccountFormProps>({
+  const [accountForm, setAccountForm] = useState<AccountFormData>({
     name: "",
     image: "",
     phone: "",
@@ -47,27 +40,39 @@ export function AccountForm() {
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    const formattedValue = name === "phone" ? formatPhone(value) : value;
+
     setAccountForm((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value,
+      [name]: formattedValue,
     }));
   };
 
   async function handleSubmit(e: any) {
     e.preventDefault();
-    setIsLoading(true);
+    const validationErrors = validateAccountForm(accountForm);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (Object.keys(validationErrors).length > 0) {
+      Object.values(validationErrors).map((error, index) => {
+        toast.error(error, toastDefaultValues);
+      });
+    } else {
+      setIsLoading(true);
 
-    const response = await updateUser(user.id, accountForm);
-    toast[response.type](response.message, toastDefaultValues);
-    setIsLoading(false);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const response = await updateUser(user.id, accountForm);
+      toast[response.type](response.message, toastDefaultValues);
+      setIsLoading(false);
+    }
   }
 
   return (
     <>
       <form className="" onSubmit={handleSubmit}>
-        {accountForm ? (
+        {Object.keys(user).length !== 0 ? (
           <>
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[20%_1fr] lg:gap-4">
               {/* Photo */}
@@ -113,6 +118,7 @@ export function AccountForm() {
                       name="phone"
                       value={accountForm.phone || ""}
                       placeholder="Não preenchido"
+                      maxLength={15}
                       onChange={handleChange}
                     />
                     <TextInput
@@ -147,22 +153,13 @@ export function AccountForm() {
                   </h2>
 
                   <div className="grid grid-cols-[1fr] items-start gap-6">
-                    {/* <SelectInput
-                      label="Idioma"
-                      name="spokenLanguages"
-                      value={accountForm.}
-                      options={spokenLanguages}
-                      onChange={handleChange}
-                    /> */}
                     <div>
                       <h5>
-                        Como deseja receber notificações sobre seus
-                        agendamentos?
+                        Deseja receber notificações sobre seus agendamentos por
+                        e-mail?
                       </h5>
                       <div className="flex flex-col items-start justify-start gap-4 py-2 lg:flex-row lg:items-center lg:gap-8">
-                        <CheckboxInput label="E-mail" name="email" />
-                        <CheckboxInput label="SMS" name="SMS" />
-                        <CheckboxInput label="WhatsApp" name="whatsapp" />
+                        <CheckboxInput label="Sim" name="notifyByEmail" />
                       </div>
                     </div>
                     <div />
@@ -175,7 +172,43 @@ export function AccountForm() {
             </div>
           </>
         ) : (
-          <p>carregando...</p>
+          <div className="grid animate-pulse grid-cols-1 gap-10 lg:grid-cols-[20%_1fr] lg:gap-4">
+            <div className="flex w-full flex-col items-center justify-start gap-4">
+              <div className="relative h-[200px] w-[200px] overflow-hidden rounded-xl bg-background-300"></div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {/* About me */}
+              <div className="grid grid-cols-1 gap-4 text-lg lg:grid-cols-2">
+                <div className="col-span-full h-10 w-20 rounded-md bg-background-300" />
+
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-7 w-28 rounded-md bg-background-300" />
+                  <div className="h-10 w-full rounded-md bg-background-300" />
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </form>
       <ToastContainer closeOnClick theme="dark" />

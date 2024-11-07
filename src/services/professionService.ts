@@ -8,8 +8,12 @@ export async function getAllCategories() {
 }
 
 // Get profession by category
-export async function getProfessionByCategory(categoryId: string) {
-  return await prisma.profession.findMany({
-    where: { categoryId },
+export async function getOccupationByCategory(categoryId: string) {
+  return await prisma.occupation.findMany({
+    where: {
+      category: {
+        id: categoryId,
+      },
+    },
   });
 }

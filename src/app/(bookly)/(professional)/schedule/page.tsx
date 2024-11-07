@@ -7,11 +7,6 @@ import { TextInput } from "@/components/input/text";
 import { SelectInput } from "@/components/input/select";
 import { DateInput } from "@/components/input/date";
 import SubmitButton from "@/components/button/submit";
-import {
-  convertTimeToMinutes,
-  formatMinutesToTime,
-  handleTimeInput,
-} from "@/utils/format-time";
 import { getSchedule, updateSchedule } from "@/services/professionalService";
 import { UserContext } from "@/contexts/UserContext";
 import {
@@ -21,21 +16,46 @@ import {
   getOptions,
 } from "@/services/absenceService";
 import dayjs from "dayjs";
+import { toast, ToastContainer } from "react-toastify";
+import toastDefaultValues from "@/utils/toast-default-values";
+import {
+  AbsenceFormData,
+  ScheduleFormData,
+  validateAbsenceForm,
+  validateScheduleForm,
+} from "@/utils/validators";
+
+interface AbsenceOptionsProps {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface AbsenceListProps {
+  id: string;
+  professionalId: string;
+  startTime: string;
+  endTime: string;
+  absenceOption: {
+    name: string;
+    description: string;
+  };
+}
 
 export default function ProfessionalSchedule() {
   const { user } = useContext(UserContext);
   const weekDays = getWeekDays({ short: false });
 
-  const [absenceOptions, setAbsenceOptions] = useState<any>();
-  const [absenceList, setAbsenceList] = useState<any>();
+  const [absenceOptions, setAbsenceOptions] = useState<AbsenceOptionsProps[]>();
+  const [absenceList, setAbsenceList] = useState<AbsenceListProps[]>();
 
   const [isLoading, setIsLoading] = useState({
     schedule: false,
     absence: false,
     absenceList: true,
   });
-  const [scheduleForm, setScheduleForm] = useState<any>();
-  const [absenceForm, setAbsenceForm] = useState<any>({
+  const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>();
+  const [absenceForm, setAbsenceForm] = useState<AbsenceFormData>({
     userId: "",
     absenceOptionId: "",
     startTime: "",
@@ -59,6 +79,12 @@ export default function ProfessionalSchedule() {
       }));
     }
   }, [user]);
+
+  const formatTime = (totalMinutes: number) => {
+    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+    const minutes = String(totalMinutes % 60).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
 
   async function getProfessionalSchedule(userId: string) {
     let response = await getSchedule(userId);
@@ -115,7 +141,7 @@ export default function ProfessionalSchedule() {
     const { name, value, checked } = event.target;
 
     if (form === "scheduleForm") {
-      setScheduleForm((prevState) => {
+      setScheduleForm((prevState: any) => {
         const updateInterval = (updateFn) =>
           prevState.intervals.map((interval) =>
             interval.id === intervalId ? updateFn(interval) : interval,
@@ -125,12 +151,16 @@ export default function ProfessionalSchedule() {
           timeStartInMinutes: () =>
             updateInterval((interval) => ({
               ...interval,
-              timeStartInMinutes: convertTimeToMinutes(value),
+              timeStartInMinutes:
+                parseInt(value.split(":")[0], 10) * 60 +
+                parseInt(value.split(":")[1], 10),
             })),
           timeEndInMinutes: () =>
             updateInterval((interval) => ({
               ...interval,
-              timeEndInMinutes: convertTimeToMinutes(value),
+              timeEndInMinutes:
+                parseInt(value.split(":")[0], 10) * 60 +
+                parseInt(value.split(":")[1], 10),
             })),
           enabled: () =>
             updateInterval((interval) => ({ ...interval, enabled: checked })),
@@ -153,37 +183,56 @@ export default function ProfessionalSchedule() {
 
   async function handleSubmitSchedule(e: any) {
     e.preventDefault();
-    setIsLoading((prevState) => ({
-      ...prevState,
-      schedule: true,
-    }));
+    const validationErrors = validateScheduleForm(scheduleForm);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (Object.keys(validationErrors).length > 0) {
+      Object.values(validationErrors).map((error, index) => {
+        toast.error(error, toastDefaultValues);
+      });
+    } else {
+      setIsLoading((prevState) => ({
+        ...prevState,
+        schedule: true,
+      }));
 
-    const response = await updateSchedule(user.id, scheduleForm);
-    setIsLoading((prevState) => ({
-      ...prevState,
-      schedule: false,
-    }));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const response = await updateSchedule(user.id, scheduleForm);
+
+      toast[response.type](response.message, toastDefaultValues);
+      setIsLoading((prevState) => ({
+        ...prevState,
+        schedule: false,
+      }));
+    }
   }
 
   async function handleSubmitAbsence(e: any) {
     e.preventDefault();
-    setIsLoading((prevState) => ({
-      ...prevState,
-      absence: true,
-    }));
+    const validationErrors = validateAbsenceForm(absenceForm);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (Object.keys(validationErrors).length > 0) {
+      Object.values(validationErrors).map((error, index) => {
+        toast.error(error, toastDefaultValues);
+      });
+    } else {
+      setIsLoading((prevState) => ({
+        ...prevState,
+        absence: true,
+      }));
 
-    const response = await createAbsence(absenceForm);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setAbsenceList((prevState) => [...prevState, response]);
+      const response = await createAbsence(absenceForm);
 
-    setIsLoading((prevState) => ({
-      ...prevState,
-      absence: false,
-    }));
+      setAbsenceList((prevState) => [...prevState, response.data]);
+      toast[response.type](response.message, toastDefaultValues);
+
+      setIsLoading((prevState) => ({
+        ...prevState,
+        absence: false,
+      }));
+    }
   }
 
   return (
@@ -234,12 +283,11 @@ export default function ProfessionalSchedule() {
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <input
-                          className={`${interval.enabled ? "" : "text-slate-500 line-through"} w-20 rounded-md border-0 bg-background-300 p-2`}
-                          type="text"
+                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          type="time"
                           name="timeStartInMinutes"
-                          value={formatMinutesToTime(
-                            interval.timeStartInMinutes,
-                          )}
+                          step={600}
+                          value={formatTime(interval.timeStartInMinutes)}
                           maxLength={5}
                           disabled={!interval.enabled}
                           onChange={(e) =>
@@ -247,10 +295,10 @@ export default function ProfessionalSchedule() {
                           }
                         />
                         <input
-                          className={`${interval.enabled ? "" : "text-slate-500 line-through"} w-20 rounded-md border-0 bg-background-300 p-2`}
-                          type="text"
+                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-[0.3] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          type="time"
                           name="timeEndInMinutes"
-                          value={formatMinutesToTime(interval.timeEndInMinutes)}
+                          value={formatTime(interval.timeEndInMinutes)}
                           maxLength={5}
                           disabled={!interval.enabled}
                           onChange={(e) =>
@@ -440,6 +488,7 @@ export default function ProfessionalSchedule() {
           </div>
         </div>
       </div>
+      <ToastContainer closeOnClick theme="dark" />
     </section>
   );
 }

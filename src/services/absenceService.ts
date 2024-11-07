@@ -3,8 +3,8 @@
 import { prisma } from "@/lib/prisma";
 
 // Get absence by userId
-export async function getAbsence(userId) {
-  const { id: profileId } = await prisma.profile.findUnique({
+export async function getAbsence(userId: string) {
+  const { id: professionalId } = await prisma.professional.findUnique({
     where: {
       userId,
     },
@@ -15,11 +15,11 @@ export async function getAbsence(userId) {
 
   const response = await prisma.absence.findMany({
     where: {
-      profileId,
+      professionalId,
     },
     select: {
       id: true,
-      profileId: true,
+      professionalId: true,
       startTime: true,
       endTime: true,
       absenceOption: {
@@ -49,38 +49,51 @@ export async function getOptions() {
 
 // Create absence
 export async function createAbsence(data: any) {
-  const { id: profileId } = await prisma.profile.findUnique({
-    where: {
-      userId: data.userId,
-    },
-  });
+  try {
+    const { id: professionalId } = await prisma.professional.findUnique({
+      where: {
+        userId: data.userId,
+      },
+    });
 
-  let { userId, ...newData } = data;
+    let { userId, ...newData } = data;
 
-  const formatedData = { ...newData, profileId };
+    const formatedData = { ...newData, professionalId };
 
-  const response = await prisma.absence.create({
-    data: formatedData,
-    select: {
-      id: true,
-      profileId: true,
-      startTime: true,
-      endTime: true,
-      absenceOption: {
-        select: {
-          name: true,
-          description: true,
+    const response = await prisma.absence.create({
+      data: formatedData,
+      select: {
+        id: true,
+        professionalId: true,
+        startTime: true,
+        endTime: true,
+        absenceOption: {
+          select: {
+            name: true,
+            description: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return response;
+    return {
+      type: "success",
+      message: "Ausência criada com sucesso!",
+      data: response,
+    };
+  } catch (error) {
+    console.error("Erro ao criar ausência:", error);
+
+    return {
+      type: "error",
+      error: error.message || "Erro ao criar ausência",
+    };
+  }
 }
 
 // Delete absence
 export async function deleteAbsence(userId: string, absenceId: string) {
-  const { id: profileId } = await prisma.profile.findUnique({
+  const { id: professionalId } = await prisma.professional.findUnique({
     where: {
       userId,
     },
@@ -92,7 +105,7 @@ export async function deleteAbsence(userId: string, absenceId: string) {
   const response = await prisma.absence.delete({
     where: {
       id: absenceId,
-      profileId,
+      professionalId,
     },
   });
 

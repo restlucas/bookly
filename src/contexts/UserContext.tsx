@@ -7,12 +7,14 @@ interface User {
   name: string;
   email: string;
   image: string;
-  role?: string;
   address?: string;
   birth?: string;
   phone?: string;
   gender?: string;
   favorites?: string[] | string;
+  userType: {
+    slug: string;
+  };
 }
 
 interface UserContextType {
@@ -56,7 +58,9 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
   function updateRole(role: string) {
     setUser((prevState) => ({
       ...prevState,
-      role,
+      userType: {
+        slug: role,
+      },
     }));
   }
 

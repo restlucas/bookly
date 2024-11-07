@@ -22,10 +22,10 @@ export function Card({ professional }: any) {
             <h3 className="text-xl font-bold text-vibrant-green-100">
               {professional.name}
             </h3>
-            <p>{professional.profile.profession.name}</p>
+            <p>{professional.professional.occupation.name}</p>
           </div>
           <p id="lineClamp" className="lineClamp max-h-full w-full flex-1">
-            {professional.profile.bio}
+            {professional.professional.bio}
           </p>
         </div>
         <div className="absolute right-0 top-0 p-4 duration-100">

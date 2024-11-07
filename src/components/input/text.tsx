@@ -20,7 +20,7 @@ export function TextInput({
     <div className="flex w-full flex-col gap-2">
       <label className="">{label}</label>
       <input
-        className="rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400"
+        className="rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400 [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter"
         value={value}
         name={name}
         type={type}

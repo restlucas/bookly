@@ -19,8 +19,8 @@ CREATE TABLE `Account` (
     `provider_type` VARCHAR(191) NOT NULL,
     `provider_id` VARCHAR(191) NOT NULL,
     `provider_account_id` VARCHAR(191) NOT NULL,
-    `refreshToken` VARCHAR(191) NULL,
-    `access_token` VARCHAR(191) NULL,
+    `refreshToken` TEXT NULL,
+    `access_token` TEXT NULL,
     `accessTokenExpires` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -45,19 +45,21 @@ CREATE TABLE `Session` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Category` (
+CREATE TABLE `categories` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Profession` (
+CREATE TABLE `occupations` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `categoryId` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -74,7 +76,7 @@ CREATE TABLE `users` (
     `birth` VARCHAR(191) NULL,
     `gender` VARCHAR(191) NULL,
     `address` VARCHAR(191) NULL,
-    `role` VARCHAR(191) NULL,
+    `userTypeId` VARCHAR(191) NULL,
     `favorites` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -84,26 +86,26 @@ CREATE TABLE `users` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Profile` (
+CREATE TABLE `professionals` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `professionId` VARCHAR(191) NULL,
-    `professionCategoryId` VARCHAR(191) NULL,
-    `bio` VARCHAR(191) NULL,
-    `serviceType` VARCHAR(191) NULL,
+    `categoryId` VARCHAR(191) NULL,
+    `occupationId` VARCHAR(191) NULL,
+    `bio` TEXT NULL,
+    `serviceTypeId` VARCHAR(191) NULL,
     `serviceValue` VARCHAR(191) NULL,
-    `serviceTimeInMinutes` INTEGER NOT NULL DEFAULT 30,
+    `serviceTimeInMinutes` INTEGER NOT NULL DEFAULT 60,
     `tags` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Profile_userId_key`(`userId`),
+    UNIQUE INDEX `professionals_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Schedule` (
+CREATE TABLE `schedules` (
     `id` VARCHAR(191) NOT NULL,
-    `profileId` VARCHAR(191) NOT NULL,
+    `professionalId` VARCHAR(191) NOT NULL,
     `weekDay` INTEGER NOT NULL,
     `enabled` BOOLEAN NOT NULL DEFAULT false,
     `timeStartInMinutes` INTEGER NOT NULL DEFAULT 480,
@@ -115,10 +117,10 @@ CREATE TABLE `Schedule` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Review` (
+CREATE TABLE `reviews` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `profileId` VARCHAR(191) NOT NULL,
+    `professionalId` VARCHAR(191) NOT NULL,
     `comment` VARCHAR(191) NULL,
     `rating` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -128,11 +130,12 @@ CREATE TABLE `Review` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Scheduling` (
+CREATE TABLE `schedulings` (
     `id` VARCHAR(191) NOT NULL,
     `date` DATETIME(3) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `profileId` VARCHAR(191) NOT NULL,
+    `professionalId` VARCHAR(191) NOT NULL,
+    `serviceTypeId` VARCHAR(191) NOT NULL,
     `statusId` VARCHAR(191) NOT NULL,
     `observations` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -142,7 +145,7 @@ CREATE TABLE `Scheduling` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Status` (
+CREATE TABLE `status` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -151,9 +154,9 @@ CREATE TABLE `Status` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Absence` (
+CREATE TABLE `absences` (
     `id` VARCHAR(191) NOT NULL,
-    `profileId` VARCHAR(191) NOT NULL,
+    `professionalId` VARCHAR(191) NOT NULL,
     `absenceOptionId` VARCHAR(191) NOT NULL,
     `startTime` VARCHAR(191) NOT NULL,
     `endTime` VARCHAR(191) NOT NULL,
@@ -164,11 +167,29 @@ CREATE TABLE `Absence` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `AbsenceOptions` (
+CREATE TABLE `absenceOptions` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `serviceTypes` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `userTypes` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `slug` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -180,37 +201,46 @@ ALTER TABLE `Account` ADD CONSTRAINT `Account_user_id_fkey` FOREIGN KEY (`user_i
 ALTER TABLE `Session` ADD CONSTRAINT `Session_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Profession` ADD CONSTRAINT `Profession_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `occupations` ADD CONSTRAINT `occupations_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Profile` ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `users` ADD CONSTRAINT `users_userTypeId_fkey` FOREIGN KEY (`userTypeId`) REFERENCES `userTypes`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Profile` ADD CONSTRAINT `Profile_professionId_fkey` FOREIGN KEY (`professionId`) REFERENCES `Profession`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `professionals` ADD CONSTRAINT `professionals_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Profile` ADD CONSTRAINT `Profile_professionCategoryId_fkey` FOREIGN KEY (`professionCategoryId`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `professionals` ADD CONSTRAINT `professionals_occupationId_fkey` FOREIGN KEY (`occupationId`) REFERENCES `occupations`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `professionals` ADD CONSTRAINT `professionals_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Review` ADD CONSTRAINT `Review_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `professionals` ADD CONSTRAINT `professionals_serviceTypeId_fkey` FOREIGN KEY (`serviceTypeId`) REFERENCES `serviceTypes`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Review` ADD CONSTRAINT `Review_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `schedules` ADD CONSTRAINT `schedules_professionalId_fkey` FOREIGN KEY (`professionalId`) REFERENCES `professionals`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Scheduling` ADD CONSTRAINT `Scheduling_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `reviews` ADD CONSTRAINT `reviews_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Scheduling` ADD CONSTRAINT `Scheduling_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `reviews` ADD CONSTRAINT `reviews_professionalId_fkey` FOREIGN KEY (`professionalId`) REFERENCES `professionals`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Scheduling` ADD CONSTRAINT `Scheduling_statusId_fkey` FOREIGN KEY (`statusId`) REFERENCES `Status`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `schedulings` ADD CONSTRAINT `schedulings_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Absence` ADD CONSTRAINT `Absence_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `schedulings` ADD CONSTRAINT `schedulings_professionalId_fkey` FOREIGN KEY (`professionalId`) REFERENCES `professionals`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Absence` ADD CONSTRAINT `Absence_absenceOptionId_fkey` FOREIGN KEY (`absenceOptionId`) REFERENCES `AbsenceOptions`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `schedulings` ADD CONSTRAINT `schedulings_statusId_fkey` FOREIGN KEY (`statusId`) REFERENCES `status`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `schedulings` ADD CONSTRAINT `schedulings_serviceTypeId_fkey` FOREIGN KEY (`serviceTypeId`) REFERENCES `serviceTypes`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `absences` ADD CONSTRAINT `absences_professionalId_fkey` FOREIGN KEY (`professionalId`) REFERENCES `professionals`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `absences` ADD CONSTRAINT `absences_absenceOptionId_fkey` FOREIGN KEY (`absenceOptionId`) REFERENCES `absenceOptions`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

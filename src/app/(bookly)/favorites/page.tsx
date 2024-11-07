@@ -5,9 +5,22 @@ import { getUserFavorites } from "@/services/userService";
 import { useContext, useEffect, useState } from "react";
 import { Card } from "./card";
 
+interface FavoriteProps {
+  id: string;
+  address: string;
+  image: string;
+  name: string;
+  professional: {
+    bio?: string;
+    occupation: {
+      name: string;
+    };
+  };
+}
+
 export default function Favorites() {
   const { user } = useContext(UserContext);
-  const [favorites, setFavorites] = useState<any>();
+  const [favorites, setFavorites] = useState<FavoriteProps[]>();
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -25,11 +38,19 @@ export default function Favorites() {
         <h2 className="mb-8 text-2xl font-bold text-vibrant-green-100">
           Salvos
         </h2>
-        <div className="grid-cols-auto-fill grid max-h-40 grid-cols-4 gap-4">
-          {favorites &&
-            favorites.map((favorited, index) => {
-              return <Card professional={favorited} />;
-            })}
+        <div className="grid-cols-auto-fill grid grid-cols-1 gap-4 xl:grid-cols-4">
+          {favorites
+            ? favorites.map((favorited, index) => {
+                return <Card professional={favorited} />;
+              })
+            : Array.from({ length: 4 }).map((_, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="h-40 w-full animate-pulse cursor-pointer rounded-md border-2 border-slate-700 bg-background-300 p-4 shadow-md"
+                  />
+                );
+              })}
         </div>
       </div>
     </section>

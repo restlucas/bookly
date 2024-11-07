@@ -4,16 +4,32 @@ import SubmitButton from "@/components/button/submit";
 import { SelectInput } from "@/components/input/select";
 
 import { UserContext } from "@/contexts/UserContext";
-import { updateUserRole } from "@/services/userService";
-import { usersType } from "@/utils/common-data";
+import { getUserTypes, updateUserRole } from "@/services/userService";
 import toastDefaultValues from "@/utils/toast-default-values";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
+interface UserTypesProps {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export function SelectRole() {
-  const [selectedUserType, setSelectedUserType] = useState("personal");
   const { user, updateRole } = useContext(UserContext);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [userTypes, setUserTypes] = useState<UserTypesProps[]>();
+  const [selectedUserType, setSelectedUserType] = useState();
+
+  useEffect(() => {
+    const fetchUserTypes = async () => {
+      const response = await getUserTypes();
+      setUserTypes(response);
+    };
+
+    fetchUserTypes();
+  }, []);
 
   async function handleSubmit(event: any) {
     event.preventDefault();
@@ -45,7 +61,7 @@ export function SelectRole() {
         <SelectInput
           label="Tipo de perfil"
           name="userType"
-          options={usersType}
+          options={userTypes}
           value={selectedUserType}
           onChange={(e) => setSelectedUserType(e.target.value)}
           required
