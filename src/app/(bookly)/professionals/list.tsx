@@ -1,22 +1,22 @@
-import { ProfessionalCard } from '@/components/card/professional'
-import { getProfessionals } from '@/services/professionalService'
+import { ProfessionalCard } from "@/components/card/professional";
+import { getProfessionals } from "@/services/professionalService";
 
 interface Props {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default async function List({ searchParams }: Props) {
-  const category = searchParams.category as string
-  const occupation = searchParams.occupation as string
-  const serviceType = searchParams.serviceType as string
+  const category = searchParams.category as string;
+  const occupation = searchParams.occupation as string;
+  const serviceType = searchParams.serviceType as string;
 
   const filterQuery = {
     category,
     occupation,
     serviceType,
-  }
+  };
 
-  const list = await getProfessionals(filterQuery)
+  const list = await getProfessionals(filterQuery);
 
   return (
     <div className="flex-1 space-y-6 rounded-md bg-background-200 p-8">
@@ -27,13 +27,13 @@ export default async function List({ searchParams }: Props) {
       {list ? (
         list.count > 0 ? (
           <div className="flex flex-col gap-6">
-            {list.professionals.map((professional, index) => {
+            {list.professionals.map((professional) => {
               return (
                 <ProfessionalCard
                   key={professional.id}
                   professional={professional}
                 />
-              )
+              );
             })}
           </div>
         ) : (
@@ -54,10 +54,10 @@ export default async function List({ searchParams }: Props) {
                 key={index}
                 className="h-[184px] w-full rounded-md bg-background-300 p-3"
               />
-            )
+            );
           })}
         </div>
       )}
     </div>
-  )
+  );
 }
