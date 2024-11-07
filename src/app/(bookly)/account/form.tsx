@@ -10,6 +10,7 @@ import { gendersType } from '@/utils/common-data'
 import { formatPhone } from '@/utils/format-functions'
 import toastDefaultValues from '@/utils/toast-default-values'
 import { AccountFormData, validateAccountForm } from '@/utils/validators'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -71,6 +72,7 @@ export function AccountForm() {
 
   return (
     <>
+      <NextSeo title="Minha conta | Bookly" noindex />
       <form className="" onSubmit={handleSubmit}>
         {Object.keys(user).length !== 0 ? (
           <>

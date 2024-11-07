@@ -10,6 +10,7 @@ import { updateSchedulingStatus } from '@/services/schedulingService'
 import { toast, ToastContainer } from 'react-toastify'
 import toastDefaultValues from '@/utils/toast-default-values'
 import { CommentsFormModal } from '@/components/modal/form/comments'
+import { NextSeo } from 'next-seo'
 
 interface StatusTypes {
   professional: {
@@ -266,32 +267,164 @@ export default function Scheduling() {
   }
 
   return (
-    <section className="mb-8 flex flex-col gap-6">
-      {Object.keys(user).length !== 0 ? (
-        <>
-          {user.userType.slug === 'professional' && (
+    <>
+      <NextSeo title="Agendamentos | Bookly" noindex />
+      <section className="mb-8 flex flex-col gap-6">
+        {Object.keys(user).length !== 0 ? (
+          <>
+            {user.userType.slug === 'professional' && (
+              <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
+                <div>
+                  <div className="mb-8 flex w-full flex-col items-start lg:flex-row lg:items-center lg:justify-between">
+                    <h2 className="mb-4 text-2xl text-vibrant-green-100 lg:mb-0">
+                      Meus agendamentos (profissional)
+                    </h2>
+                  </div>
+
+                  <div>
+                    <div className="mb-4 flex items-center justify-start overflow-x-scroll lg:mb-0 lg:overflow-hidden">
+                      {isLoading.professional ? (
+                        <p>...</p>
+                      ) : (
+                        status.professional &&
+                        status.professional.map((item) => {
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={() =>
+                                handleSelectedFilter('professional', item.id)
+                              }
+                              className={`${item.id === selectedStatus.professional ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
+                            >
+                              {item.name}
+                            </button>
+                          )
+                        })
+                      )}
+                    </div>
+
+                    <div className="w-full overflow-x-scroll lg:overflow-hidden">
+                      <table className="font-regular w-full text-left text-sm shadow-md rtl:text-right">
+                        <thead className="bg-background-300 text-xs uppercase">
+                          <tr className="">
+                            <th className="px-6 py-3">Data</th>
+                            <th className="px-6 py-3">Cliente</th>
+                            <th className="px-6 py-3">Telefone</th>
+                            <th className="px-6 py-3">Observações</th>
+                            <th className="px-6 py-3">Valor</th>
+                            <th className="px-6 py-3">Tipo</th>
+                            <th className="px-6 py-3">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {isLoadingScheduling.professional ? (
+                            <tr>
+                              <td colSpan={7} className="py-6 text-center">
+                                Buscando informações...
+                              </td>
+                            </tr>
+                          ) : scheduling.professional.length > 0 ? (
+                            scheduling.professional.map((schedule, index) => {
+                              return (
+                                <tr
+                                  key={index}
+                                  className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
+                                >
+                                  <td className="px-6 py-4">
+                                    {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    {schedule.user.name}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    {schedule.user.phone}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <button
+                                      onClick={() =>
+                                        showCommentModal(
+                                          schedule.id,
+                                          schedule.observations,
+                                        )
+                                      }
+                                      className={`flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20`}
+                                    >
+                                      <span>Visualizar comentário</span>
+                                    </button>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    {schedule.professional.serviceValue}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    {schedule.professional.serviceType.name}
+                                  </td>
+                                  <td className="flex items-center justify-start gap-1 px-6 py-4">
+                                    {steps[schedule.status.name] &&
+                                      steps[schedule.status.name].options.map(
+                                        (step, index) => {
+                                          return (
+                                            <button
+                                              className="cursor-pointer"
+                                              key={index}
+                                              title={step.title}
+                                              onClick={() =>
+                                                handleStatus(
+                                                  {
+                                                    name: step.name,
+                                                    title: step.title,
+                                                    nextStep: step.nextStep,
+                                                  },
+                                                  schedule.id,
+                                                )
+                                              }
+                                            >
+                                              {step.element}
+                                            </button>
+                                          )
+                                        },
+                                      )}
+                                  </td>
+                                </tr>
+                              )
+                            })
+                          ) : (
+                            <tr>
+                              <td colSpan={7} className="py-6 text-center">
+                                Nenhum agendamento encontrado :(
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
               <div>
-                <div className="mb-8 flex w-full flex-col items-start lg:flex-row lg:items-center lg:justify-between">
-                  <h2 className="mb-4 text-2xl text-vibrant-green-100 lg:mb-0">
-                    Meus agendamentos (profissional)
+                <div className="mb-8 flex w-full items-center justify-start">
+                  <h2 className="text-2xl text-vibrant-green-100">
+                    Meus agendamentos{' '}
+                    {user.userType.slug === 'professional' && '(pessoal)'}
                   </h2>
                 </div>
 
                 <div>
                   <div className="mb-4 flex items-center justify-start overflow-x-scroll lg:mb-0 lg:overflow-hidden">
-                    {isLoading.professional ? (
+                    {isLoading.personal ? (
                       <p>...</p>
                     ) : (
-                      status.professional &&
-                      status.professional.map((item) => {
+                      status.personal &&
+                      status.personal.map((item) => {
                         return (
                           <button
                             key={item.id}
                             onClick={() =>
-                              handleSelectedFilter('professional', item.id)
+                              handleSelectedFilter('personal', item.id)
                             }
-                            className={`${item.id === selectedStatus.professional ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
+                            className={`${item.id === selectedStatus.personal ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
                           >
                             {item.name}
                           </button>
@@ -305,47 +438,42 @@ export default function Scheduling() {
                       <thead className="bg-background-300 text-xs uppercase">
                         <tr className="">
                           <th className="px-6 py-3">Data</th>
-                          <th className="px-6 py-3">Cliente</th>
+                          <th className="px-6 py-3">Profissional</th>
+                          <th className="px-6 py-3">Ocupação</th>
                           <th className="px-6 py-3">Telefone</th>
                           <th className="px-6 py-3">Observações</th>
                           <th className="px-6 py-3">Valor</th>
                           <th className="px-6 py-3">Tipo</th>
-                          <th className="px-6 py-3">Ações</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {isLoadingScheduling.professional ? (
+                        {isLoadingScheduling.personal ? (
                           <tr>
                             <td colSpan={7} className="py-6 text-center">
                               Buscando informações...
                             </td>
                           </tr>
-                        ) : scheduling.professional.length > 0 ? (
-                          scheduling.professional.map((schedule, index) => {
+                        ) : scheduling.personal.length > 0 ? (
+                          scheduling.personal.map((schedule, index) => {
                             return (
                               <tr
-                                key={index}
+                                key={schedule.id}
                                 className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                               >
                                 <td className="px-6 py-4">
                                   {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                                 </td>
                                 <td className="px-6 py-4">
-                                  {schedule.user.name}
+                                  {schedule.professional.user.name}
                                 </td>
                                 <td className="px-6 py-4">
-                                  {schedule.user.phone}
+                                  {schedule.professional.occupation.name}
                                 </td>
                                 <td className="px-6 py-4">
-                                  <button
-                                    onClick={() =>
-                                      showCommentModal(
-                                        schedule.id,
-                                        schedule.observations,
-                                      )
-                                    }
-                                    className={`flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20`}
-                                  >
+                                  {schedule.professional.user.phone}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <button className="flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20">
                                     <span>Visualizar comentário</span>
                                   </button>
                                 </td>
@@ -354,32 +482,6 @@ export default function Scheduling() {
                                 </td>
                                 <td className="px-6 py-4">
                                   {schedule.professional.serviceType.name}
-                                </td>
-                                <td className="flex items-center justify-start gap-1 px-6 py-4">
-                                  {steps[schedule.status.name] &&
-                                    steps[schedule.status.name].options.map(
-                                      (step, index) => {
-                                        return (
-                                          <button
-                                            className="cursor-pointer"
-                                            key={index}
-                                            title={step.title}
-                                            onClick={() =>
-                                              handleStatus(
-                                                {
-                                                  name: step.name,
-                                                  title: step.title,
-                                                  nextStep: step.nextStep,
-                                                },
-                                                schedule.id,
-                                              )
-                                            }
-                                          >
-                                            {step.element}
-                                          </button>
-                                        )
-                                      },
-                                    )}
                                 </td>
                               </tr>
                             )
@@ -397,121 +499,23 @@ export default function Scheduling() {
                 </div>
               </div>
             </div>
-          )}
-
-          <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
-            <div>
-              <div className="mb-8 flex w-full items-center justify-start">
-                <h2 className="text-2xl text-vibrant-green-100">
-                  Meus agendamentos{' '}
-                  {user.userType.slug === 'professional' && '(pessoal)'}
-                </h2>
-              </div>
-
-              <div>
-                <div className="mb-4 flex items-center justify-start overflow-x-scroll lg:mb-0 lg:overflow-hidden">
-                  {isLoading.personal ? (
-                    <p>...</p>
-                  ) : (
-                    status.personal &&
-                    status.personal.map((item) => {
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() =>
-                            handleSelectedFilter('personal', item.id)
-                          }
-                          className={`${item.id === selectedStatus.personal ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
-                        >
-                          {item.name}
-                        </button>
-                      )
-                    })
-                  )}
-                </div>
-
-                <div className="w-full overflow-x-scroll lg:overflow-hidden">
-                  <table className="font-regular w-full text-left text-sm shadow-md rtl:text-right">
-                    <thead className="bg-background-300 text-xs uppercase">
-                      <tr className="">
-                        <th className="px-6 py-3">Data</th>
-                        <th className="px-6 py-3">Profissional</th>
-                        <th className="px-6 py-3">Ocupação</th>
-                        <th className="px-6 py-3">Telefone</th>
-                        <th className="px-6 py-3">Observações</th>
-                        <th className="px-6 py-3">Valor</th>
-                        <th className="px-6 py-3">Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {isLoadingScheduling.personal ? (
-                        <tr>
-                          <td colSpan={7} className="py-6 text-center">
-                            Buscando informações...
-                          </td>
-                        </tr>
-                      ) : scheduling.personal.length > 0 ? (
-                        scheduling.personal.map((schedule, index) => {
-                          return (
-                            <tr
-                              key={schedule.id}
-                              className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
-                            >
-                              <td className="px-6 py-4">
-                                {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
-                              </td>
-                              <td className="px-6 py-4">
-                                {schedule.professional.user.name}
-                              </td>
-                              <td className="px-6 py-4">
-                                {schedule.professional.occupation.name}
-                              </td>
-                              <td className="px-6 py-4">
-                                {schedule.professional.user.phone}
-                              </td>
-                              <td className="px-6 py-4">
-                                <button className="flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20">
-                                  <span>Visualizar comentário</span>
-                                </button>
-                              </td>
-                              <td className="px-6 py-4">
-                                {schedule.professional.serviceValue}
-                              </td>
-                              <td className="px-6 py-4">
-                                {schedule.professional.serviceType.name}
-                              </td>
-                            </tr>
-                          )
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={7} className="py-6 text-center">
-                            Nenhum agendamento encontrado :(
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+          </>
+        ) : (
+          <div className="w-full animate-pulse space-y-4 rounded-md bg-background-200 p-8 shadow-md">
+            <div className="h-10 w-64 rounded-md bg-background-300" />
+            <div className="h-10 w-1/3 rounded-md bg-background-300" />
+            <div className="h-10 w-full rounded-md bg-background-300" />
           </div>
-        </>
-      ) : (
-        <div className="w-full animate-pulse space-y-4 rounded-md bg-background-200 p-8 shadow-md">
-          <div className="h-10 w-64 rounded-md bg-background-300" />
-          <div className="h-10 w-1/3 rounded-md bg-background-300" />
-          <div className="h-10 w-full rounded-md bg-background-300" />
-        </div>
-      )}
-      <ToastContainer closeOnClick theme="dark" />
+        )}
+        <ToastContainer closeOnClick theme="dark" />
 
-      {showModal && (
-        <CommentsFormModal
-          selectedScheduling={selectedScheduling}
-          setShowModal={setShowModal}
-        />
-      )}
-    </section>
+        {showModal && (
+          <CommentsFormModal
+            selectedScheduling={selectedScheduling}
+            setShowModal={setShowModal}
+          />
+        )}
+      </section>
+    </>
   )
 }

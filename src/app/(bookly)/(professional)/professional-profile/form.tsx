@@ -24,6 +24,7 @@ import {
   validateProfessionalProfileForm,
 } from '@/utils/validators'
 import { formatCurrency } from '@/utils/format-functions'
+import { NextSeo } from 'next-seo'
 
 interface CategoriesProps {
   id: string
@@ -169,6 +170,7 @@ export function ProfessionalProfileForm() {
 
   return (
     <>
+      <NextSeo title="Perfil profissional | Bookly" noindex />
       <form className="" onSubmit={handleSubmit}>
         {Object.keys(user).length !== 0 ? (
           <>

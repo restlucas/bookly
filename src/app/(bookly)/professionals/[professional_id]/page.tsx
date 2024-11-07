@@ -16,6 +16,7 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { FavoriteButton } from '@/components/button/favorite'
 import { UserContext } from '@/contexts/UserContext'
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher'
+import { NextSeo } from 'next-seo'
 
 interface ProfessionalProps {
   name: string
@@ -82,6 +83,7 @@ export default function ProfessionalProfile({
     <div>
       {professional && professional.professional ? (
         <>
+          <NextSeo title={`${professional.name} | Bookly`} noindex />
           <div className="mb-4 flex items-start justify-start">
             <Link
               href={'./'}
