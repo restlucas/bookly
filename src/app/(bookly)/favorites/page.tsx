@@ -41,7 +41,7 @@ export default function Favorites() {
         <div className="grid-cols-auto-fill grid grid-cols-1 gap-4 xl:grid-cols-4">
           {favorites
             ? favorites.map((favorited, index) => {
-                return <Card professional={favorited} />;
+                return <Card key={index} professional={favorited} />;
               })
             : Array.from({ length: 4 }).map((_, index) => {
                 return (

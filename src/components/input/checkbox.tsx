@@ -1,6 +1,6 @@
 interface CheckboxInputProps {
-  label: string;
-  name: string;
+  label: string
+  name: string
 }
 
 export function CheckboxInput({ label, name }: CheckboxInputProps) {
@@ -16,5 +16,5 @@ export function CheckboxInput({ label, name }: CheckboxInputProps) {
         <span>{label}</span>
       </label>
     </div>
-  );
+  )
 }

@@ -22,5 +22,5 @@ export function CommentsCard() {
         </div>
       </div>
     </div>
-  );
+  )
 }

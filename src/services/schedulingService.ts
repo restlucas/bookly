@@ -1,18 +1,18 @@
-"use server";
+'use server'
 
-import { prisma } from "@/lib/prisma";
-import dayjs from "dayjs";
+import { prisma } from '@/lib/prisma'
+import dayjs from 'dayjs'
 
 interface ServiceResponse<T> {
-  type: "success" | "error";
-  data?: T;
-  message?: string;
+  type: 'success' | 'error'
+  data?: T
+  message?: string
 }
 
 export async function getServiceType() {
-  const response = await prisma.serviceType.findMany();
+  const response = await prisma.serviceType.findMany()
 
-  return response;
+  return response
 }
 
 export async function createScheduling(
@@ -20,7 +20,7 @@ export async function createScheduling(
   schedulingData: any,
 ): Promise<ServiceResponse<any>> {
   try {
-    const { userProfessionalId, date, hour, serviceTypeSlug } = schedulingData;
+    const { userProfessionalId, date, hour, serviceTypeSlug } = schedulingData
 
     // Get professional id
     const { id: professionalId } = await prisma.professional.findFirstOrThrow({
@@ -30,14 +30,14 @@ export async function createScheduling(
       select: {
         id: true,
       },
-    });
+    })
 
     // Get default status id
     const { id: statusId } = await prisma.status.findFirst({
       where: {
-        name: "Aguardando aprovação",
+        name: 'Aguardando aprovação',
       },
-    });
+    })
 
     // Get serviceTypeId
     const serviceType = await prisma.serviceType.findFirst({
@@ -47,16 +47,16 @@ export async function createScheduling(
       select: {
         id: true,
       },
-    });
+    })
 
-    const dateInStringFormat = date;
-    const hourNumber = hour / 60;
+    const dateInStringFormat = date
+    const hourNumber = hour / 60
 
-    const formattedDate = new Date(dateInStringFormat);
+    const formattedDate = new Date(dateInStringFormat)
 
-    const hours = Math.floor(hourNumber);
-    const minutes = Math.round((hourNumber - hours) * 60);
-    formattedDate.setUTCHours(hours + 3, minutes, 0, 0);
+    const hours = Math.floor(hourNumber)
+    const minutes = Math.round((hourNumber - hours) * 60)
+    formattedDate.setUTCHours(hours + 3, minutes, 0, 0)
 
     const data = {
       userId,
@@ -64,24 +64,24 @@ export async function createScheduling(
       date: formattedDate.toISOString(),
       serviceTypeId: serviceType.id,
       statusId,
-    };
+    }
 
     const response = await prisma.scheduling.create({
       data,
-    });
+    })
 
     return {
-      type: "success",
-      message: "Sucesso ao criar agendamento!",
+      type: 'success',
+      message: 'Sucesso ao criar agendamento!',
       data: response,
-    };
+    }
   } catch (error: any) {
-    console.error("Erro ao criar agendamento:", error);
+    console.error('Erro ao criar agendamento:', error)
 
     return {
-      type: "error",
-      message: "Erro ao criar agendamento",
-    };
+      type: 'error',
+      message: 'Erro ao criar agendamento',
+    }
   }
 }
 
@@ -94,7 +94,7 @@ export async function updateSchedulingStatus(
       where: {
         name: operation.nextStep,
       },
-    });
+    })
 
     const response = await prisma.scheduling.update({
       where: {
@@ -103,20 +103,20 @@ export async function updateSchedulingStatus(
       data: {
         statusId,
       },
-    });
+    })
 
     return {
-      type: "success",
-      message: "Status alterado com sucesso!",
+      type: 'success',
+      message: 'Status alterado com sucesso!',
       data: response,
-    };
+    }
   } catch (error: any) {
-    console.error("Erro ao atualizar status:", error);
+    console.error('Erro ao atualizar status:', error)
 
     return {
-      type: "error",
-      message: "Erro ao atualizar status",
-    };
+      type: 'error',
+      message: 'Erro ao atualizar status',
+    }
   }
 }
 
@@ -132,32 +132,32 @@ export async function updateSchedulingObservations(
       data: {
         observations: comment,
       },
-    });
+    })
 
     return {
-      type: "success",
-      message: "Comentário salvo com sucesso!",
+      type: 'success',
+      message: 'Comentário salvo com sucesso!',
       data: response,
-    };
+    }
   } catch (error: any) {
-    console.error("Erro ao salvar comentário:", error);
+    console.error('Erro ao salvar comentário:', error)
 
     return {
-      type: "error",
-      message: "Erro ao salvar comentário",
-    };
+      type: 'error',
+      message: 'Erro ao salvar comentário',
+    }
   }
 }
 
 export async function getNextAppointmentsByUser(userId: string) {
-  const today = new Date();
+  const today = new Date()
 
   const nextTwoWeeks = dayjs(today)
-    .set("date", dayjs(today).get("date") + 14)
-    .set("hour", 23)
-    .set("minutes", 59)
-    .set("seconds", 59)
-    .toDate();
+    .set('date', dayjs(today).get('date') + 14)
+    .set('hour', 23)
+    .set('minutes', 59)
+    .set('seconds', 59)
+    .toDate()
 
   const response = await prisma.scheduling.findMany({
     where: {
@@ -167,7 +167,7 @@ export async function getNextAppointmentsByUser(userId: string) {
         lt: nextTwoWeeks,
       },
       status: {
-        name: "Em andamento",
+        name: 'Em andamento',
       },
     },
     select: {
@@ -193,7 +193,7 @@ export async function getNextAppointmentsByUser(userId: string) {
         },
       },
     },
-  });
+  })
 
-  return response;
+  return response
 }

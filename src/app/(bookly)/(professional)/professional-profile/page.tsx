@@ -1,4 +1,4 @@
-import { ProfessionalProfileForm } from "./form";
+import { ProfessionalProfileForm } from './form'
 
 export default function ProfessionalProfile() {
   return (
@@ -11,5 +11,5 @@ export default function ProfessionalProfile() {
         <ProfessionalProfileForm />
       </div>
     </section>
-  );
+  )
 }

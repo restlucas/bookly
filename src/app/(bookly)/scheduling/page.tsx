@@ -1,93 +1,93 @@
-"use client";
+'use client'
 
-import { UserContext } from "@/contexts/UserContext";
-import { getStatus } from "@/services/statusService";
-import { CheckSquare, Question, XSquare } from "@phosphor-icons/react";
-import { useContext, useEffect, useState } from "react";
-import { getSchedulingByStatus } from "@/services/professionalService";
-import dayjs from "dayjs";
-import { updateSchedulingStatus } from "@/services/schedulingService";
-import { toast, ToastContainer } from "react-toastify";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { CommentsFormModal } from "@/components/modal/form/comments";
+import { UserContext } from '@/contexts/UserContext'
+import { getStatus } from '@/services/statusService'
+import { CheckSquare, Question, XSquare } from '@phosphor-icons/react'
+import { useContext, useEffect, useState } from 'react'
+import { getSchedulingByStatus } from '@/services/professionalService'
+import dayjs from 'dayjs'
+import { updateSchedulingStatus } from '@/services/schedulingService'
+import { toast, ToastContainer } from 'react-toastify'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { CommentsFormModal } from '@/components/modal/form/comments'
 
 interface StatusTypes {
   professional: {
-    id: string;
-    name: string;
-  }[];
+    id: string
+    name: string
+  }[]
   personal: {
-    id: string;
-    name: string;
-  }[];
+    id: string
+    name: string
+  }[]
 }
 
 interface SchedulingProps {
-  date: Date;
-  id: string;
-  observations?: string;
+  date: Date
+  id: string
+  observations?: string
   professional: {
     occupation: {
-      name: string;
-    };
-    serviceValue: string;
+      name: string
+    }
+    serviceValue: string
     user: {
-      name: string;
-      phone: string;
-    };
+      name: string
+      phone: string
+    }
     serviceType: {
-      name: string;
-    };
-  };
+      name: string
+    }
+  }
   user: {
-    name: string;
-    phone: string;
-  };
+    name: string
+    phone: string
+  }
   status: {
-    name: string;
-  };
+    name: string
+  }
 }
 
 interface SchedulingTypes {
-  professional: SchedulingProps[];
-  personal: SchedulingProps[];
+  professional: SchedulingProps[]
+  personal: SchedulingProps[]
 }
 
 interface SelectedSchedulingProps {
-  id: string;
-  observations?: string;
+  id: string
+  observations?: string
 }
 
 export default function Scheduling() {
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext)
 
-  const [status, setStatus] = useState<StatusTypes>();
+  const [status, setStatus] = useState<StatusTypes>()
   const [selectedStatus, setSelectedStatus] = useState({
-    professional: "",
-    personal: "",
-  });
+    professional: '',
+    personal: '',
+  })
   const [isLoading, setIsLoading] = useState({
     professional: true,
     personal: true,
-  });
+  })
 
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedScheduling, setSelectedScheduling] =
-    useState<SelectedSchedulingProps>();
+    useState<SelectedSchedulingProps>()
 
-  const [scheduling, setScheduling] = useState<SchedulingTypes>();
+  const [scheduling, setScheduling] = useState<SchedulingTypes>()
   const [isLoadingScheduling, setIsLoadingScheduling] = useState({
     professional: true,
     personal: true,
-  });
+  })
 
   const steps = {
-    "Aguardando aprovação": {
+    'Aguardando aprovação': {
       options: [
         {
-          name: "approve",
-          title: "Aprovar",
-          nextStep: "Em andamento",
+          name: 'approve',
+          title: 'Aprovar',
+          nextStep: 'Em andamento',
           element: (
             <CheckSquare
               className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -97,21 +97,21 @@ export default function Scheduling() {
           ),
         },
         {
-          name: "repprove",
-          title: "Reprovar",
-          nextStep: "Cancelado",
+          name: 'repprove',
+          title: 'Reprovar',
+          nextStep: 'Cancelado',
           element: (
             <XSquare className="fill-rose-400" size={32} weight="fill" />
           ),
         },
       ],
     },
-    "Em andamento": {
+    'Em andamento': {
       options: [
         {
-          name: "conclude",
-          title: "Concluir",
-          nextStep: "Concluído",
+          name: 'conclude',
+          title: 'Concluir',
+          nextStep: 'Concluído',
           element: (
             <CheckSquare
               className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -121,100 +121,100 @@ export default function Scheduling() {
           ),
         },
         {
-          name: "cancel",
-          title: "Cancelar",
-          nextStep: "Cancelado",
+          name: 'cancel',
+          title: 'Cancelar',
+          nextStep: 'Cancelado',
           element: (
             <XSquare className="fill-rose-400" size={32} weight="fill" />
           ),
         },
         {
-          name: "not-attend",
-          title: "Não compareceu",
-          nextStep: "Não compareceu",
+          name: 'not-attend',
+          title: 'Não compareceu',
+          nextStep: 'Não compareceu',
           element: (
             <Question className="fill-orange-400" size={32} weight="fill" />
           ),
         },
       ],
     },
-  };
+  }
 
   // Initial status fetch
   useEffect(() => {
-    fetchStatus();
-  }, []);
+    fetchStatus()
+  }, [])
 
   const fetchStatus = async () => {
-    const fetchedStatus = await getStatus();
+    const fetchedStatus = await getStatus()
     setStatus({
       professional: fetchedStatus,
       personal: fetchedStatus,
-    });
+    })
 
     const selectedStatusId = fetchedStatus.find(
-      (item) => item.name === "Aguardando aprovação",
-    )?.id;
+      (item) => item.name === 'Aguardando aprovação',
+    )?.id
 
     setSelectedStatus({
       professional: selectedStatusId,
       personal: selectedStatusId,
-    });
+    })
 
-    setIsLoading((prev) => ({ ...prev, professional: false, personal: false }));
-  };
+    setIsLoading((prev) => ({ ...prev, professional: false, personal: false }))
+  }
 
   // Watching professional status filter change to fetch professional scheduling
   useEffect(() => {
     user.userType &&
-      user.userType.slug === "professional" &&
-      fetchScheduling("professional");
-  }, [user, selectedStatus.professional]);
+      user.userType.slug === 'professional' &&
+      fetchScheduling('professional')
+  }, [user, selectedStatus.professional])
 
   /// Watching personal status filter change to fetch personal scheduling
   useEffect(() => {
-    user.userType && user.userType.slug && fetchScheduling("personal");
-  }, [user, selectedStatus.personal]);
+    user.userType && user.userType.slug && fetchScheduling('personal')
+  }, [user, selectedStatus.personal])
 
   // Fetch scheduling based on user role
   const fetchScheduling = async (type: string) => {
-    let response;
+    let response
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    if (type === "professional") {
+    if (type === 'professional') {
       response = await getSchedulingByStatus(
-        "professional", // userRole passed to prisma where conditional
+        'professional', // userRole passed to prisma where conditional
         user.id,
         selectedStatus.professional,
-      );
+      )
 
       setScheduling((prevState) => ({
         ...prevState,
         professional: response,
-      }));
+      }))
 
       setIsLoadingScheduling((prevState) => ({
         ...prevState,
         professional: false,
-      }));
+      }))
     }
 
     response = await getSchedulingByStatus(
-      "personal", // userRole passed to prisma where conditional
+      'personal', // userRole passed to prisma where conditional
       user.id,
       selectedStatus.personal,
-    );
+    )
     setScheduling((prevState) => ({
       ...prevState,
       personal: response,
-    }));
+    }))
 
     setIsLoadingScheduling((prevState) => ({
       ...prevState,
       personal: false,
-    }));
-  };
+    }))
+  }
 
   // Handle filter in scheduling table
   const handleSelectedFilter = async (type: string, itemId: string) => {
@@ -222,13 +222,13 @@ export default function Scheduling() {
       setIsLoadingScheduling((prevState) => ({
         ...prevState,
         [type]: true,
-      }));
+      }))
       setSelectedStatus((prevState) => ({
         ...prevState,
         [type]: itemId,
-      }));
+      }))
     }
-  };
+  }
 
   const handleStatus = async (
     operation: { name: string; title: string; nextStep: string },
@@ -236,21 +236,21 @@ export default function Scheduling() {
   ) => {
     const rsp = confirm(
       `Confirmar novo status do agendamento para: ${operation.title.toLowerCase()}?`,
-    );
+    )
 
     if (rsp) {
-      const response = await updateSchedulingStatus(operation, schedulingId);
+      const response = await updateSchedulingStatus(operation, schedulingId)
       setIsLoadingScheduling((prevState) => ({
         ...prevState,
         professional: true,
-      }));
+      }))
 
-      toast[response.type](response.message, toastDefaultValues);
+      toast[response.type](response.message, toastDefaultValues)
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      fetchScheduling("professional");
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      fetchScheduling('professional')
     }
-  };
+  }
 
   const showCommentModal = async (
     scheduleId: string,
@@ -259,15 +259,15 @@ export default function Scheduling() {
     setSelectedScheduling({
       id: scheduleId,
       observations: scheduleObservations,
-    });
-    setShowModal(true);
-  };
+    })
+    setShowModal(true)
+  }
 
   return (
     <section className="mb-8 flex flex-col gap-6">
       {Object.keys(user).length !== 0 ? (
         <>
-          {user.userType.slug === "professional" && (
+          {user.userType.slug === 'professional' && (
             <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
               <div>
                 <div className="mb-8 flex w-full flex-col items-start lg:flex-row lg:items-center lg:justify-between">
@@ -287,13 +287,13 @@ export default function Scheduling() {
                           <button
                             key={item.id}
                             onClick={() =>
-                              handleSelectedFilter("professional", item.id)
+                              handleSelectedFilter('professional', item.id)
                             }
-                            className={`${item.id === selectedStatus.professional ? "bg-background-300 text-vibrant-green-100" : "bg-transparent text-white"} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
+                            className={`${item.id === selectedStatus.professional ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
                           >
                             {item.name}
                           </button>
-                        );
+                        )
                       })
                     )}
                   </div>
@@ -323,10 +323,10 @@ export default function Scheduling() {
                             return (
                               <tr
                                 key={index}
-                                className={`${index === 4 ? "" : "border-b"} border-background-300 hover:bg-background-300/50`}
+                                className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                               >
                                 <td className="px-6 py-4">
-                                  {`${String(dayjs(schedule.date).format("DD/MM/YYYY"))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, "0")}:${String(dayjs(schedule.date).minute()).padEnd(2, "0")}`}
+                                  {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                                 </td>
                                 <td className="px-6 py-4">
                                   {schedule.user.name}
@@ -375,12 +375,12 @@ export default function Scheduling() {
                                           >
                                             {step.element}
                                           </button>
-                                        );
+                                        )
                                       },
                                     )}
                                 </td>
                               </tr>
-                            );
+                            )
                           })
                         ) : (
                           <tr>
@@ -401,8 +401,8 @@ export default function Scheduling() {
             <div>
               <div className="mb-8 flex w-full items-center justify-start">
                 <h2 className="text-2xl text-vibrant-green-100">
-                  Meus agendamentos{" "}
-                  {user.userType.slug === "professional" && "(pessoal)"}
+                  Meus agendamentos{' '}
+                  {user.userType.slug === 'professional' && '(pessoal)'}
                 </h2>
               </div>
 
@@ -417,13 +417,13 @@ export default function Scheduling() {
                         <button
                           key={item.id}
                           onClick={() =>
-                            handleSelectedFilter("personal", item.id)
+                            handleSelectedFilter('personal', item.id)
                           }
-                          className={`${item.id === selectedStatus.personal ? "bg-background-300 text-vibrant-green-100" : "bg-transparent text-white"} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
+                          className={`${item.id === selectedStatus.personal ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
                         >
                           {item.name}
                         </button>
-                      );
+                      )
                     })
                   )}
                 </div>
@@ -453,10 +453,10 @@ export default function Scheduling() {
                           return (
                             <tr
                               key={schedule.id}
-                              className={`${index === 4 ? "" : "border-b"} border-background-300 hover:bg-background-300/50`}
+                              className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                             >
                               <td className="px-6 py-4">
-                                {`${String(dayjs(schedule.date).format("DD/MM/YYYY"))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, "0")}:${String(dayjs(schedule.date).minute()).padEnd(2, "0")}`}
+                                {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                               </td>
                               <td className="px-6 py-4">
                                 {schedule.professional.user.name}
@@ -479,7 +479,7 @@ export default function Scheduling() {
                                 {schedule.professional.serviceType.name}
                               </td>
                             </tr>
-                          );
+                          )
                         })
                       ) : (
                         <tr>
@@ -511,5 +511,5 @@ export default function Scheduling() {
         />
       )}
     </section>
-  );
+  )
 }

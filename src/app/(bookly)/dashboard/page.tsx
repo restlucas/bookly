@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { SelectRole } from "./select-role";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "@/contexts/UserContext";
+import { SelectRole } from './select-role'
+import { useContext, useEffect, useState } from 'react'
+import { UserContext } from '@/contexts/UserContext'
 
 import {
   BuildingOffice,
@@ -10,42 +10,42 @@ import {
   CurrencyDollar,
   SmileySad,
   User,
-} from "@phosphor-icons/react";
-import { getNextAppointmentsByUser } from "@/services/schedulingService";
-import dayjs from "dayjs";
+} from '@phosphor-icons/react'
+import { getNextAppointmentsByUser } from '@/services/schedulingService'
+import dayjs from 'dayjs'
 
 interface NextSchedulingsProps {
   professional: {
     user: {
-      name: string;
-    };
-    serviceValue: string;
+      name: string
+    }
+    serviceValue: string
     occupation: {
-      name: string;
-    };
-  };
+      name: string
+    }
+  }
   serviceType: {
-    name: string;
-  };
-  date: Date;
+    name: string
+  }
+  date: Date
 }
 
 export default function Dashboard() {
-  const { user, isLoading } = useContext(UserContext);
+  const { user, isLoading } = useContext(UserContext)
 
   const [nextSchedulings, setNextSchedulings] =
-    useState<NextSchedulingsProps[]>();
+    useState<NextSchedulingsProps[]>()
 
   useEffect(() => {
     const fetchNextSchedulings = async () => {
       if (user.id) {
-        const response = await getNextAppointmentsByUser(user.id);
-        setNextSchedulings(response);
+        const response = await getNextAppointmentsByUser(user.id)
+        setNextSchedulings(response)
       }
-    };
+    }
 
-    fetchNextSchedulings();
-  }, [user]);
+    fetchNextSchedulings()
+  }, [user])
 
   if (isLoading) {
     return (
@@ -66,7 +66,7 @@ export default function Dashboard() {
           />
         </svg>
       </div>
-    );
+    )
   }
 
   if (!user.userType) {
@@ -74,13 +74,13 @@ export default function Dashboard() {
       <div className="absolute bottom-0 left-0 right-0 top-0 flex h-full w-screen items-center justify-center bg-background-100">
         <SelectRole />
       </div>
-    );
+    )
   } else {
     return (
       <main className="h-full space-y-8">
         <div className="w-full rounded-md bg-background-200 p-8">
           <h1 className="text-center text-xl">
-            Bem vindo novamente{" "}
+            Bem vindo novamente{' '}
             <span className="font-bold text-vibrant-green-100">
               {user.name}
             </span>
@@ -105,9 +105,9 @@ export default function Dashboard() {
                         <div className="flex items-center justify-start gap-2">
                           <CalendarDots size={24} />
                           <span>
-                            {dayjs(scheduling.date).format("DD/MM/YYYY")}
-                            {" ~ "}
-                            {`${String(dayjs(scheduling.date).hour()).padStart(2, "0")}:${String(dayjs(scheduling.date).minute()).padEnd(2, "0")}`}
+                            {dayjs(scheduling.date).format('DD/MM/YYYY')}
+                            {' ~ '}
+                            {`${String(dayjs(scheduling.date).hour()).padStart(2, '0')}:${String(dayjs(scheduling.date).minute()).padEnd(2, '0')}`}
                           </span>
                         </div>
                         <div className="flex items-center justify-start gap-2">
@@ -129,7 +129,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </li>
-                  );
+                  )
                 })
               ) : (
                 <div className="flex w-full flex-col items-center justify-center gap-1 fill-slate-400 text-slate-400">
@@ -141,6 +141,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-    );
+    )
   }
 }

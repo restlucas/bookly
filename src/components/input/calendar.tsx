@@ -7,5 +7,5 @@ export function CalendarInput() {
         type="date"
       />
     </div>
-  );
+  )
 }

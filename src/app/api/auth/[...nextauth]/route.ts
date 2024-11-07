@@ -1,18 +1,18 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-import NextAuth, { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { PrismaClient } from '@prisma/client'
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
   providers: [
     GoogleProvider({
@@ -23,23 +23,23 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (url === baseUrl || url.startsWith(baseUrl)) {
-        return `${baseUrl}/dashboard`;
+        return `${baseUrl}/dashboard`
       }
-      return url;
+      return url
     },
 
     async jwt({ token, user, account }) {
       if (account) {
         const userInfo = await prisma.user.findUnique({
           where: { email: user.email },
-        });
+        })
 
-        token.accessToken = account.access_token;
-        token.user_id = userInfo?.id;
-        token.role = userInfo?.role;
+        token.accessToken = account.access_token
+        token.user_id = userInfo?.id
+        token.role = userInfo?.role
       }
 
-      return token;
+      return token
     },
 
     async session({ session, user, token }) {
@@ -47,18 +47,18 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.user_id,
         role: token.role,
-      };
+      }
 
-      return session;
+      return session
     },
 
     async signIn({ user, account }) {
-      if (account.provider === "google") {
+      if (account.provider === 'google') {
         let existingUser = await prisma.user.findUnique({
           where: {
             email: user.email,
           },
-        });
+        })
 
         if (!existingUser) {
           existingUser = await prisma.user.create({
@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name,
               image: user.image,
             },
-          });
+          })
 
           await prisma.account.create({
             data: {
@@ -77,7 +77,7 @@ export const authOptions: NextAuthOptions = {
               accessToken: account.access_token,
               userId: existingUser.id,
             },
-          });
+          })
         }
 
         // const cookie = cookies();
@@ -86,10 +86,10 @@ export const authOptions: NextAuthOptions = {
         //   httpOnly: true,
         // });
       }
-      return true;
+      return true
     },
   },
-};
+}
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions)
+export { handler as GET, handler as POST }

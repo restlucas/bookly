@@ -1,24 +1,24 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { List, SignOut, X } from "@phosphor-icons/react";
-import Image from "next/image";
-import { signOut } from "next-auth/react";
-import { useContext, useState } from "react";
-import { UserContext } from "@/contexts/UserContext";
-import { menus } from "@/utils/common-data";
-import { usePathname, useRouter } from "next/navigation";
+import Link from 'next/link'
+import { List, SignOut, X } from '@phosphor-icons/react'
+import Image from 'next/image'
+import { signOut } from 'next-auth/react'
+import { useContext, useState } from 'react'
+import { UserContext } from '@/contexts/UserContext'
+import { menus } from '@/utils/common-data'
+import { usePathname, useRouter } from 'next/navigation'
 
 export function Header() {
-  const { user, isLoading } = useContext(UserContext);
-  const router = useRouter();
-  const pathname = usePathname();
+  const { user, isLoading } = useContext(UserContext)
+  const router = useRouter()
+  const pathname = usePathname()
 
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false)
 
   function handleMenu(menu) {
-    setShowMenu(false);
-    router.push(`${menu}`);
+    setShowMenu(false)
+    router.push(`${menu}`)
   }
 
   if (!user.userType)
@@ -41,7 +41,7 @@ export function Header() {
           <div className="h-12 w-12 rounded-md bg-background-200" />
         </div>
       </div>
-    );
+    )
 
   return (
     <div>
@@ -59,12 +59,12 @@ export function Header() {
                     menu.access.includes(user.userType.slug) && (
                       <li
                         key={menu.id}
-                        className={`duration-100 hover:underline ${pathname.includes(menu.href) && "font-bold text-vibrant-green-100"}`}
+                        className={`duration-100 hover:underline ${pathname.includes(menu.href) && 'font-bold text-vibrant-green-100'}`}
                       >
                         <Link href={menu.href}>{menu.name}</Link>
                       </li>
                     )
-                  );
+                  )
                 })}
               </ul>
               <div className="flex items-center justify-center gap-4">
@@ -95,7 +95,7 @@ export function Header() {
                       >
                         Favoritos
                       </Link>
-                      {user.userType.slug === "professional" && (
+                      {user.userType.slug === 'professional' && (
                         <Link
                           href="/professional-profile"
                           className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
@@ -104,7 +104,7 @@ export function Header() {
                         </Link>
                       )}
                       <button
-                        onClick={() => signOut({ callbackUrl: "/login" })}
+                        onClick={() => signOut({ callbackUrl: '/login' })}
                         className="flex cursor-pointer items-center justify-between gap-4 py-2 pl-4 pr-2 hover:bg-background-300"
                       >
                         <span>Sair</span>
@@ -145,40 +145,40 @@ export function Header() {
                           menu.access.includes(user.userType.slug) && (
                             <li
                               key={menu.id}
-                              className={`text-lg duration-100 hover:underline ${pathname.includes(menu.href) && "font-bold text-vibrant-green-100"}`}
+                              className={`text-lg duration-100 hover:underline ${pathname.includes(menu.href) && 'font-bold text-vibrant-green-100'}`}
                             >
                               <button onClick={() => handleMenu(menu.href)}>
                                 {menu.name}
                               </button>
                             </li>
                           )
-                        );
+                        )
                       })}
                     </ul>
                   )}
                   <div className="mt-auto flex w-full flex-col gap-4 border-t-[2px] border-background-300 pt-6 text-lg">
                     <button
-                      onClick={() => handleMenu("account")}
+                      onClick={() => handleMenu('account')}
                       className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
                     >
                       Minha conta
                     </button>
                     <button
-                      onClick={() => handleMenu("favorites")}
+                      onClick={() => handleMenu('favorites')}
                       className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
                     >
                       Favoritos
                     </button>
-                    {user.userType.slug === "professional" && (
+                    {user.userType.slug === 'professional' && (
                       <button
-                        onClick={() => handleMenu("profile")}
+                        onClick={() => handleMenu('profile')}
                         className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
                       >
                         Perfil profissional
                       </button>
                     )}
                     <button
-                      onClick={() => signOut({ callbackUrl: "/login" })}
+                      onClick={() => signOut({ callbackUrl: '/login' })}
                       className="flex cursor-pointer items-center justify-between gap-4 py-2 pl-4 pr-2 hover:bg-background-300"
                     >
                       <span>Sair</span>
@@ -200,5 +200,5 @@ export function Header() {
         </div>
       </nav>
     </div>
-  );
+  )
 }

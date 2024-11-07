@@ -1,18 +1,18 @@
-"use client";
+'use client'
 
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  name: string;
-  value?: string;
-  type?: string;
-  onChange: (e) => void;
+  label?: string
+  name: string
+  value?: string
+  type?: string
+  onChange: (e) => void
 }
 
 export function DateInput({
   label,
   name,
-  value = "",
-  type = "text",
+  value = '',
+  type = 'text',
   onChange,
   ...rest
 }: TextInputProps) {
@@ -29,5 +29,5 @@ export function DateInput({
         />
       </div>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { SchedulingHistory } from "@/components/table/scheduling-history";
-import { AccountForm } from "./form";
+import { SchedulingHistory } from '@/components/table/scheduling-history'
+import { AccountForm } from './form'
 
 export default function Account() {
   return (
@@ -13,5 +13,5 @@ export default function Account() {
         <AccountForm />
       </div>
     </section>
-  );
+  )
 }

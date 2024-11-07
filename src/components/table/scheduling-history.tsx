@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { ArrowUpRight } from "@phosphor-icons/react";
-import Link from "next/link";
+import { ArrowUpRight } from '@phosphor-icons/react'
+import Link from 'next/link'
 
 export function SchedulingHistory() {
   return (
@@ -41,9 +41,9 @@ export function SchedulingHistory() {
                 </div>
               </td>
             </tr>
-          );
+          )
         })}
       </tbody>
     </table>
-  );
+  )
 }

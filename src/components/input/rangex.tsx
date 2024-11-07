@@ -1,14 +1,14 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 
 export function RangeInput() {
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(500);
-  const [selectedValue, setSelectedValue] = useState(500);
+  const [minValue, setMinValue] = useState(0)
+  const [maxValue, setMaxValue] = useState(500)
+  const [selectedValue, setSelectedValue] = useState(500)
 
   function handleRangeValue(event: any) {
-    setSelectedValue(event.target.value);
+    setSelectedValue(event.target.value)
   }
 
   return (
@@ -30,5 +30,5 @@ export function RangeInput() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,21 +1,21 @@
-"use client";
+'use client'
 
-import SubmitButton from "@/components/button/submit";
-import { TextAreaInput } from "@/components/input/textarea";
-import { updateSchedulingObservations } from "@/services/schedulingService";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { X } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { toast, ToastContainer } from "react-toastify";
+import SubmitButton from '@/components/button/submit'
+import { TextAreaInput } from '@/components/input/textarea'
+import { updateSchedulingObservations } from '@/services/schedulingService'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { X } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { toast, ToastContainer } from 'react-toastify'
 
 interface ModalProps {
   selectedScheduling: {
-    id: string;
-    observations?: string;
-  };
-  closable?: boolean;
-  setShowModal: (e) => void;
+    id: string
+    observations?: string
+  }
+  closable?: boolean
+  setShowModal: (e) => void
 }
 
 export function CommentsFormModal({
@@ -23,32 +23,32 @@ export function CommentsFormModal({
   closable = true,
   setShowModal,
 }: ModalProps) {
-  const [comments, setComments] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [comments, setComments] = useState<string>()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    if (!!selectedScheduling.observations) {
-      setComments(selectedScheduling.observations);
+    if (selectedScheduling.observations) {
+      setComments(selectedScheduling.observations)
     }
-  }, [selectedScheduling]);
+  }, [selectedScheduling])
 
   function handleChange(e: any) {
-    setComments(e.target.value);
+    setComments(e.target.value)
   }
 
   async function handleSubmit(event: any) {
-    event.preventDefault();
-    setIsLoading(true);
+    event.preventDefault()
+    setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
     const response = await updateSchedulingObservations(
       comments,
       selectedScheduling.id,
-    );
+    )
 
-    toast[response.type](response.message, toastDefaultValues);
-    setIsLoading(false);
+    toast[response.type](response.message, toastDefaultValues)
+    setIsLoading(false)
   }
 
   return createPortal(
@@ -90,5 +90,5 @@ export function CommentsFormModal({
     </div>,
 
     document.body,
-  );
+  )
 }

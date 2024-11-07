@@ -1,81 +1,81 @@
-"use client";
+'use client'
 
-import { Calendar } from "@/components/calendar";
-import { CommentsCard } from "@/components/card/comments";
-import { getProfessional } from "@/services/professionalService";
+import { Calendar } from '@/components/calendar'
+import { CommentsCard } from '@/components/card/comments'
+import { getProfessional } from '@/services/professionalService'
 import {
   ArrowLeft,
   InstagramLogo,
   LinkedinLogo,
   MapPin,
   WhatsappLogo,
-} from "@phosphor-icons/react";
-import Image from "next/image";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import { FavoriteButton } from "@/components/button/favorite";
-import { UserContext } from "@/contexts/UserContext";
-import dayjs from "dayjs";
+} from '@phosphor-icons/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useContext, useEffect, useState } from 'react'
+import { FavoriteButton } from '@/components/button/favorite'
+import { UserContext } from '@/contexts/UserContext'
+import dayjs from 'dayjs'
 
 interface ProfessionalProps {
-  name: string;
+  name: string
   professional: {
     serviceType: {
-      id: string;
-      name: string;
-    };
+      id: string
+      name: string
+    }
     occupation: {
-      name: string;
-    };
+      name: string
+    }
     reviews: {
-      createdAt: Date;
+      createdAt: Date
       user: {
-        name: string;
-        image: string;
-      };
-      comment: string;
-      rating: string;
-    }[];
-    bio: string;
-    serviceValue: string;
-    tags: string;
-  };
-  address: string;
-  image: string;
-  email: string;
-  phone: string;
+        name: string
+        image: string
+      }
+      comment: string
+      rating: string
+    }[]
+    bio: string
+    serviceValue: string
+    tags: string
+  }
+  address: string
+  image: string
+  email: string
+  phone: string
 }
 
 interface SchedulingDateProps {
-  date: string;
+  date: string
   hour: {
-    time_formatted: string;
-    time_in_minutes: number;
-  };
+    time_formatted: string
+    time_in_minutes: number
+  }
 }
 
 export default function ProfessionalProfile({
   params: { professional_id },
 }: any) {
-  const professionalId = professional_id;
-  const { user } = useContext(UserContext);
-  const [professional, setProfessional] = useState<ProfessionalProps>();
+  const professionalId = professional_id
+  const { user } = useContext(UserContext)
+  const [professional, setProfessional] = useState<ProfessionalProps>()
   const [schedulingDate, setSchedulingDate] = useState<SchedulingDateProps>({
-    date: "",
+    date: '',
     hour: {
-      time_formatted: "",
+      time_formatted: '',
       time_in_minutes: 0,
     },
-  });
+  })
 
   useEffect(() => {
     const fetchProfessional = async (professionalId) => {
-      const response = await getProfessional(professionalId);
-      setProfessional(response);
-    };
+      const response = await getProfessional(professionalId)
+      setProfessional(response)
+    }
 
-    fetchProfessional(professionalId);
-  }, []);
+    fetchProfessional(professionalId)
+  }, [])
 
   return (
     <div>
@@ -83,7 +83,7 @@ export default function ProfessionalProfile({
         <>
           <div className="mb-4 flex items-start justify-start">
             <Link
-              href={"./"}
+              href={'./'}
               className="flex items-center justify-center gap-2 rounded-md border-2 border-transparent px-3 py-1 duration-100 hover:border-vibrant-green-100 hover:text-vibrant-green-100"
             >
               <ArrowLeft
@@ -112,7 +112,7 @@ export default function ProfessionalProfile({
                   <Image
                     className="z-10 rounded-md object-cover"
                     alt={professional.name}
-                    src={professional.image.replace("s96", "s500")}
+                    src={professional.image.replace('s96', 's500')}
                     fill={true}
                   />
                 </div>
@@ -129,15 +129,15 @@ export default function ProfessionalProfile({
                     <h5 className="text-base">
                       {professional.professional.occupation
                         ? professional.professional.occupation.name
-                        : ""}
+                        : ''}
                     </h5>
                   </div>
                   <p className="">
-                    A partir de:{" "}
+                    A partir de:{' '}
                     <span className="font-bold text-vibrant-green-100">
                       {professional.professional.serviceValue
                         ? professional.professional.serviceValue
-                        : ""}
+                        : ''}
                     </span>
                   </p>
 
@@ -159,7 +159,7 @@ export default function ProfessionalProfile({
                       weight="bold"
                       size={26}
                     />
-                    <span>{professional.address || ""}</span>
+                    <span>{professional.address || ''}</span>
                   </div>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function ProfessionalProfile({
                   <div className="flex flex-wrap items-center justify-start gap-3">
                     {professional.professional.tags &&
                       professional.professional.tags
-                        .split(",")
+                        .split(',')
                         .map((tag, index) => {
                           return (
                             <button
@@ -196,7 +196,7 @@ export default function ProfessionalProfile({
                             >
                               {tag}
                             </button>
-                          );
+                          )
                         })}
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export default function ProfessionalProfile({
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
                   Sobre mim
                 </h2>
-                <p>{professional.professional.bio || ""}</p>
+                <p>{professional.professional.bio || ''}</p>
               </div>
               <div className="space-y-6 rounded-md bg-background-200 p-8">
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
@@ -214,7 +214,7 @@ export default function ProfessionalProfile({
 
                 <div className="grid grid-cols-3 items-start gap-4">
                   {professional.professional.reviews.map((_, index) => {
-                    return <CommentsCard key={index} />;
+                    return <CommentsCard key={index} />
                   })}
                 </div>
               </div>
@@ -254,7 +254,7 @@ export default function ProfessionalProfile({
         </>
       )}
     </div>
-  );
+  )
 
-  return null;
+  return null
 }

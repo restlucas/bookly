@@ -1,50 +1,50 @@
-"use client";
+'use client'
 
-import SubmitButton from "@/components/button/submit";
-import { SelectInput } from "@/components/input/select";
+import SubmitButton from '@/components/button/submit'
+import { SelectInput } from '@/components/input/select'
 
-import { UserContext } from "@/contexts/UserContext";
-import { getUserTypes, updateUserRole } from "@/services/userService";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { useContext, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { UserContext } from '@/contexts/UserContext'
+import { getUserTypes, updateUserRole } from '@/services/userService'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { useContext, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
 
 interface UserTypesProps {
-  id: string;
-  name: string;
-  slug: string;
+  id: string
+  name: string
+  slug: string
 }
 
 export function SelectRole() {
-  const { user, updateRole } = useContext(UserContext);
+  const { user, updateRole } = useContext(UserContext)
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [userTypes, setUserTypes] = useState<UserTypesProps[]>();
-  const [selectedUserType, setSelectedUserType] = useState();
+  const [isLoading, setIsLoading] = useState(false)
+  const [userTypes, setUserTypes] = useState<UserTypesProps[]>()
+  const [selectedUserType, setSelectedUserType] = useState()
 
   useEffect(() => {
     const fetchUserTypes = async () => {
-      const response = await getUserTypes();
-      setUserTypes(response);
-    };
-
-    fetchUserTypes();
-  }, []);
-
-  async function handleSubmit(event: any) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const response = await updateUserRole(user.id, selectedUserType);
-
-    if (response.type === "success") {
-      updateRole(selectedUserType);
+      const response = await getUserTypes()
+      setUserTypes(response)
     }
 
-    toast[response.type](response.message, toastDefaultValues);
-    setIsLoading(false);
+    fetchUserTypes()
+  }, [])
+
+  async function handleSubmit(event: any) {
+    event.preventDefault()
+    setIsLoading(true)
+
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    const response = await updateUserRole(user.id, selectedUserType)
+
+    if (response.type === 'success') {
+      updateRole(selectedUserType)
+    }
+
+    toast[response.type](response.message, toastDefaultValues)
+    setIsLoading(false)
   }
 
   return (
@@ -73,5 +73,5 @@ export function SelectRole() {
       </form>
       <ToastContainer closeOnClick theme="dark" />
     </>
-  );
+  )
 }

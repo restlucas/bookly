@@ -1,5 +1,5 @@
-import Filter from "./filter";
-import List from "./list";
+import Filter from './filter'
+import List from './list'
 
 export default function Professionals(props: any) {
   return (
@@ -7,5 +7,5 @@ export default function Professionals(props: any) {
       <Filter filters={props.searchParams} />
       <List searchParams={props.searchParams} />
     </div>
-  );
+  )
 }

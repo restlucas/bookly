@@ -1,5 +1,5 @@
-import { LoginButton } from "@/components/button/login";
-import { CommentsCard } from "@/components/card/comments";
+import { LoginButton } from '@/components/button/login'
+import { CommentsCard } from '@/components/card/comments'
 
 export default function Home() {
   return (
@@ -149,7 +149,7 @@ export default function Home() {
       {/* Comments */}
       <section className="w-full">
         <h1 className="mb-5 text-center text-3xl">
-          O que as pessoas pensam{" "}
+          O que as pessoas pensam{' '}
           <span className="bg-vibrant-green-100 font-bold text-background-300">
             sobre nós
           </span>
@@ -157,11 +157,11 @@ export default function Home() {
         <div className="flex items-center justify-center">
           <div className="grid w-full grid-cols-1 gap-6 lg:w-3/4 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => {
-              return <CommentsCard key={index} />;
+              return <CommentsCard key={index} />
             })}
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }

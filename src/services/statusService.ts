@@ -1,6 +1,6 @@
-"use server";
+'use server'
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma'
 
 // Get all status
 export async function getStatus() {
@@ -9,5 +9,5 @@ export async function getStatus() {
       id: true,
       name: true,
     },
-  });
+  })
 }

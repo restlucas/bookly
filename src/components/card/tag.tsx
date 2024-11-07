@@ -6,5 +6,5 @@ export function TagCard({ key, tag }: any) {
     >
       <span>{tag}</span>
     </div>
-  );
+  )
 }

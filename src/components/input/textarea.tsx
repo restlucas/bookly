@@ -1,8 +1,8 @@
 interface TextAreaInputProps {
-  name: string;
-  value: string;
-  placeholder?: string;
-  onChange: (e) => void;
+  name: string
+  value: string
+  placeholder?: string
+  onChange: (e) => void
 }
 
 export function TextAreaInput({
@@ -20,5 +20,5 @@ export function TextAreaInput({
       placeholder={placeholder}
       onChange={onChange}
     />
-  );
+  )
 }

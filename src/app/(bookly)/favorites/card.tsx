@@ -1,6 +1,6 @@
-import { ArrowSquareUpRight } from "@phosphor-icons/react";
-import Image from "next/image";
-import Link from "next/link";
+import { ArrowSquareUpRight } from '@phosphor-icons/react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export function Card({ professional }: any) {
   return (
@@ -11,7 +11,7 @@ export function Card({ professional }: any) {
       <div className="grid grid-cols-[30%_70%] items-start gap-4 overflow-hidden">
         <div className="w-h-32 relative h-32 overflow-hidden rounded-md">
           <Image
-            src={professional.image.replace("s96", "s500")}
+            src={professional.image.replace('s96', 's500')}
             alt={professional.name}
             className="object-cover"
             fill={true}
@@ -37,5 +37,5 @@ export function Card({ professional }: any) {
         </div>
       </div>
     </Link>
-  );
+  )
 }

@@ -1,27 +1,27 @@
-"use server";
+'use server'
 
-import { prisma } from "@/lib/prisma";
-import { getWeekDays } from "@/utils/get-week-days";
+import { prisma } from '@/lib/prisma'
+import { getWeekDays } from '@/utils/get-week-days'
 
 interface UserProps {
-  name?: string;
-  email?: string;
-  phone?: string;
-  image?: string;
-  birth?: string;
-  gender?: string;
-  address?: string;
+  name?: string
+  email?: string
+  phone?: string
+  image?: string
+  birth?: string
+  gender?: string
+  address?: string
 }
 
 interface ServiceResponse<T> {
-  type: "success" | "error";
-  data?: T;
-  message?: string;
+  type: 'success' | 'error'
+  data?: T
+  message?: string
 }
 
 // Get user types
 export async function getUserTypes() {
-  return await prisma.userType.findMany();
+  return await prisma.userType.findMany()
 }
 
 // Get user by id
@@ -46,7 +46,7 @@ export async function getUserById(id: string) {
         },
       },
     },
-  });
+  })
 }
 
 // Get user favorites
@@ -56,11 +56,11 @@ export async function getUserFavorites(id: string) {
     select: {
       favorites: true,
     },
-  });
+  })
 
-  if (favorites && typeof favorites === "string") {
-    const favoritesArray = favorites.replace(/'/g, '"');
-    const favoritesArrayFormatted = JSON.parse(favoritesArray);
+  if (favorites && typeof favorites === 'string') {
+    const favoritesArray = favorites.replace(/'/g, '"')
+    const favoritesArrayFormatted = JSON.parse(favoritesArray)
 
     const favoritedProfessionals = await Promise.all(
       favoritesArrayFormatted.map(async (favoritedId) => {
@@ -82,14 +82,14 @@ export async function getUserFavorites(id: string) {
               },
             },
           },
-        });
+        })
       }),
-    );
+    )
 
-    return favoritedProfessionals;
+    return favoritedProfessionals
   }
 
-  return null;
+  return null
 }
 
 // Update user
@@ -101,20 +101,20 @@ export async function updateUser(
     const updatedUser = await prisma.user.update({
       where: { id },
       data,
-    });
+    })
 
     return {
-      type: "success",
-      message: "Informações salvas com sucesso!",
+      type: 'success',
+      message: 'Informações salvas com sucesso!',
       data: updatedUser,
-    };
+    }
   } catch (error: any) {
-    console.error("Erro ao atualizar o usuário:", error);
+    console.error('Erro ao atualizar o usuário:', error)
 
     return {
-      type: "error",
-      message: "Erro ao atualizar o usuário",
-    };
+      type: 'error',
+      message: 'Erro ao atualizar o usuário',
+    }
   }
 }
 
@@ -128,21 +128,21 @@ export async function updateUserRole(
       where: {
         slug: roleSlug,
       },
-    });
+    })
 
     const updatedUserRole = await prisma.user.update({
       where: { id },
       data: {
         userTypeId,
       },
-    });
+    })
 
-    if (roleSlug === "professional") {
+    if (roleSlug === 'professional') {
       const newProfessional = await prisma.professional.create({
         data: {
           userId: id,
         },
-      });
+      })
 
       await Promise.all(
         Array.from({ length: 7 }).map(async (_, index) => {
@@ -151,23 +151,23 @@ export async function updateUserRole(
               professionalId: newProfessional.id,
               weekDay: index,
             },
-          });
+          })
         }),
-      );
+      )
     }
 
     return {
-      type: "success",
-      message: "Sucesso ao atualizar role do usuário!",
+      type: 'success',
+      message: 'Sucesso ao atualizar role do usuário!',
       data: updatedUserRole,
-    };
+    }
   } catch (error: any) {
-    console.error("Error on update user role:", error);
+    console.error('Error on update user role:', error)
 
     return {
-      type: "error",
-      message: "Error ao atualizar usuário",
-    };
+      type: 'error',
+      message: 'Error ao atualizar usuário',
+    }
   }
 }
 
@@ -182,20 +182,20 @@ export async function updateUserFavorites(
       data: {
         favorites,
       },
-    });
+    })
 
     return {
-      type: "success",
-      message: "Favoritos salvos com sucesso!",
+      type: 'success',
+      message: 'Favoritos salvos com sucesso!',
       data: updateUserFavorites,
-    };
+    }
   } catch (error) {
-    console.error("Error on favorites user field:", error);
+    console.error('Error on favorites user field:', error)
 
     return {
-      type: "error",
-      message: "Erro ao atualizar usuário",
-    };
+      type: 'error',
+      message: 'Erro ao atualizar usuário',
+    }
   }
 }
 
@@ -203,5 +203,5 @@ export async function updateUserFavorites(
 export async function deleteUser(id: string) {
   return await prisma.user.delete({
     where: { id },
-  });
+  })
 }

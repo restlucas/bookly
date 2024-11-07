@@ -1,14 +1,14 @@
-"use client";
+'use client'
 
-import { BookmarkSimple, MapPin } from "@phosphor-icons/react";
-import Image from "next/image";
-import Link from "next/link";
-import { FavoriteButton } from "../button/favorite";
-import { useContext } from "react";
-import { UserContext } from "@/contexts/UserContext";
+import { BookmarkSimple, MapPin } from '@phosphor-icons/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { FavoriteButton } from '../button/favorite'
+import { useContext } from 'react'
+import { UserContext } from '@/contexts/UserContext'
 
 export function ProfessionalCard({ professional }: any) {
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext)
 
   return (
     <div className="flex h-full items-start justify-start gap-4 overflow-hidden rounded-md bg-background-300 p-3">
@@ -16,7 +16,7 @@ export function ProfessionalCard({ professional }: any) {
         <Image
           className="object-cover"
           alt={professional.name}
-          src={professional.image.replace("s96", "s500")}
+          src={professional.image.replace('s96', 's500')}
           fill={true}
         />
       </div>
@@ -28,10 +28,10 @@ export function ProfessionalCard({ professional }: any) {
         <h6 className="text-vibrant-green-100">
           {professional.professional.occupation
             ? professional.professional.occupation.name
-            : ""}
+            : ''}
         </h6>
         <p id="lineClampTwo" className="max-h-full w-full flex-1">
-          {professional.professional.bio ? professional.professional.bio : ""}
+          {professional.professional.bio ? professional.professional.bio : ''}
         </p>
       </div>
       <div className="flex h-40 flex-col items-end justify-between">
@@ -51,11 +51,11 @@ export function ProfessionalCard({ professional }: any) {
 
         <div className="flex flex-col items-end justify-end gap-2">
           <span className="text-base md:text-xl">
-            A partir de:{" "}
+            A partir de:{' '}
             <span className="font-bold text-vibrant-green-100">
               {professional.professional.serviceValue
                 ? professional.professional.serviceValue
-                : "não informado"}
+                : 'não informado'}
             </span>
           </span>
           <Link
@@ -67,5 +67,5 @@ export function ProfessionalCard({ professional }: any) {
         </div>
       </div>
     </div>
-  );
+  )
 }
