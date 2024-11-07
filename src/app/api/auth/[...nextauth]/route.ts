@@ -1,20 +1,19 @@
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { PrismaClient } from '@prisma/client'
-import NextAuth, { NextAuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
+import GoogleProvider from "next-auth/providers/google";
 
 // Instanciando o Prisma Client
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 // Definindo as opções de configuração do NextAuth com tipos apropriados
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
   providers: [
     GoogleProvider({
@@ -26,16 +25,16 @@ export const authOptions: NextAuthOptions = {
     // Callback para redirecionamento
     async redirect({ url, baseUrl }) {
       if (url === baseUrl || url.startsWith(baseUrl)) {
-        return `${baseUrl}/dashboard`
+        return `${baseUrl}/dashboard`;
       }
-      return url
+      return url;
     },
 
     // Callback para JWT
     async jwt({ token, user, account }) {
       if (account) {
         const userInfo = await prisma.user.findUnique({
-          where: { email: user?.email ?? '' }, // Garantindo que user.email seja sempre uma string
+          where: { email: user?.email ?? "" }, // Garantindo que user.email seja sempre uma string
           select: {
             id: true,
             userType: {
@@ -44,14 +43,14 @@ export const authOptions: NextAuthOptions = {
               },
             },
           },
-        })
+        });
 
-        token.accessToken = account.access_token
-        token.user_id = userInfo?.id
-        token.role = userInfo?.userType?.slug
+        token.accessToken = account.access_token;
+        token.user_id = userInfo?.id;
+        token.role = userInfo?.userType?.slug;
       }
 
-      return token
+      return token;
     },
 
     // Callback para sessão
@@ -61,29 +60,29 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.user_id,
           role: token.role,
-        }
+        };
       }
 
-      return session
+      return session;
     },
 
     // Callback para signIn
     async signIn({ user, account }) {
-      if (account.provider === 'google') {
+      if (account.provider === "google") {
         let existingUser = await prisma.user.findUnique({
           where: {
-            email: user?.email ?? '', // Garantindo que user.email seja sempre uma string
+            email: user?.email ?? "", // Garantindo que user.email seja sempre uma string
           },
-        })
+        });
 
         if (!existingUser) {
           existingUser = await prisma.user.create({
             data: {
-              email: user?.email ?? '', // Garantindo que user.email seja sempre uma string
-              name: user?.name ?? '',
-              image: user?.image ?? '',
+              email: user?.email ?? "", // Garantindo que user.email seja sempre uma string
+              name: user?.name ?? "",
+              image: user?.image ?? "",
             },
-          })
+          });
 
           await prisma.account.create({
             data: {
@@ -93,16 +92,16 @@ export const authOptions: NextAuthOptions = {
               accessToken: account.access_token,
               userId: existingUser.id,
             },
-          })
+          });
         }
       }
-      return true
+      return true;
     },
   },
-}
+};
 
 // Handler do NextAuth configurado com as opções
-const handler = NextAuth(authOptions)
+const handler = authOptions;
 
 // Exportando os manipuladores GET e POST
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
