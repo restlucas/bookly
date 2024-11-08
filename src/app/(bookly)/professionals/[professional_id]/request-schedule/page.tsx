@@ -1,124 +1,124 @@
-"use client";
+'use client'
 
-import { SelectInput } from "@/components/input/select";
-import { TextInput } from "@/components/input/text";
-import { getProfessional } from "@/services/professionalService";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { DateInput } from "@/components/input/date";
-import Image from "next/image";
-import { UserContext } from "@/contexts/UserContext";
-import { createScheduling, getServiceType } from "@/services/schedulingService";
-import { toast, ToastContainer } from "react-toastify";
-import toastDefaultValues from "@/utils/toast-default-values";
-import SubmitButton from "@/components/button/submit";
-import { SchedulingFormData } from "@/utils/validators";
+import { SelectInput } from '@/components/input/select'
+import { TextInput } from '@/components/input/text'
+import { getProfessional } from '@/services/professionalService'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { DateInput } from '@/components/input/date'
+import Image from 'next/image'
+import { UserContext } from '@/contexts/UserContext'
+import { createScheduling, getServiceType } from '@/services/schedulingService'
+import { toast, ToastContainer } from 'react-toastify'
+import toastDefaultValues from '@/utils/toast-default-values'
+import SubmitButton from '@/components/button/submit'
+import { SchedulingFormData } from '@/utils/validators'
 
 interface ServiceTypeOptionsProps {
-  id: string;
-  name: string;
-  slug: string;
+  id: string
+  name: string
+  slug: string
 }
 
 interface SelectedProfessionalProps {
-  name: string;
-  email: string;
-  image: string;
-  address?: string;
-  phone?: string;
+  name: string
+  email: string
+  image: string
+  address?: string
+  phone?: string
   professional: {
-    bio: string;
-    serviceValue: string;
-    tags?: string;
+    bio: string
+    serviceValue: string
+    tags?: string
     occupation: {
-      name: string;
-    };
+      name: string
+    }
     reviews?: {
       user: {
-        name: string;
-        image: string;
-      };
-      createdAt: Date;
-      comment: string;
-      rating: string;
-    }[];
+        name: string
+        image: string
+      }
+      createdAt: Date
+      comment: string
+      rating: string
+    }[]
     serviceType: {
-      id: string;
-      name: string;
-    };
-  };
+      id: string
+      name: string
+    }
+  }
 }
 
 export default function FinishSchedule() {
-  const { user } = useContext(UserContext);
-  const params = useSearchParams();
-  const router = useRouter();
-  const { professional_id: professionalId } = useParams();
+  const { user } = useContext(UserContext)
+  const params = useSearchParams()
+  const router = useRouter()
+  const { professional_id: professionalId } = useParams()
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
   const [selectedProfessional, setSelectedProfessional] =
-    useState<SelectedProfessionalProps>();
+    useState<SelectedProfessionalProps>()
   const [serviceTypeOptions, setServiceTypeOptions] =
-    useState<ServiceTypeOptionsProps[]>();
+    useState<ServiceTypeOptionsProps[]>()
   const [scheduling, setScheduling] = useState<SchedulingFormData>({
     userProfessionalId: professionalId,
-    date: params.get("selected_date"),
-    hour: Number(params.get("minutes")),
-    serviceTypeSlug: "",
-  });
+    date: params.get('selected_date'),
+    hour: Number(params.get('minutes')),
+    serviceTypeSlug: '',
+  })
 
   const fetchServiceType = useCallback(async () => {
-    const response = await getServiceType();
-    setServiceTypeOptions(response);
-  }, []);
+    const response = await getServiceType()
+    setServiceTypeOptions(response)
+  }, [])
 
   const fetchData = useCallback(async () => {
-    const professionalData = await getProfessional(String(professionalId));
-    const typeOfService = professionalData.professional.serviceType;
+    const professionalData = await getProfessional(String(professionalId))
+    const typeOfService = professionalData.professional.serviceType
 
-    if (typeOfService.name === "Presencial e Online") {
+    if (typeOfService.name === 'Presencial e Online') {
       setServiceTypeOptions((prevState) =>
         prevState.filter((option) => option.id !== typeOfService.id),
-      );
+      )
     } else {
       setServiceTypeOptions((prevState) =>
         prevState.filter((option) => option.id === typeOfService.id),
-      );
+      )
     }
 
-    setSelectedProfessional(professionalData);
-  }, [professionalId]);
+    setSelectedProfessional(professionalData)
+  }, [professionalId])
 
   useEffect(() => {
-    fetchServiceType();
-    fetchData();
-  }, [professionalId, fetchServiceType, fetchData]);
+    fetchServiceType()
+    fetchData()
+  }, [professionalId, fetchServiceType, fetchData])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setScheduling((prevState) => ({
       ...prevState,
       serviceTypeSlug: e.target.value,
-    }));
+    }))
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    const response = await createScheduling(user.id, scheduling);
+    const response = await createScheduling(user.id, scheduling)
 
-    toast[response.type](response.message, toastDefaultValues);
-    setIsLoading(false);
+    toast[response.type](response.message, toastDefaultValues)
+    setIsLoading(false)
 
-    if (response.type === "success") {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      router.push("./");
+    if (response.type === 'success') {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      router.push('./')
     }
   }
 
-  if (!selectedProfessional) return null;
+  if (!selectedProfessional) return null
 
   return (
     <>
@@ -126,7 +126,7 @@ export default function FinishSchedule() {
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="relative h-28 w-28 overflow-hidden rounded-full">
             <Image
-              src={selectedProfessional.image.replace("s96", "s500")}
+              src={selectedProfessional.image.replace('s96', 's500')}
               alt={selectedProfessional.name}
               fill
               className="object-cover"
@@ -155,7 +155,7 @@ export default function FinishSchedule() {
                 name="serviceValue"
                 label="Valor"
                 readOnly={true}
-                value={selectedProfessional.professional.serviceValue || ""}
+                value={selectedProfessional.professional.serviceValue || ''}
                 disabled
               />
               <div className="flex w-full flex-col gap-2">
@@ -163,20 +163,20 @@ export default function FinishSchedule() {
                 <DateInput
                   name="selectedDate"
                   onChange={() => handleChange}
-                  value={params.get("selected_date")}
+                  value={params.get('selected_date')}
                   disabled={true}
                 />
               </div>
               <TextInput
                 label="Horário do agendamento"
                 name="selectedHour"
-                value={params.get("hour")}
+                value={params.get('hour')}
                 disabled={true}
               />
               <SelectInput
                 label="Tipo de atendimento"
                 name="serviceType"
-                value={scheduling.serviceTypeSlug || ""}
+                value={scheduling.serviceTypeSlug || ''}
                 usingSlug={true}
                 options={serviceTypeOptions}
                 onChange={handleChange}
@@ -185,7 +185,7 @@ export default function FinishSchedule() {
           </div>
           <div className="flex items-center justify-end gap-4">
             <button
-              onClick={() => router.push("./")}
+              onClick={() => router.push('./')}
               className="hover: rounded-md border-2 border-vibrant-green-100 px-4 py-2 text-white duration-100 hover:bg-background-300"
             >
               Cancelar
@@ -200,5 +200,5 @@ export default function FinishSchedule() {
         <ToastContainer closeOnClick theme="dark" />
       </div>
     </>
-  );
+  )
 }

@@ -1,87 +1,86 @@
-import { getStatus } from "@/services/statusService";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/utils/authOptions";
-import { PersonalAppointments } from "./personal-appointments";
-import { ProfessionalAppointments } from "./professional-appointments";
-import { Metadata } from "next";
+import { getStatus } from '@/services/statusService'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/utils/authOptions'
+import { PersonalAppointments } from './personal-appointments'
+import { ProfessionalAppointments } from './professional-appointments'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Meus agendamentos | Bookly",
-  description: "Pagina de agendamentos",
-};
+  title: 'Meus agendamentos | Bookly',
+  description: 'Pagina de agendamentos',
+}
 
 export interface StatusTypes {
   professional: {
-    id: string;
-    name: string;
-  }[];
+    id: string
+    name: string
+  }[]
   personal: {
-    id: string;
-    name: string;
-  }[];
+    id: string
+    name: string
+  }[]
 }
 
 export interface SchedulingProps {
-  date: Date;
-  id: string;
-  observations?: string;
+  date: Date
+  id: string
+  observations?: string
   professional: {
     occupation: {
-      name: string;
-    };
-    serviceValue: string;
+      name: string
+    }
+    serviceValue: string
     user: {
-      name: string;
-      phone: string;
-    };
+      name: string
+      phone: string
+    }
     serviceType: {
-      name: string;
-    };
-  };
+      name: string
+    }
+  }
   user: {
-    name: string;
-    phone: string;
-  };
+    name: string
+    phone: string
+  }
   status: {
-    name: string;
-  };
+    name: string
+  }
 }
-[];
 
 export interface SchedulingTypes {
-  professional: SchedulingProps[];
-  personal: SchedulingProps[];
+  professional: SchedulingProps[]
+  personal: SchedulingProps[]
 }
 
 export interface SelectedSchedulingProps {
-  id: string;
-  observations?: string;
+  id: string
+  observations?: string
 }
 
 export interface AppointmentsProps {
   user: {
-    id: string;
-    name: string;
-    email: string;
-    image: string;
-    role: string;
-  };
+    id: string
+    name: string
+    email: string
+    image: string
+    role: string
+  }
   status: {
-    id: string;
-    name: string;
-  }[];
+    id: string
+    name: string
+  }[]
 }
 
 export default async function Scheduling() {
-  const { user } = await getServerSession(authOptions);
-  const status = await getStatus();
+  const { user } = await getServerSession(authOptions)
+  const status = await getStatus()
 
   return (
     <>
       <section className="mb-8 flex flex-col gap-6">
         {user ? (
           <>
-            {user.role === "professional" && (
+            {user.role === 'professional' && (
               <ProfessionalAppointments user={user} status={status} />
             )}
             <PersonalAppointments user={user} status={status} />
@@ -95,5 +94,5 @@ export default async function Scheduling() {
         )}
       </section>
     </>
-  );
+  )
 }

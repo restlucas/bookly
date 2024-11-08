@@ -1,10 +1,10 @@
-import { Metadata } from "next";
-import { LoginOptions } from "./options";
+import { Metadata } from 'next'
+import { LoginOptions } from './options'
 
 export const metadata: Metadata = {
-  title: "Login | Bookly",
-  description: "Pagina de login",
-};
+  title: 'Login | Bookly',
+  description: 'Pagina de login',
+}
 
 export default function Login() {
   return (
@@ -27,5 +27,5 @@ export default function Login() {
         </div>
       </div>
     </>
-  );
+  )
 }

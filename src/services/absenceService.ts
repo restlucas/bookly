@@ -1,7 +1,7 @@
-"use server";
+'use server'
 
-import { prisma } from "@/lib/prisma";
-import { AbsenceFormData } from "@/utils/validators";
+import { prisma } from '@/lib/prisma'
+import { AbsenceFormData } from '@/utils/validators'
 
 // Get absence by userId
 export async function getAbsence(userId: string) {
@@ -12,7 +12,7 @@ export async function getAbsence(userId: string) {
     select: {
       id: true,
     },
-  });
+  })
 
   const response = await prisma.absence.findMany({
     where: {
@@ -30,9 +30,9 @@ export async function getAbsence(userId: string) {
         },
       },
     },
-  });
+  })
 
-  return response;
+  return response
 }
 
 // Get absence options
@@ -43,9 +43,9 @@ export async function getOptions() {
       name: true,
       description: true,
     },
-  });
+  })
 
-  return response;
+  return response
 }
 
 // Create absence
@@ -55,11 +55,12 @@ export async function createAbsence(data: AbsenceFormData) {
       where: {
         userId: data.userId,
       },
-    });
+    })
 
-    const { userId, ...newData } = data;
+    const { userId, ...newData } = data
+    console.log(userId)
 
-    const formatedData = { ...newData, professionalId };
+    const formatedData = { ...newData, professionalId }
 
     const response = await prisma.absence.create({
       data: formatedData,
@@ -75,20 +76,20 @@ export async function createAbsence(data: AbsenceFormData) {
           },
         },
       },
-    });
+    })
 
     return {
-      type: "success",
-      message: "Ausência criada com sucesso!",
+      type: 'success',
+      message: 'Ausência criada com sucesso!',
       data: response,
-    };
+    }
   } catch (error) {
-    console.error("Erro ao criar ausência:", error);
+    console.error('Erro ao criar ausência:', error)
 
     return {
-      type: "error",
-      error: error.message || "Erro ao criar ausência",
-    };
+      type: 'error',
+      error: error.message || 'Erro ao criar ausência',
+    }
   }
 }
 
@@ -101,14 +102,14 @@ export async function deleteAbsence(userId: string, absenceId: string) {
     select: {
       id: true,
     },
-  });
+  })
 
   const response = await prisma.absence.delete({
     where: {
       id: absenceId,
       professionalId,
     },
-  });
+  })
 
-  return response;
+  return response
 }

@@ -1,56 +1,59 @@
-"use client";
+'use client'
 
-import SubmitButton from "@/components/button/submit";
-import { TextInput } from "@/components/input/text";
-import { getSchedule, updateSchedule } from "@/services/professionalService";
-import { getWeekDays } from "@/utils/get-week-days";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { ScheduleFormData, validateScheduleForm } from "@/utils/validators";
-import { useCallback, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { UserProps } from "./page";
+import SubmitButton from '@/components/button/submit'
+import { TextInput } from '@/components/input/text'
+import { getSchedule, updateSchedule } from '@/services/professionalService'
+import { getWeekDays } from '@/utils/get-week-days'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { ScheduleFormData, validateScheduleForm } from '@/utils/validators'
+import { useCallback, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import { UserProps } from './page'
 
 interface Interval {
-  id: string;
-  timeStartInMinutes: number;
-  timeEndInMinutes: number;
-  enabled: boolean;
-  weekDay: number;
+  id: string
+  timeStartInMinutes: number
+  timeEndInMinutes: number
+  enabled: boolean
+  weekDay: number
 }
 
 export function ScheduleForm({ user }: { user: UserProps }) {
-  const weekDays = getWeekDays({ short: false });
-  const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>();
-  const [isLoading, setIsLoading] = useState(false);
+  const weekDays = getWeekDays({ short: false })
+  const [scheduleForm, setScheduleForm] = useState<ScheduleFormData>()
+  const [isLoading, setIsLoading] = useState(false)
 
   const formatTime = (totalMinutes: number) => {
-    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-    const minutes = String(totalMinutes % 60).padStart(2, "0");
-    return `${hours}:${minutes}`;
-  };
+    const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0')
+    const minutes = String(totalMinutes % 60).padStart(2, '0')
+    return `${hours}:${minutes}`
+  }
 
-  const getProfessionalSchedule = useCallback(async (userId: string) => {
-    const response = await getSchedule(userId);
+  const getProfessionalSchedule = useCallback(
+    async (userId: string) => {
+      const response = await getSchedule(userId)
 
-    response.intervals = weekDays.map((weekDayName, index) => ({
-      ...response.intervals[index],
-      name: weekDayName,
-    }));
+      response.intervals = weekDays.map((weekDayName, index) => ({
+        ...response.intervals[index],
+        name: weekDayName,
+      }))
 
-    setScheduleForm(response);
-  }, []);
+      setScheduleForm(response)
+    },
+    [weekDays],
+  )
 
   function handleChange(
     intervalId: string,
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
-    const { name, value, checked } = event.target;
+    const { name, value, checked } = event.target
 
     setScheduleForm((prevState: ScheduleFormData) => {
       const updateInterval = (updateFn: (interval: Interval) => Interval) =>
         prevState.intervals.map((interval) =>
           interval.id === intervalId ? updateFn(interval) : interval,
-        );
+        )
 
       const actions: Record<string, () => ScheduleFormData> = {
         timeStartInMinutes: () => ({
@@ -58,8 +61,8 @@ export function ScheduleForm({ user }: { user: UserProps }) {
           intervals: updateInterval((interval) => ({
             ...interval,
             timeStartInMinutes:
-              parseInt(value.split(":")[0], 10) * 60 +
-              parseInt(value.split(":")[1], 10),
+              parseInt(value.split(':')[0], 10) * 60 +
+              parseInt(value.split(':')[1], 10),
           })),
         }),
         timeEndInMinutes: () => ({
@@ -67,8 +70,8 @@ export function ScheduleForm({ user }: { user: UserProps }) {
           intervals: updateInterval((interval) => ({
             ...interval,
             timeEndInMinutes:
-              parseInt(value.split(":")[0], 10) * 60 +
-              parseInt(value.split(":")[1], 10),
+              parseInt(value.split(':')[0], 10) * 60 +
+              parseInt(value.split(':')[1], 10),
           })),
         }),
         enabled: () => ({
@@ -79,42 +82,45 @@ export function ScheduleForm({ user }: { user: UserProps }) {
           })),
         }),
         default: () => ({ ...prevState, serviceTime: value }),
-      };
+      }
 
-      return actions[name] ? actions[name]() : prevState;
-    });
+      return actions[name] ? actions[name]() : prevState
+    })
   }
 
   async function handleSubmitSchedule(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+    e.preventDefault()
     const formattedSchedule = {
       ...scheduleForm,
-      intervals: scheduleForm.intervals.map(({ name, ...rest }) => rest), // Desestruturando para remover 'name'
-    };
+      intervals: scheduleForm.intervals.map(({ name, ...rest }) => {
+        console.log(name)
+        return rest
+      }), // Desestruturando para remover 'name'
+    }
 
-    const validationErrors = validateScheduleForm(formattedSchedule);
+    const validationErrors = validateScheduleForm(formattedSchedule)
 
     if (Object.keys(validationErrors).length > 0) {
       Object.values(validationErrors).forEach((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+        toast.error(error, toastDefaultValues)
+      })
     } else {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await updateSchedule(user.id, formattedSchedule);
+      const response = await updateSchedule(user.id, formattedSchedule)
 
-      toast[response.type](response.message, toastDefaultValues);
-      setIsLoading(false);
+      toast[response.type](response.message, toastDefaultValues)
+      setIsLoading(false)
     }
   }
 
   useEffect(() => {
     if (user.id) {
-      getProfessionalSchedule(user.id);
+      getProfessionalSchedule(user.id)
     }
-  }, [user, getProfessionalSchedule]);
+  }, [user, getProfessionalSchedule])
 
   return (
     <div>
@@ -134,7 +140,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                   return (
                     <div
                       key={index}
-                      className={`${index !== 6 ? "border-b-[1px] border-slate-700" : ""} flex items-center justify-between gap-2 px-4 py-3`}
+                      className={`${index !== 6 ? 'border-b-[1px] border-slate-700' : ''} flex items-center justify-between gap-2 px-4 py-3`}
                     >
                       <div className="flex flex-1 items-center justify-start gap-2">
                         <input
@@ -146,14 +152,14 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                         />
 
                         <label
-                          className={`${interval.enabled ? "" : "text-slate-500 line-through"}`}
+                          className={`${interval.enabled ? '' : 'text-slate-500 line-through'}`}
                         >
                           {interval.name}
                         </label>
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <input
-                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          className={`${interval.enabled ? 'cursor-pointer' : 'cursor-not-allowed text-slate-500 line-through'} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-50 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
                           type="time"
                           name="timeStartInMinutes"
                           step={600}
@@ -163,7 +169,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                           onChange={(e) => handleChange(interval.id, e)}
                         />
                         <input
-                          className={`${interval.enabled ? "cursor-pointer" : "cursor-not-allowed text-slate-500 line-through"} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-[0.3] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
+                          className={`${interval.enabled ? 'cursor-pointer' : 'cursor-not-allowed text-slate-500 line-through'} rounded-md border-0 bg-background-300 p-2 text-sm [&::-webkit-calendar-picker-indicator]:brightness-[0.3] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:filter`}
                           type="time"
                           name="timeEndInMinutes"
                           value={formatTime(interval.timeEndInMinutes)}
@@ -173,7 +179,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                         />
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -187,7 +193,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                   name="serviceTime"
                   value={scheduleForm.serviceTime}
                   required
-                  onChange={(e) => handleChange("", e)}
+                  onChange={(e) => handleChange('', e)}
                 />
               </div>
             </div>
@@ -210,7 +216,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                   return (
                     <div
                       key={index}
-                      className={`${index !== 6 ? "border-b-[1px] border-slate-700" : ""} flex h-[65px] items-center justify-between gap-2 px-4 py-3`}
+                      className={`${index !== 6 ? 'border-b-[1px] border-slate-700' : ''} flex h-[65px] items-center justify-between gap-2 px-4 py-3`}
                     >
                       <div className="flex flex-1 items-center justify-start gap-2">
                         <div className="h-5 w-5 rounded" />
@@ -220,7 +226,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
                         <div className="p-2" />
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -230,7 +236,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
               </h3>
               <div className="w-1/2">
                 <div className="h-[44px] animate-pulse rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400">
-                  {" "}
+                  {' '}
                 </div>
               </div>
             </div>
@@ -239,5 +245,5 @@ export function ScheduleForm({ user }: { user: UserProps }) {
       </div>
       <ToastContainer closeOnClick theme="dark" />
     </div>
-  );
+  )
 }

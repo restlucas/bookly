@@ -1,88 +1,89 @@
-"use client";
+'use client'
 
-import { SelectInput } from "@/components/input/select";
+import { SelectInput } from '@/components/input/select'
 import {
   getAllCategories,
   getOccupationByCategory,
-} from "@/services/professionService";
-import { getServiceType } from "@/services/schedulingService";
-import { Trash } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+} from '@/services/professionService'
+import { getServiceType } from '@/services/schedulingService'
+import { Trash } from '@phosphor-icons/react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 interface CategoriesProps {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt?: Date;
+  id: string
+  name: string
+  slug: string
+  createdAt?: Date
 }
 
 interface OccupationsProps {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt?: Date;
+  id: string
+  name: string
+  slug: string
+  createdAt?: Date
 }
 
 interface ServiceTypesProps {
-  id: string;
-  name: string;
-  slug: string;
+  id: string
+  name: string
+  slug: string
 }
 
 interface FilterProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default function Filter({ searchParams }: FilterProps) {
-  const router = useRouter();
+  console.log(searchParams)
+  const router = useRouter()
 
-  const [categories, setCategories] = useState<CategoriesProps[]>();
-  const [occupations, setOccupations] = useState<OccupationsProps[]>();
-  const [serviceTypes, setServiceTypes] = useState<ServiceTypesProps[]>();
+  const [categories, setCategories] = useState<CategoriesProps[]>()
+  const [occupations, setOccupations] = useState<OccupationsProps[]>()
+  const [serviceTypes, setServiceTypes] = useState<ServiceTypesProps[]>()
 
-  const [filters, setFilters] = useState<{ [key: string]: string }>({});
+  const [filters, setFilters] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await getAllCategories();
-      setCategories(response);
-    };
+      const response = await getAllCategories()
+      setCategories(response)
+    }
 
     const fetchServiceType = async () => {
-      const response = await getServiceType();
-      setServiceTypes(response);
-    };
+      const response = await getServiceType()
+      setServiceTypes(response)
+    }
 
-    fetchCategories();
-    fetchServiceType();
-  }, []);
+    fetchCategories()
+    fetchServiceType()
+  }, [])
 
   useEffect(() => {
     const fetchOccupation = async () => {
       if (filters.category) {
-        const response = await getOccupationByCategory(filters.category);
-        setOccupations(response);
+        const response = await getOccupationByCategory(filters.category)
+        setOccupations(response)
       }
-    };
+    }
 
-    fetchOccupation();
-  }, [filters.category]);
+    fetchOccupation()
+  }, [filters.category])
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = event.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = event.target
+    setFilters((prev) => ({ ...prev, [name]: value }))
+  }
 
   const applyFilters = () => {
-    const query = new URLSearchParams(filters).toString();
-    router.replace(`?${query}`);
-  };
+    const query = new URLSearchParams(filters).toString()
+    router.replace(`?${query}`)
+  }
 
   const clearFilter = () => {
-    router.replace(`?`);
-    setFilters({});
-  };
+    router.replace(`?`)
+    setFilters({})
+  }
 
   return (
     <div className="space-y-6 rounded-md bg-background-200 p-8">
@@ -91,20 +92,20 @@ export default function Filter({ searchParams }: FilterProps) {
       <SelectInput
         name="category"
         label="Categoria"
-        value={filters.category || ""}
+        value={filters.category || ''}
         options={categories}
         onChange={handleChange}
       />
       <SelectInput
         name="occupation"
         label="Ocupação"
-        value={filters.occupation || ""}
+        value={filters.occupation || ''}
         options={occupations}
         onChange={handleChange}
       />
       <SelectInput
         name="serviceType"
-        value={filters.serviceType || ""}
+        value={filters.serviceType || ''}
         label="Tipo de atendimento"
         options={serviceTypes}
         onChange={handleChange}
@@ -129,5 +130,5 @@ export default function Filter({ searchParams }: FilterProps) {
         </button>
       </div>
     </div>
-  );
+  )
 }

@@ -1,73 +1,73 @@
-import { Calendar } from "./components/calendar";
-import { CommentsCard } from "@/components/card/comments";
+import { Calendar } from './components/calendar'
+import { CommentsCard } from '@/components/card/comments'
 import {
   getProfessional,
   getProfessionalName,
-} from "@/services/professionalService";
+} from '@/services/professionalService'
 
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
-import ProfessionalCard from "./components/card";
-import { Metadata } from "next";
-import { BackButton } from "./components/back-button";
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher'
+import ProfessionalCard from './components/card'
+import { Metadata } from 'next'
+import { BackButton } from './components/back-button'
 
 export async function generateMetadata({
   params,
 }: {
-  params: Params;
+  params: Params
 }): Promise<Metadata> {
-  const professionalId = (await params).professional_id;
-  const { name: professionalName } = await getProfessionalName(professionalId);
+  const professionalId = (await params).professional_id
+  const { name: professionalName } = await getProfessionalName(professionalId)
   return {
     title: `${professionalName} | Bookly`,
     description: `Pagina de ${professionalName}`,
-  };
+  }
 }
 
 interface ProfessionalProfile {
-  bio: string;
-  serviceValue: string;
-  tags: string;
+  bio: string
+  serviceValue: string
+  tags: string
   occupation: {
-    name: string;
-  };
+    name: string
+  }
   reviews?: {
     user: {
-      name: string;
-      image: string;
-    };
-    createdAt: Date;
-    comment: string;
-    rating: string;
-  }[];
+      name: string
+      image: string
+    }
+    createdAt: Date
+    comment: string
+    rating: string
+  }[]
   serviceType: {
-    id: string;
-    name: string;
-  };
+    id: string
+    name: string
+  }
 }
 
 export interface ProfessionalProps {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  phone: string;
-  address: string;
-  profile: ProfessionalProfile;
+  id: string
+  name: string
+  email: string
+  image: string
+  phone: string
+  address: string
+  profile: ProfessionalProfile
 }
 
 export default async function ProfessionalProfile({
   params: { professional_id: professionalId },
 }: {
-  params: Params;
+  params: Params
 }) {
-  const professionalData = await getProfessional(professionalId);
+  const professionalData = await getProfessional(professionalId)
 
   const professional = {
     ...professionalData,
     profile: professionalData.professional,
-  };
+  }
 
-  delete professional.professional;
+  delete professional.professional
 
   return (
     <div>
@@ -93,7 +93,7 @@ export default async function ProfessionalProfile({
                   </h2>
                   <div className="flex flex-wrap items-center justify-start gap-3">
                     {professional.profile.tags &&
-                      professional.profile.tags.split(",").map((tag, index) => {
+                      professional.profile.tags.split(',').map((tag, index) => {
                         return (
                           <button
                             key={index}
@@ -101,7 +101,7 @@ export default async function ProfessionalProfile({
                           >
                             {tag}
                           </button>
-                        );
+                        )
                       })}
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export default async function ProfessionalProfile({
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
                   Sobre mim
                 </h2>
-                <p>{professional.profile.bio || ""}</p>
+                <p>{professional.profile.bio || ''}</p>
               </div>
               <div className="space-y-6 rounded-md bg-background-200 p-8">
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
@@ -119,7 +119,7 @@ export default async function ProfessionalProfile({
 
                 <div className="grid grid-cols-3 items-start gap-4">
                   {professional.profile.reviews.map((_, index) => {
-                    return <CommentsCard key={index} />;
+                    return <CommentsCard key={index} />
                   })}
                 </div>
               </div>
@@ -159,7 +159,7 @@ export default async function ProfessionalProfile({
         </>
       )}
     </div>
-  );
+  )
 
-  return null;
+  return null
 }

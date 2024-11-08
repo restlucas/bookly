@@ -1,27 +1,26 @@
-"use client";
+'use client'
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react'
 import {
   AppointmentsProps,
   SchedulingProps,
-  SchedulingTypes,
   SelectedSchedulingProps,
-} from "./page";
-import { updateSchedulingStatus } from "@/services/schedulingService";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { toast, ToastContainer } from "react-toastify";
-import { getSchedulingByStatus } from "@/services/professionalService";
-import { CommentsFormModal } from "@/components/modal/form/comments";
-import dayjs from "dayjs";
-import { CheckSquare, Question, XSquare } from "@phosphor-icons/react";
+} from './page'
+import { updateSchedulingStatus } from '@/services/schedulingService'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { toast, ToastContainer } from 'react-toastify'
+import { getSchedulingByStatus } from '@/services/professionalService'
+import { CommentsFormModal } from '@/components/modal/form/comments'
+import dayjs from 'dayjs'
+import { CheckSquare, Question, XSquare } from '@phosphor-icons/react'
 
 export const steps = {
-  "Aguardando aprovação": {
+  'Aguardando aprovação': {
     options: [
       {
-        name: "approve",
-        title: "Aprovar",
-        nextStep: "Em andamento",
+        name: 'approve',
+        title: 'Aprovar',
+        nextStep: 'Em andamento',
         element: (
           <CheckSquare
             className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -31,19 +30,19 @@ export const steps = {
         ),
       },
       {
-        name: "repprove",
-        title: "Reprovar",
-        nextStep: "Cancelado",
+        name: 'repprove',
+        title: 'Reprovar',
+        nextStep: 'Cancelado',
         element: <XSquare className="fill-rose-400" size={32} weight="fill" />,
       },
     ],
   },
-  "Em andamento": {
+  'Em andamento': {
     options: [
       {
-        name: "conclude",
-        title: "Concluir",
-        nextStep: "Concluído",
+        name: 'conclude',
+        title: 'Concluir',
+        nextStep: 'Concluído',
         element: (
           <CheckSquare
             className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -53,40 +52,40 @@ export const steps = {
         ),
       },
       {
-        name: "cancel",
-        title: "Cancelar",
-        nextStep: "Cancelado",
+        name: 'cancel',
+        title: 'Cancelar',
+        nextStep: 'Cancelado',
         element: <XSquare className="fill-rose-400" size={32} weight="fill" />,
       },
       {
-        name: "not-attend",
-        title: "Não compareceu",
-        nextStep: "Não compareceu",
+        name: 'not-attend',
+        title: 'Não compareceu',
+        nextStep: 'Não compareceu',
         element: (
           <Question className="fill-orange-400" size={32} weight="fill" />
         ),
       },
     ],
   },
-};
+}
 
 export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
-  const [selectedStatus, setSelectedStatus] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedScheduling, setSelectedScheduling] =
-    useState<SelectedSchedulingProps>();
+    useState<SelectedSchedulingProps>()
 
-  const [scheduling, setScheduling] = useState<SchedulingProps[]>();
-  const [isLoadingScheduling, setIsLoadingScheduling] = useState(true);
+  const [scheduling, setScheduling] = useState<SchedulingProps[]>()
+  const [isLoadingScheduling, setIsLoadingScheduling] = useState(true)
 
   // Handle filter in scheduling table
   const handleSelectedFilter = async (itemId: string) => {
     if (selectedStatus !== itemId) {
-      setIsLoadingScheduling(true);
-      setSelectedStatus(itemId);
+      setIsLoadingScheduling(true)
+      setSelectedStatus(itemId)
     }
-  };
+  }
 
   const handleStatus = async (
     operation: { name: string; title: string; nextStep: string },
@@ -94,31 +93,31 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
   ) => {
     const rsp = confirm(
       `Confirmar novo status do agendamento para: ${operation.title.toLowerCase()}?`,
-    );
+    )
 
     if (rsp) {
-      const response = await updateSchedulingStatus(operation, schedulingId);
-      setIsLoadingScheduling(true);
+      const response = await updateSchedulingStatus(operation, schedulingId)
+      setIsLoadingScheduling(true)
 
-      toast[response.type](response.message, toastDefaultValues);
+      toast[response.type](response.message, toastDefaultValues)
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      fetchScheduling();
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      fetchScheduling()
     }
-  };
+  }
 
   const fetchScheduling = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const response = await getSchedulingByStatus(
-      "professional", // userRole passed to prisma where conditional
+      'professional', // userRole passed to prisma where conditional
       user.id,
       selectedStatus,
-    );
-    setScheduling(response);
+    )
+    setScheduling(response)
 
-    setIsLoadingScheduling(false);
-  }, [selectedStatus, selectedStatus, user.id]);
+    setIsLoadingScheduling(false)
+  }, [selectedStatus, user.id])
 
   const showCommentModal = async (
     scheduleId: string,
@@ -127,24 +126,24 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
     setSelectedScheduling({
       id: scheduleId,
       observations: scheduleObservations,
-    });
-    setShowModal(true);
-  };
+    })
+    setShowModal(true)
+  }
 
   useEffect(() => {
-    if (user.role) fetchScheduling();
-  }, [user, fetchScheduling]);
+    if (user.role) fetchScheduling()
+  }, [user, fetchScheduling])
 
   useEffect(() => {
     if (status.length !== 0) {
-      setIsLoading(false);
+      setIsLoading(false)
       const selectedStatusId = status.find(
-        (item) => item.name === "Aguardando aprovação",
-      )?.id;
+        (item) => item.name === 'Aguardando aprovação',
+      )?.id
 
-      setSelectedStatus(selectedStatusId);
+      setSelectedStatus(selectedStatusId)
     }
-  }, [status]);
+  }, [status])
 
   return (
     <>
@@ -166,11 +165,11 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
                     <button
                       key={item.id}
                       onClick={() => handleSelectedFilter(item.id)}
-                      className={`${item.id === selectedStatus ? "bg-background-300 text-vibrant-green-100" : "bg-transparent text-white"} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
+                      className={`${item.id === selectedStatus ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md`}
                     >
                       {item.name}
                     </button>
-                  );
+                  )
                 })
               )}
             </div>
@@ -200,10 +199,10 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
                       return (
                         <tr
                           key={index}
-                          className={`${index === 4 ? "" : "border-b"} border-background-300 hover:bg-background-300/50`}
+                          className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                         >
                           <td className="px-6 py-4">
-                            {`${String(dayjs(schedule.date).format("DD/MM/YYYY"))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, "0")}:${String(dayjs(schedule.date).minute()).padEnd(2, "0")}`}
+                            {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                           </td>
                           <td className="px-6 py-4">{schedule.user.name}</td>
                           <td className="px-6 py-4">{schedule.user.phone}</td>
@@ -248,12 +247,12 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
                                     >
                                       {step.element}
                                     </button>
-                                  );
+                                  )
                                 },
                               )}
                           </td>
                         </tr>
-                      );
+                      )
                     })
                   ) : (
                     <tr>
@@ -276,5 +275,5 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
         />
       )}
     </>
-  );
+  )
 }

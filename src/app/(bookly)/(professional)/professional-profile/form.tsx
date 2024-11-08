@@ -1,73 +1,72 @@
-"use client";
+'use client'
 
-import { SelectInput } from "@/components/input/select";
-import { TextInput } from "@/components/input/text";
-import { TextAreaInput } from "@/components/input/textarea";
-import { UserContext } from "@/contexts/UserContext";
+import { SelectInput } from '@/components/input/select'
+import { TextInput } from '@/components/input/text'
+import { TextAreaInput } from '@/components/input/textarea'
 import {
   getProfessionalProfile,
   updateProfessionalProfile,
-} from "@/services/professionalService";
-import { useCallback, useContext, useEffect, useState } from "react";
-import Image from "next/image";
+} from '@/services/professionalService'
+import { useCallback, useEffect, useState } from 'react'
+import Image from 'next/image'
 import {
   getAllCategories,
   getOccupationByCategory,
-} from "@/services/professionService";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { toast, ToastContainer } from "react-toastify";
-import SubmitButton from "@/components/button/submit";
-import { X } from "@phosphor-icons/react";
-import { getServiceType } from "@/services/schedulingService";
+} from '@/services/professionService'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { toast, ToastContainer } from 'react-toastify'
+import SubmitButton from '@/components/button/submit'
+import { X } from '@phosphor-icons/react'
+import { getServiceType } from '@/services/schedulingService'
 import {
   ProfessionalProfileData,
   validateProfessionalProfileForm,
-} from "@/utils/validators";
-import { formatCurrency } from "@/utils/format-functions";
-import { SessionProps } from "../../dashboard/page";
+} from '@/utils/validators'
+import { formatCurrency } from '@/utils/format-functions'
+import { SessionProps } from '../../dashboard/page'
 
 interface CategoriesProps {
-  id: string;
-  createdAt?: Date;
-  name: string;
-  slug: string;
+  id: string
+  createdAt?: Date
+  name: string
+  slug: string
 }
 
 interface OccupationProps {
-  id: string;
-  createdAt?: Date;
-  name: string;
-  slug: string;
+  id: string
+  createdAt?: Date
+  name: string
+  slug: string
 }
 
 interface ServiceTypesProps {
-  id: string;
-  name: string;
-  slug: string;
+  id: string
+  name: string
+  slug: string
 }
 
 export function ProfessionalProfileForm({ user }: SessionProps) {
-  const [tagInput, setTagInput] = useState("");
+  const [tagInput, setTagInput] = useState('')
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
-  const [categories, setCategories] = useState<CategoriesProps[]>();
-  const [occupations, setOccupations] = useState<OccupationProps[]>();
-  const [serviceTypes, setServiceTypes] = useState<ServiceTypesProps[]>();
+  const [categories, setCategories] = useState<CategoriesProps[]>()
+  const [occupations, setOccupations] = useState<OccupationProps[]>()
+  const [serviceTypes, setServiceTypes] = useState<ServiceTypesProps[]>()
 
   const [professionalProfile, setProfessionalProfile] =
     useState<ProfessionalProfileData>({
-      bio: "",
-      occupationId: "",
-      categoryId: "",
-      serviceValue: "",
-      tags: "",
-      serviceTypeId: "",
-    });
+      bio: '',
+      occupationId: '',
+      categoryId: '',
+      serviceValue: '',
+      tags: '',
+      serviceTypeId: '',
+    })
 
   // Professional profile fetch
   const fetchProfessionalProfile = useCallback(async () => {
-    const professionalProfile = await getProfessionalProfile(user.id);
+    const professionalProfile = await getProfessionalProfile(user.id)
 
     setProfessionalProfile({
       bio: professionalProfile.bio,
@@ -76,95 +75,95 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
       serviceTypeId: professionalProfile.serviceType?.id,
       serviceValue: professionalProfile.serviceValue,
       tags: professionalProfile.tags,
-    });
-  }, [user.id]);
+    })
+  }, [user.id])
 
   // Categories fetch
   const fetchCategories = useCallback(async () => {
-    const fetchedCategories = await getAllCategories();
-    setCategories(fetchedCategories);
-  }, []);
+    const fetchedCategories = await getAllCategories()
+    setCategories(fetchedCategories)
+  }, [])
 
   const fetchServiceTypes = useCallback(async () => {
-    const response = await getServiceType();
-    setServiceTypes(response);
-  }, []);
+    const response = await getServiceType()
+    setServiceTypes(response)
+  }, [])
 
   // Profession by categories fetch
   const fetchOccupations = useCallback(async () => {
     if (professionalProfile.categoryId) {
       const fetchedProfessions = await getOccupationByCategory(
         professionalProfile.categoryId,
-      );
-      setOccupations(fetchedProfessions);
+      )
+      setOccupations(fetchedProfessions)
     }
-  }, [professionalProfile.categoryId]);
+  }, [professionalProfile.categoryId])
 
   useEffect(() => {
-    fetchProfessionalProfile();
-  }, [user.id, fetchProfessionalProfile]);
+    fetchProfessionalProfile()
+  }, [user.id, fetchProfessionalProfile])
 
   useEffect(() => {
-    fetchCategories();
-    fetchServiceTypes();
-  }, [fetchCategories, fetchServiceTypes]);
+    fetchCategories()
+    fetchServiceTypes()
+  }, [fetchCategories, fetchServiceTypes])
 
   useEffect(() => {
-    fetchOccupations();
-  }, [professionalProfile.categoryId, fetchOccupations]);
+    fetchOccupations()
+  }, [professionalProfile.categoryId, fetchOccupations])
 
   function handleTags() {
     setProfessionalProfile((prevState) => ({
       ...prevState,
       tags: prevState.tags ? `${prevState.tags},${tagInput}` : tagInput,
-    }));
-    setTagInput("");
+    }))
+    setTagInput('')
   }
 
   function removeTag(index: number) {
     const newTags = professionalProfile.tags
-      .split(",")
+      .split(',')
       .filter((_, tagIndex) => tagIndex !== index)
-      .join(",");
+      .join(',')
 
     setProfessionalProfile((prevState) => ({
       ...prevState,
       tags: newTags,
-    }));
+    }))
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
     const formattedValue =
-      name === "serviceValue" ? formatCurrency(value) || "0" : value || "";
+      name === 'serviceValue' ? formatCurrency(value) || '0' : value || ''
 
     setProfessionalProfile((prevState) => ({
       ...prevState,
       [name]: formattedValue,
-    }));
-  };
+    }))
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
     const validationErrors =
-      validateProfessionalProfileForm(professionalProfile);
+      validateProfessionalProfileForm(professionalProfile)
 
     if (Object.keys(validationErrors).length > 0) {
       Object.values(validationErrors).forEach((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+        toast.error(error, toastDefaultValues)
+      })
     } else {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       const response = await updateProfessionalProfile(
         user.id,
         professionalProfile,
-      );
-      toast[response.type](response.message, toastDefaultValues);
-      setIsLoading(false);
+      )
+      toast[response.type](response.message, toastDefaultValues)
+      setIsLoading(false)
     }
   }
 
@@ -178,7 +177,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
               <div className="flex w-full flex-col items-center justify-start gap-4">
                 <div className="relative h-[200px] w-[200px] overflow-hidden rounded-xl bg-cyan-300">
                   <Image
-                    src={user.image ? user.image.replace("s96", "s500") : ""}
+                    src={user.image ? user.image.replace('s96', 's500') : ''}
                     alt={user.name}
                     fill
                     className="object-cover"
@@ -205,21 +204,21 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                   <SelectInput
                     label="Categoria da profissão"
                     name="categoryId"
-                    value={professionalProfile.categoryId || ""}
+                    value={professionalProfile.categoryId || ''}
                     options={categories || []}
                     onChange={handleChange}
                   />
                   <SelectInput
                     label="Profissão"
                     name="occupationId"
-                    value={professionalProfile.occupationId || ""}
+                    value={professionalProfile.occupationId || ''}
                     options={occupations || []}
                     onChange={handleChange}
                   />
                   <SelectInput
                     label="Tipo de atendimento"
                     name="serviceTypeId"
-                    value={professionalProfile.serviceTypeId || ""}
+                    value={professionalProfile.serviceTypeId || ''}
                     options={serviceTypes || []}
                     onChange={handleChange}
                   />
@@ -228,7 +227,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                     label="Valor do atendimento"
                     placeholder="R$000,00"
                     name="serviceValue"
-                    value={professionalProfile.serviceValue || ""}
+                    value={professionalProfile.serviceValue || ''}
                     onChange={handleChange}
                   />
                 </div>
@@ -263,7 +262,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                     <div className="flex w-full flex-wrap gap-2">
                       {professionalProfile.tags &&
                         professionalProfile.tags
-                          .split(",")
+                          .split(',')
                           .map((tag, index) => {
                             return (
                               <button
@@ -278,7 +277,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                                   size={18}
                                 />
                               </button>
-                            );
+                            )
                           })}
                     </div>
                   </div>
@@ -292,7 +291,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
 
                   <TextAreaInput
                     name="bio"
-                    value={professionalProfile.bio || ""}
+                    value={professionalProfile.bio || ''}
                     onChange={handleChange}
                     placeholder="Conte um pouco sobre você"
                   />
@@ -358,5 +357,5 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
       </form>
       <ToastContainer closeOnClick theme="dark" />
     </>
-  );
+  )
 }

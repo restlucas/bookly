@@ -1,72 +1,60 @@
-"use client";
+'use client'
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react'
 import {
   AppointmentsProps,
   SchedulingProps,
   SelectedSchedulingProps,
-} from "./page";
-import { getSchedulingByStatus } from "@/services/professionalService";
-import { ToastContainer } from "react-toastify";
-import dayjs from "dayjs";
-import { CommentsFormModal } from "@/components/modal/form/comments";
+} from './page'
+import { getSchedulingByStatus } from '@/services/professionalService'
+import dayjs from 'dayjs'
+import { CommentsFormModal } from '@/components/modal/form/comments'
 
 export function PersonalAppointments({ user, status }: AppointmentsProps) {
-  const [selectedStatus, setSelectedStatus] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedScheduling, setSelectedScheduling] =
-    useState<SelectedSchedulingProps>();
+    useState<SelectedSchedulingProps>()
 
-  const [scheduling, setScheduling] = useState<SchedulingProps[]>([]);
-  const [isLoadingScheduling, setIsLoadingScheduling] = useState<boolean>(true);
+  const [scheduling, setScheduling] = useState<SchedulingProps[]>([])
+  const [isLoadingScheduling, setIsLoadingScheduling] = useState<boolean>(true)
 
   // Handle filter in scheduling table
   const handleSelectedFilter = async (itemId: string) => {
     if (selectedStatus !== itemId) {
-      setIsLoadingScheduling(true);
-      setSelectedStatus(itemId);
+      setIsLoadingScheduling(true)
+      setSelectedStatus(itemId)
     }
-  };
+  }
 
   const fetchScheduling = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const response = await getSchedulingByStatus(
-      "personal",
+      'personal',
       user.id,
       selectedStatus,
-    );
-    setScheduling(response);
+    )
+    setScheduling(response)
 
-    setIsLoadingScheduling(false);
-  }, [selectedStatus, user.id]);
-
-  const showCommentModal = async (
-    scheduleId: string,
-    scheduleObservations: string,
-  ) => {
-    setSelectedScheduling({
-      id: scheduleId,
-      observations: scheduleObservations,
-    });
-    setShowModal(true);
-  };
+    setIsLoadingScheduling(false)
+  }, [selectedStatus, user.id])
 
   useEffect(() => {
-    if (user.role) fetchScheduling();
-  }, [user, fetchScheduling]);
+    if (user.role) fetchScheduling()
+  }, [user, fetchScheduling])
 
   useEffect(() => {
     if (status.length !== 0) {
-      setIsLoading(false);
+      setIsLoading(false)
       const selectedStatusId = status.find(
-        (item) => item.name === "Aguardando aprovação",
-      )?.id;
+        (item) => item.name === 'Aguardando aprovação',
+      )?.id
 
-      setSelectedStatus(selectedStatusId);
+      setSelectedStatus(selectedStatusId)
     }
-  }, [status]);
+  }, [status])
 
   return (
     <>
@@ -74,7 +62,7 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
         <div>
           <div className="mb-8 flex w-full items-center justify-start">
             <h2 className="text-2xl text-vibrant-green-100">
-              Meus agendamentos {user.role === "professional" && "(pessoal)"}
+              Meus agendamentos {user.role === 'professional' && '(pessoal)'}
             </h2>
           </div>
 
@@ -88,11 +76,11 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                     <button
                       key={item.id}
                       onClick={() => handleSelectedFilter(item.id)}
-                      className={`${item.id === selectedStatus ? "bg-background-300 text-vibrant-green-100" : "bg-transparent text-white"} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
+                      className={`${item.id === selectedStatus ? 'bg-background-300 text-vibrant-green-100' : 'bg-transparent text-white'} cursor-pointer rounded-b-md rounded-t-md p-4 text-xs uppercase md:rounded-b-none md:rounded-t-md lg:p-4`}
                     >
                       {item.name}
                     </button>
-                  );
+                  )
                 })
               )}
             </div>
@@ -122,10 +110,10 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                       return (
                         <tr
                           key={schedule.id}
-                          className={`${index === 4 ? "" : "border-b"} border-background-300 hover:bg-background-300/50`}
+                          className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                         >
                           <td className="px-6 py-4">
-                            {`${String(dayjs(schedule.date).format("DD/MM/YYYY"))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, "0")}:${String(dayjs(schedule.date).minute()).padEnd(2, "0")}`}
+                            {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                           </td>
                           <td className="px-6 py-4">
                             {schedule.professional.user.name}
@@ -137,7 +125,11 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                             {schedule.professional.user.phone}
                           </td>
                           <td className="px-6 py-4">
-                            <button className="flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedScheduling(schedule)}
+                              className="flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20"
+                            >
                               <span>Visualizar comentário</span>
                             </button>
                           </td>
@@ -148,7 +140,7 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                             {schedule.professional.serviceType.name}
                           </td>
                         </tr>
-                      );
+                      )
                     })
                   ) : (
                     <tr>
@@ -170,5 +162,5 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
         />
       )}
     </>
-  );
+  )
 }

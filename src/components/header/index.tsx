@@ -1,10 +1,9 @@
-import { getServerSession } from "next-auth";
-import { HeaderNavigation } from "./navigation";
-import { authOptions } from "@/utils/authOptions";
-import { Session } from "next-auth";
+import { getServerSession, Session } from 'next-auth'
+import { HeaderNavigation } from './navigation'
+import { authOptions } from '@/utils/authOptions'
 
 export default async function Header() {
-  const session: Session = await getServerSession(authOptions);
+  const session: Session = await getServerSession(authOptions)
 
   if (!session.user.role)
     return (
@@ -26,7 +25,7 @@ export default async function Header() {
           <div className="h-12 w-12 rounded-md bg-background-200" />
         </div>
       </div>
-    );
+    )
 
   return (
     <div>
@@ -38,5 +37,5 @@ export default async function Header() {
         <HeaderNavigation session={session} />
       </nav>
     </div>
-  );
+  )
 }
