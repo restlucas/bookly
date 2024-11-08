@@ -1,14 +1,16 @@
-import { LoginButton } from '@/components/button/login'
-import { CommentsCard } from '@/components/card/comments'
-import { NextSeo } from 'next-seo'
+import { LoginButton } from "@/components/button/login";
+import { CommentsCard } from "@/components/card/comments";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home | Bookly",
+  description: "Agende, gerencie e confirme, tudo em um só lugar.",
+};
 
 export default function Home() {
   return (
     <>
-      <NextSeo
-        title="Home | Bookly"
-        description="Agende, gerencie e confirme, tudo em um só lugar."
-      />
       <div className="mb-16 flex flex-col gap-20 lg:mx-16">
         {/* Login button */}
         <div className="flex items-center justify-between">
@@ -157,7 +159,7 @@ export default function Home() {
         {/* Comments */}
         <section className="w-full">
           <h1 className="mb-5 text-center text-3xl">
-            O que as pessoas pensam{' '}
+            O que as pessoas pensam{" "}
             <span className="bg-vibrant-green-100 font-bold text-background-300">
               sobre nós
             </span>
@@ -165,12 +167,12 @@ export default function Home() {
           <div className="flex items-center justify-center">
             <div className="grid w-full grid-cols-1 gap-6 lg:w-3/4 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, index) => {
-                return <CommentsCard key={index} />
+                return <CommentsCard key={index} />;
               })}
             </div>
           </div>
         </section>
       </div>
     </>
-  )
+  );
 }

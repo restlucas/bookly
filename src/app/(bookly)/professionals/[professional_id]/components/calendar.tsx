@@ -1,131 +1,136 @@
-'use client'
+"use client";
 
-import { SchedulingDateProps } from '@/app/(bookly)/professionals/[professional_id]/page'
+import { UserContext } from "@/contexts/UserContext";
 import {
   getAvailability,
   getBlockedDates,
-} from '@/services/professionalService'
-import { getWeekDays } from '@/utils/get-week-days'
-import { CaretLeft, CaretRight } from '@phosphor-icons/react'
-import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+} from "@/services/professionalService";
+import { getWeekDays } from "@/utils/get-week-days";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import dayjs from "dayjs";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 interface CalendarDay {
-  date: dayjs.Dayjs
-  disabled: boolean
+  date: dayjs.Dayjs;
+  disabled: boolean;
 }
 
 interface CalendarWeek {
-  week: number
-  days: CalendarDay[]
+  week: number;
+  days: CalendarDay[];
 }
-type CalendarWeeks = CalendarWeek[]
+type CalendarWeeks = CalendarWeek[];
 
 interface Availability {
-  possibleTimes: { time_formatted: string; time_in_minutes: number }[]
-  availableTimes: { time_formatted: string; time_in_minutes: number }[]
+  possibleTimes: { time_formatted: string; time_in_minutes: number }[];
+  availableTimes: { time_formatted: string; time_in_minutes: number }[];
 }
 
 interface BlockedDates {
-  blockedWeekDays: number[]
-  blockedDates: number[]
+  blockedWeekDays: number[];
+  blockedDates: number[];
 }
 
 interface CalendarProps {
-  professionalId: string
-  schedulingDate: SchedulingDateProps
-  setSchedulingDate: (data: {
-    date: string
-    hour: {
-      time_formatted: string
-      time_in_minutes: number
-    }
-  }) => void
+  professionalId: string;
 }
 
-export function Calendar({
-  professionalId,
-  schedulingDate,
-  setSchedulingDate,
-}: CalendarProps) {
-  const shortWeekDays = getWeekDays({ short: true })
+export interface SchedulingDateProps {
+  date: string;
+  hour: {
+    time_formatted: string;
+    time_in_minutes: number;
+  };
+}
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [currentDate, setCurrentDate] = useState(dayjs().startOf('month'))
-  const [availability, setAvailability] = useState<Availability | null>(null)
-  const [blockedDates, setBlockedDates] = useState<BlockedDates>()
+export function Calendar({ professionalId }: CalendarProps) {
+  const shortWeekDays = getWeekDays({ short: true });
 
-  const isDateSelected = Boolean(selectedDate)
-  const weekDay = selectedDate ? dayjs(selectedDate).format('dddd') : ''
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(dayjs().startOf("month"));
+  const [availability, setAvailability] = useState<Availability | null>(null);
+  const [blockedDates, setBlockedDates] = useState<BlockedDates>();
+
+  const isDateSelected = Boolean(selectedDate);
+  const weekDay = selectedDate ? dayjs(selectedDate).format("dddd") : "";
   const describedDate = selectedDate
-    ? dayjs(selectedDate).format('DD[ de ]MMMM')
-    : ''
-  const currentMonth = currentDate.format('MMMM')
-  const currentYear = currentDate.format('YYYY')
+    ? dayjs(selectedDate).format("DD[ de ]MMMM")
+    : "";
+  const currentMonth = currentDate.format("MMMM");
+  const currentYear = currentDate.format("YYYY");
 
   const calendarWeeks = useMemo(() => {
-    if (!blockedDates) return []
+    if (!blockedDates) return [];
 
     const daysInMonth = Array.from(
       { length: currentDate.daysInMonth() },
-      (_, i) => currentDate.set('date', i + 1),
-    )
+      (_, i) => currentDate.set("date", i + 1),
+    );
     const previousDays = Array.from({ length: currentDate.day() }, (_, i) =>
-      currentDate.subtract(i + 1, 'day'),
-    ).reverse()
-    const lastDay = currentDate.endOf('month')
+      currentDate.subtract(i + 1, "day"),
+    ).reverse();
+    const lastDay = currentDate.endOf("month");
     const nextDays = Array.from({ length: 6 - lastDay.day() }, (_, i) =>
-      lastDay.add(i + 1, 'day'),
-    )
+      lastDay.add(i + 1, "day"),
+    );
 
-    const allDays = [...previousDays, ...daysInMonth, ...nextDays]
+    const allDays = [...previousDays, ...daysInMonth, ...nextDays];
     const calendarDays = allDays.map((date) => ({
       date,
       disabled:
-        date.isBefore(dayjs(), 'day') ||
+        date.isBefore(dayjs(), "day") ||
         blockedDates.blockedWeekDays.includes(date.day()) ||
         blockedDates.blockedDates.includes(date.date()),
-    }))
+    }));
 
     return calendarDays.reduce<CalendarWeeks>((weeks, day, i) => {
-      const isNewWeek = i % 7 === 0
+      const isNewWeek = i % 7 === 0;
       if (isNewWeek)
-        weeks.push({ week: i / 7 + 1, days: calendarDays.slice(i, i + 7) })
-      return weeks
-    }, [])
-  }, [currentDate, blockedDates])
+        weeks.push({ week: i / 7 + 1, days: calendarDays.slice(i, i + 7) });
+      return weeks;
+    }, []);
+  }, [currentDate, blockedDates]);
 
-  const handleDateNavigation = (direction: 'previous' | 'next') => {
+  const [schedulingDate, setSchedulingDate] = useState<SchedulingDateProps>({
+    date: "",
+    hour: {
+      time_formatted: "",
+      time_in_minutes: 0,
+    },
+  });
+
+  const handleDateNavigation = (direction: "previous" | "next") => {
     setCurrentDate(
-      currentDate[direction === 'previous' ? 'subtract' : 'add'](1, 'month'),
-    )
-  }
+      currentDate[direction === "previous" ? "subtract" : "add"](1, "month"),
+    );
+  };
 
   useEffect(() => {
     const fetchAvailability = async () => {
       if (selectedDate) {
         const response = await getAvailability(
           String(professionalId),
-          dayjs(selectedDate).format('YYYY-MM-DD'),
-        )
+          dayjs(selectedDate).format("YYYY-MM-DD"),
+        );
 
-        setAvailability(response)
+        setAvailability(response);
       }
-    }
+    };
 
-    fetchAvailability()
-  }, [selectedDate, professionalId])
+    fetchAvailability();
+  }, [selectedDate, professionalId]);
 
   useEffect(() => {
     const fetchBlockedDates = async () => {
       const response = await getBlockedDates(String(professionalId), {
         year: currentDate.year(),
         month: currentDate.month() + 1,
-      })
-      setBlockedDates(response)
-    }
-    fetchBlockedDates()
-  }, [currentDate, professionalId])
+      });
+      setBlockedDates(response);
+    };
+    fetchBlockedDates();
+  }, [currentDate, professionalId]);
 
   return (
     <div className="grid grid-cols-[70%_30%] gap-4">
@@ -137,13 +142,13 @@ export function Calendar({
           </h4>
           <div className="flex gap-2 text-slate-400">
             <button
-              onClick={() => handleDateNavigation('previous')}
+              onClick={() => handleDateNavigation("previous")}
               className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md"
             >
               <CaretLeft className="h-5 w-5" />
             </button>
             <button
-              onClick={() => handleDateNavigation('next')}
+              onClick={() => handleDateNavigation("next")}
               className="cursor-pointer rounded-sm border-none bg-none leading-[0] hover:text-slate-100 focus:shadow-md"
             >
               <CaretRight className="h-5 w-5" />
@@ -171,15 +176,15 @@ export function Calendar({
                         <button
                           onClick={() => setSelectedDate(date.toDate())}
                           disabled={disabled}
-                          className={`aspect-square w-full cursor-pointer rounded-sm text-center text-sm ${disabled ? 'disabled:text-slate-700' : 'hover:bg-background-300/60'}`}
+                          className={`aspect-square w-full cursor-pointer rounded-sm text-center text-sm ${disabled ? "disabled:text-slate-700" : "hover:bg-background-300/60"}`}
                         >
-                          {date.get('date')}
+                          {date.get("date")}
                         </button>
                       </td>
-                    )
+                    );
                   })}
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
@@ -187,7 +192,7 @@ export function Calendar({
 
       {/* Schedules */}
       <div
-        className={`border-l-[1px] border-background-300 ${!isDateSelected ? 'flex items-center justify-center' : 'pl-6'}`}
+        className={`border-l-[1px] border-background-300 ${!isDateSelected ? "flex items-center justify-center" : "pl-6"}`}
       >
         {!isDateSelected ? (
           <h4 className="w-4/5 text-center text-sm text-slate-400/90">
@@ -196,7 +201,7 @@ export function Calendar({
         ) : (
           <div className="flex h-full flex-col">
             <h4 className="mb-4 text-sm">
-              {weekDay}, <br />{' '}
+              {weekDay}, <br />{" "}
               <span className="text-vibrant-green-100">{describedDate}</span>
             </h4>
 
@@ -209,21 +214,28 @@ export function Calendar({
                         key={index}
                         onClick={() =>
                           setSchedulingDate({
-                            date: dayjs(selectedDate).format('YYYY-MM-DD'),
+                            date: dayjs(selectedDate).format("YYYY-MM-DD"),
                             hour: item,
                           })
                         }
-                        className={`${schedulingDate.date === dayjs(selectedDate).format('YYYY-MM-DD') && schedulingDate.hour.time_in_minutes === item.time_in_minutes ? 'border-2 border-vibrant-green-100' : ''} cursor-pointer rounded-sm border-2 border-transparent bg-background-300 py-1 hover:bg-background-300/60`}
+                        className={`${schedulingDate.date === dayjs(selectedDate).format("YYYY-MM-DD") && schedulingDate.hour.time_in_minutes === item.time_in_minutes ? "border-2 border-vibrant-green-100" : ""} cursor-pointer rounded-sm border-2 border-transparent bg-background-300 py-1 hover:bg-background-300/60`}
                       >
                         {item.time_formatted}
                       </button>
-                    )
+                    );
                   })}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <Link
+        href={`${professionalId}/request-schedule?selected_date=${schedulingDate.date}&hour=${schedulingDate.hour.time_formatted}&minutes=${schedulingDate.hour.time_in_minutes}`}
+        className="w-full cursor-pointer rounded-md bg-vibrant-green-100 p-4 text-center duration-150 hover:bg-vibrant-green-200"
+      >
+        Solicitar agendamento
+      </Link>
     </div>
-  )
+  );
 }

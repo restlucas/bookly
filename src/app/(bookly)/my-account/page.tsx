@@ -1,6 +1,12 @@
-import { AccountForm } from './form'
+import { Metadata } from "next";
+import { AccountForm } from "./form";
 
-export default function Account() {
+export const metadata: Metadata = {
+  title: "Minha conta | Bookly",
+  description: "Pagina dashboard",
+};
+
+export default function MyAccount() {
   return (
     <section className="mb-8 flex flex-col gap-6">
       {/* Profile and preferences */}
@@ -12,5 +18,5 @@ export default function Account() {
         <AccountForm />
       </div>
     </section>
-  )
+  );
 }

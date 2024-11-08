@@ -1,6 +1,17 @@
-import { ProfessionalProfileForm } from './form'
+import { Metadata } from "next";
+import { ProfessionalProfileForm } from "./form";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/utils/authOptions";
+import { SessionProps } from "../../dashboard/page";
 
-export default function ProfessionalProfile() {
+export const metadata: Metadata = {
+  title: "Perfil profissional | Bookly",
+  description: "Pagina dashboard",
+};
+
+export default async function ProfessionalProfile() {
+  const { user } = (await getServerSession(authOptions)) as SessionProps;
+
   return (
     <section className="mb-8">
       <div className="w-full rounded-md bg-background-200 p-8 shadow-md">
@@ -8,8 +19,8 @@ export default function ProfessionalProfile() {
           Perfil profissional
         </h2>
 
-        <ProfessionalProfileForm />
+        <ProfessionalProfileForm user={user} />
       </div>
     </section>
-  )
+  );
 }
