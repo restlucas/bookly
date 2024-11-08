@@ -1,24 +1,24 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/utils/authOptions'
-import { Metadata } from 'next'
-import { ScheduleForm } from './schedule-form'
-import { AbsenceForm } from './absence-form'
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/utils/authOptions";
+import { Metadata } from "next";
+import { ScheduleForm } from "./schedule-form";
+import { AbsenceForm } from "./absence-form";
 
 export const metadata: Metadata = {
-  title: 'Minha programação | Bookly',
-  description: 'Pagina dashboard',
-}
+  title: "Minha programação | Bookly",
+  description: "Pagina dashboard",
+};
 
 export interface UserProps {
-  id: string
-  name: string
-  email: string
-  image: string
-  role: string
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  role: string;
 }
 
 export default async function ProfessionalSchedule() {
-  const { user } = await getServerSession(authOptions)
+  const { user } = await getServerSession(authOptions);
 
   return (
     <>
@@ -36,5 +36,5 @@ export default async function ProfessionalSchedule() {
         </div>
       </section>
     </>
-  )
+  );
 }

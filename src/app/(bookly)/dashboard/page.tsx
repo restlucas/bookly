@@ -1,26 +1,26 @@
-import { SelectRole } from './select-role'
-import { NextAppointments } from './next-appointments'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/utils/authOptions'
-import { Metadata } from 'next'
+import { SelectRole } from "./select-role";
+import { NextAppointments } from "./next-appointments";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/utils/authOptions";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Dashboard | Bookly',
-  description: 'Pagina dashboard',
-}
+  title: "Dashboard | Bookly",
+  description: "Pagina dashboard",
+};
 
 export interface SessionProps {
   user: {
-    id: string
-    name: string
-    email: string
-    image: string
-    role: string
-  }
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+    role: string;
+  };
 }
 
 export default async function Dashboard() {
-  const { user } = (await getServerSession(authOptions)) as SessionProps
+  const { user } = (await getServerSession(authOptions)) as SessionProps;
 
   if (!user) {
     return (
@@ -41,7 +41,7 @@ export default async function Dashboard() {
           />
         </svg>
       </div>
-    )
+    );
   }
 
   if (!user.role) {
@@ -49,14 +49,14 @@ export default async function Dashboard() {
       <div className="absolute bottom-0 left-0 right-0 top-0 flex h-full w-screen items-center justify-center bg-background-100">
         <SelectRole />
       </div>
-    )
+    );
   } else {
     return (
       <>
         <main className="h-full space-y-6">
           <div className="w-full rounded-md bg-background-200 p-8">
             <h1 className="text-center text-xl">
-              Bem vindo novamente{' '}
+              Bem vindo novamente{" "}
               <span className="font-bold text-vibrant-green-100">
                 {user.name}
               </span>
@@ -68,6 +68,6 @@ export default async function Dashboard() {
           </div>
         </main>
       </>
-    )
+    );
   }
 }

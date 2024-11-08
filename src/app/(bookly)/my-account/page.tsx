@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import { AccountForm } from './form'
+import { Metadata } from "next";
+import { AccountForm } from "./form";
 
 export const metadata: Metadata = {
-  title: 'Minha conta | Bookly',
-  description: 'Pagina dashboard',
-}
+  title: "Minha conta | Bookly",
+  description: "Pagina dashboard",
+};
 
 export default function MyAccount() {
   return (
@@ -18,5 +18,5 @@ export default function MyAccount() {
         <AccountForm />
       </div>
     </section>
-  )
+  );
 }

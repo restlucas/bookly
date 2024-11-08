@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
 import {
   InstagramLogo,
   LinkedinLogo,
   MapPin,
   WhatsappLogo,
-} from '@phosphor-icons/react'
-import Image from 'next/image'
-import { FavoriteButton } from '@/components/button/favorite'
-import { useContext } from 'react'
-import { UserContext } from '@/contexts/UserContext'
-import Link from 'next/link'
-import { ProfessionalProps } from '../page'
+} from "@phosphor-icons/react";
+import Image from "next/image";
+import { FavoriteButton } from "@/components/button/favorite";
+import { useContext } from "react";
+import { UserContext } from "@/contexts/UserContext";
+import Link from "next/link";
+import { ProfessionalProps } from "../page";
 
 export default function ProfessionalCard({
   professional,
 }: {
-  professional: ProfessionalProps
+  professional: ProfessionalProps;
 }) {
-  const { user } = useContext(UserContext)
+  const { user } = useContext(UserContext);
 
   return (
     <div className="flex items-start justify-start gap-4 rounded-md bg-background-200 p-8">
@@ -33,7 +33,7 @@ export default function ProfessionalCard({
         <Image
           className="z-10 rounded-md object-cover"
           alt={professional.name}
-          src={professional.image.replace('s96', 's500')}
+          src={professional.image.replace("s96", "s500")}
           fill={true}
         />
       </div>
@@ -47,22 +47,22 @@ export default function ProfessionalCard({
               ⭐ (
               {professional.profile.reviews
                 ? professional.profile.reviews.length
-                : '0'}
+                : "0"}
               )
             </span>
           </div>
           <h5 className="text-base">
             {professional.profile.occupation
               ? professional.profile.occupation.name
-              : ''}
+              : ""}
           </h5>
         </div>
         <p className="">
-          A partir de:{' '}
+          A partir de:{" "}
           <span className="font-bold text-vibrant-green-100">
             {professional.profile.serviceValue
               ? professional.profile.serviceValue
-              : ''}
+              : ""}
           </span>
         </p>
 
@@ -80,9 +80,9 @@ export default function ProfessionalCard({
 
         <div className="mt-auto flex items-center justify-start gap-2">
           <MapPin className="fill-vibrant-green-100" weight="bold" size={26} />
-          <span>{professional.address || ''}</span>
+          <span>{professional.address || ""}</span>
         </div>
       </div>
     </div>
-  )
+  );
 }

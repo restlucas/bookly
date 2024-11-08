@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { UserContextProvider } from '@/contexts/UserContext'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { SessionProvider } from 'next-auth/react'
-import { useState } from 'react'
+import { UserContextProvider } from "@/contexts/UserContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
+import { useState } from "react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <SessionProvider>
@@ -16,5 +16,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         </QueryClientProvider>
       </UserContextProvider>
     </SessionProvider>
-  )
+  );
 }
