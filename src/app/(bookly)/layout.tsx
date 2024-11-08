@@ -1,6 +1,6 @@
 // import { Footer } from "@/components/footer";
-import Header from "@/components/header";
-import { ReactNode } from "react";
+import Header from '@/components/header'
+import { ReactNode } from 'react'
 
 export default function BooklyLayout({ children }: { children: ReactNode }) {
   return (
@@ -9,5 +9,5 @@ export default function BooklyLayout({ children }: { children: ReactNode }) {
       <main className="m-8 flex-1 md:mx-16 md:my-10">{children}</main>
       {/* <Footer /> */}
     </main>
-  );
+  )
 }

@@ -1,59 +1,59 @@
-import { getUserById, updateUserFavorites } from "@/services/userService";
-import { useSession } from "next-auth/react";
-import React, { createContext, ReactNode, useEffect, useState } from "react";
+import { getUserById, updateUserFavorites } from '@/services/userService'
+import { useSession } from 'next-auth/react'
+import React, { createContext, ReactNode, useEffect, useState } from 'react'
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  address?: string;
-  birth?: string;
-  phone?: string;
-  gender?: string;
-  favorites?: string[] | string;
+  id: string
+  name: string
+  email: string
+  image: string
+  address?: string
+  birth?: string
+  phone?: string
+  gender?: string
+  favorites?: string[] | string
   userType: {
-    slug: string;
-  };
+    slug: string
+  }
 }
 
 interface UserContextType {
-  user: User;
-  isLoading: boolean;
-  updateRole: (role: string) => void;
-  handleFavorite: (professionalId: string) => void;
+  user: User
+  isLoading: boolean
+  updateRole: (role: string) => void
+  handleFavorite: (professionalId: string) => void
 }
 
 interface UserContextProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
-export const UserContext = createContext({} as UserContextType);
+export const UserContext = createContext({} as UserContextType)
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
-  const [user, setUser] = useState({} as User);
-  const [isLoading, setIsLoading] = useState(true);
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState({} as User)
+  const [isLoading, setIsLoading] = useState(true)
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (status === "authenticated") {
-        const user = await getUserById(session.user.id);
+      if (status === 'authenticated') {
+        const user = await getUserById(session.user.id)
 
-        if (!!user.favorites) {
-          const favoritesArray = user.favorites.replace(/'/g, '"');
-          const favoritesArrayFormatted = JSON.parse(favoritesArray);
+        if (user.favorites) {
+          const favoritesArray = user.favorites.replace(/'/g, '"')
+          const favoritesArrayFormatted = JSON.parse(favoritesArray)
 
-          user.favorites = favoritesArrayFormatted;
+          user.favorites = favoritesArrayFormatted
         }
 
-        setUser(user);
-        setIsLoading(false);
+        setUser(user)
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchUser();
-  }, [status, session]);
+    fetchUser()
+  }, [status, session])
 
   function updateRole(role: string) {
     setUser((prevState) => ({
@@ -61,28 +61,28 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
       userType: {
         slug: role,
       },
-    }));
+    }))
   }
 
   async function handleFavorite(professionalId: string) {
-    let favoritesArray: string[] | string;
+    let favoritesArray: string[] | string
 
     if (Array.isArray(user.favorites)) {
-      const isFavorited = user.favorites.includes(professionalId);
+      const isFavorited = user.favorites.includes(professionalId)
 
       favoritesArray = isFavorited
         ? user.favorites.filter((item) => item !== professionalId)
-        : [...user.favorites, professionalId];
+        : [...user.favorites, professionalId]
     } else {
-      favoritesArray = [professionalId];
+      favoritesArray = [professionalId]
     }
 
     setUser((prevState) => ({
       ...prevState,
       favorites: favoritesArray,
-    }));
+    }))
 
-    await updateUserFavorites(user.id, JSON.stringify(favoritesArray));
+    await updateUserFavorites(user.id, JSON.stringify(favoritesArray))
   }
 
   return (
@@ -91,5 +91,5 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     >
       {children}
     </UserContext.Provider>
-  );
+  )
 }

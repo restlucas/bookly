@@ -1,58 +1,58 @@
-"use server";
+'use server'
 
-import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/utils/authOptions";
-import dayjs from "dayjs";
-import { getServerSession } from "next-auth";
+import { prisma } from '@/lib/prisma'
+import { authOptions } from '@/utils/authOptions'
+import dayjs from 'dayjs'
+import { getServerSession } from 'next-auth'
 
 interface FilterQueryProps {
-  category?: string;
-  occupation?: string;
-  serviceType?: string;
+  category?: string
+  occupation?: string
+  serviceType?: string
 }
 
 interface UpdateProfessionalProfileProps {
-  categoryId?: string;
-  occupationId?: string;
-  bio?: string;
-  serviceTypeId?: string;
-  serviceTypeValue?: string;
-  serviceTimeInMinutes?: number;
-  tags?: string;
+  categoryId?: string
+  occupationId?: string
+  bio?: string
+  serviceTypeId?: string
+  serviceTypeValue?: string
+  serviceTimeInMinutes?: number
+  tags?: string
 }
 
 interface UpdateScheduleProps {
-  serviceTime?: string;
+  serviceTime?: string
   intervals?: {
-    id: string;
-    name?: string;
-    enabled: boolean;
-    weekDay: number;
-    timeStartInMinutes: number;
-    timeEndInMinutes: number;
-  }[];
+    id: string
+    name?: string
+    enabled: boolean
+    weekDay: number
+    timeStartInMinutes: number
+    timeEndInMinutes: number
+  }[]
 }
 
 // Get all professionals
 export async function getProfessionals(filterQuery: FilterQueryProps) {
-  const { category = "", occupation = "", serviceType = "" } = filterQuery;
+  const { category = '', occupation = '', serviceType = '' } = filterQuery
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
 
   const response = await prisma.user.findMany({
     where: {
       userType: {
-        slug: "professional",
+        slug: 'professional',
       },
       professional: {
         category: {
-          slug: category !== "" ? category : { not: "" },
+          slug: category !== '' ? category : { not: '' },
         },
         occupation: {
-          slug: occupation !== "" ? occupation : { not: "" },
+          slug: occupation !== '' ? occupation : { not: '' },
         },
         serviceType: {
-          slug: serviceType !== "" ? serviceType : { not: "" },
+          slug: serviceType !== '' ? serviceType : { not: '' },
         },
       },
       NOT: {
@@ -76,9 +76,9 @@ export async function getProfessionals(filterQuery: FilterQueryProps) {
         },
       },
     },
-  });
+  })
 
-  return { count: response.length, professionals: response };
+  return { count: response.length, professionals: response }
 }
 
 // Get profile
@@ -124,7 +124,7 @@ export async function getProfessional(id: string) {
         },
       },
     },
-  });
+  })
 }
 
 export async function getProfessionalName(id: string) {
@@ -133,7 +133,7 @@ export async function getProfessionalName(id: string) {
     select: {
       name: true,
     },
-  });
+  })
 }
 
 // Get professional profile
@@ -154,9 +154,9 @@ export async function getProfessionalProfile(id: string) {
         },
       },
     },
-  });
+  })
 
-  return response;
+  return response
 }
 
 // Update professional profile
@@ -168,19 +168,19 @@ export async function updateProfessionalProfile(
     await prisma.professional.update({
       where: { userId },
       data,
-    });
+    })
 
     return {
-      type: "success",
-      message: "Perfil atualizado com sucesso!",
-    };
+      type: 'success',
+      message: 'Perfil atualizado com sucesso!',
+    }
   } catch (error) {
-    console.error("Error on update user role:", error);
+    console.error('Error on update user role:', error)
 
     return {
-      type: "error",
-      error: error.message || "Error on user update",
-    };
+      type: 'error',
+      error: error.message || 'Error on user update',
+    }
   }
 }
 
@@ -190,9 +190,9 @@ export async function getSchedulingByStatus(
   userId: string,
   statusId: string,
 ) {
-  let type = "userId";
+  let type = 'userId'
 
-  if (userRole === "professional") {
+  if (userRole === 'professional') {
     const { id: professionalId } = await prisma.professional.findFirst({
       where: {
         userId,
@@ -200,10 +200,10 @@ export async function getSchedulingByStatus(
       select: {
         id: true,
       },
-    });
+    })
 
-    type = "professionalId";
-    userId = professionalId;
+    type = 'professionalId'
+    userId = professionalId
   }
   const response = await prisma.scheduling.findMany({
     where: {
@@ -248,9 +248,9 @@ export async function getSchedulingByStatus(
         },
       },
     },
-  });
+  })
 
-  return response;
+  return response
 }
 
 // Get professional schedule
@@ -264,7 +264,7 @@ export async function getSchedule(userId: string) {
         id: true,
         serviceTimeInMinutes: true,
       },
-    });
+    })
 
   const professionalSchedule = await prisma.schedule.findMany({
     where: {
@@ -272,7 +272,7 @@ export async function getSchedule(userId: string) {
     },
     orderBy: [
       {
-        weekDay: "asc",
+        weekDay: 'asc',
       },
     ],
     select: {
@@ -282,14 +282,14 @@ export async function getSchedule(userId: string) {
       timeStartInMinutes: true,
       timeEndInMinutes: true,
     },
-  });
+  })
 
   const response = {
     intervals: professionalSchedule,
     serviceTime: String(serviceTimeInMinutes),
-  };
+  }
 
-  return response;
+  return response
 }
 
 // Update professional schedule
@@ -298,9 +298,9 @@ export async function updateSchedule(
   data: UpdateScheduleProps,
 ) {
   try {
-    const { intervals: intervalsArray } = data;
+    const { intervals: intervalsArray } = data
 
-    const intervals = intervalsArray.map(({ ...rest }) => rest);
+    const intervals = intervalsArray.map(({ ...rest }) => rest)
 
     const { id: professionalId } = await prisma.professional.findUnique({
       where: {
@@ -309,7 +309,7 @@ export async function updateSchedule(
       select: {
         id: true,
       },
-    });
+    })
 
     await Promise.all(
       intervals.map(async (data) => {
@@ -319,34 +319,34 @@ export async function updateSchedule(
             id: data.id,
           },
           data,
-        });
+        })
         return {
           success: true,
-          message: "Schedule updated successfully",
+          message: 'Schedule updated successfully',
           updatedSchedule,
-        };
+        }
       }),
-    );
+    )
     return {
-      type: "success",
-      message: "Programação salva com sucesso!",
-    };
+      type: 'success',
+      message: 'Programação salva com sucesso!',
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       return {
-        type: "error",
-        message: "Erro ao atualizar programação",
-      };
+        type: 'error',
+        message: 'Erro ao atualizar programação',
+      }
     } else {
-      console.error("Erro desconhecido", error);
+      console.error('Erro desconhecido', error)
     }
   }
 }
 
 // Get professional availability
 export async function getAvailability(userId: string, date: string) {
-  const referenceDate = dayjs(String(date));
-  const isPastDate = referenceDate.endOf("day").isBefore(new Date());
+  const referenceDate = dayjs(String(date))
+  const isPastDate = referenceDate.endOf('day').isBefore(new Date())
 
   const { id: professionalId, serviceTimeInMinutes } =
     await prisma.professional.findFirst({
@@ -357,39 +357,39 @@ export async function getAvailability(userId: string, date: string) {
         id: true,
         serviceTimeInMinutes: true,
       },
-    });
+    })
 
   if (isPastDate) {
-    return { possibleTimes: [], availableTimes: [] };
+    return { possibleTimes: [], availableTimes: [] }
   }
 
   const professionalAvailability = await prisma.schedule.findFirst({
     where: {
       professionalId,
-      weekDay: referenceDate.get("day"),
+      weekDay: referenceDate.get('day'),
       enabled: true,
     },
-  });
+  })
 
   if (!professionalAvailability) {
-    return { possibleTimes: [], availableTimes: [] };
+    return { possibleTimes: [], availableTimes: [] }
   }
 
-  const { timeStartInMinutes, timeEndInMinutes } = professionalAvailability;
+  const { timeStartInMinutes, timeEndInMinutes } = professionalAvailability
 
-  let currentTime = timeStartInMinutes;
-  const possibleTimes = [];
+  let currentTime = timeStartInMinutes
+  const possibleTimes = []
 
   while (currentTime < timeEndInMinutes) {
-    const hours = Math.floor(currentTime / 60);
-    const minutes = currentTime % 60;
-    const timeString = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    const hours = Math.floor(currentTime / 60)
+    const minutes = currentTime % 60
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 
     possibleTimes.push({
       time_formatted: timeString,
       time_in_minutes: currentTime,
-    });
-    currentTime += serviceTimeInMinutes;
+    })
+    currentTime += serviceTimeInMinutes
   }
 
   const blockedTimes = await prisma.scheduling.findMany({
@@ -399,40 +399,40 @@ export async function getAvailability(userId: string, date: string) {
     where: {
       professionalId,
       date: {
-        gte: referenceDate.set("hour", timeStartInMinutes / 60).toDate(),
-        lte: referenceDate.set("hour", timeEndInMinutes / 60).toDate(),
+        gte: referenceDate.set('hour', timeStartInMinutes / 60).toDate(),
+        lte: referenceDate.set('hour', timeEndInMinutes / 60).toDate(),
       },
       status: {
         name: {
-          notIn: ["Cancelado", "Não compareceu"],
+          notIn: ['Cancelado', 'Não compareceu'],
         },
       },
     },
-  });
+  })
 
   const availableTimes = possibleTimes.filter(({ timeInMinutes }) => {
     return !blockedTimes.some((blockedTime) => {
       const hourInMinutes =
-        blockedTime.date.getHours() * 60 + blockedTime.date.getMinutes();
+        blockedTime.date.getHours() * 60 + blockedTime.date.getMinutes()
 
-      return hourInMinutes === timeInMinutes;
-    });
-  });
-  return { possibleTimes, availableTimes };
+      return hourInMinutes === timeInMinutes
+    })
+  })
+  return { possibleTimes, availableTimes }
 }
 
 // Get professional blocked dates
 export async function getBlockedDates(
   userId: string,
   date: {
-    year: number;
-    month: number;
+    year: number
+    month: number
   },
 ) {
-  let { year, month } = date;
+  let { year, month } = date
 
-  month = month === 12 ? (month = 1) : month;
-  year = month === 12 ? year + 1 : year;
+  month = month === 12 ? (month = 1) : month
+  year = month === 12 ? year + 1 : year
 
   const { id: professionalId, serviceTimeInMinutes } =
     await prisma.professional.findFirst({
@@ -443,7 +443,7 @@ export async function getBlockedDates(
         id: true,
         serviceTimeInMinutes: true,
       },
-    });
+    })
 
   const availableWeekDays = await prisma.schedule.findMany({
     where: {
@@ -455,13 +455,13 @@ export async function getBlockedDates(
       timeStartInMinutes: true,
       timeEndInMinutes: true,
     },
-  });
+  })
 
   const blockedWeekDays = [0, 1, 2, 3, 4, 5, 6].filter((weekDay) => {
     return !availableWeekDays.some(
       (availableWeekDay) => availableWeekDay.weekDay === weekDay,
-    );
-  });
+    )
+  })
 
   // Obtenha todos os agendamentos do perfil para o mês e ano especificados
   const schedulings = await prisma.scheduling.findMany({
@@ -473,14 +473,14 @@ export async function getBlockedDates(
       },
       status: {
         name: {
-          notIn: ["Cancelado", "Não compareceu"],
+          notIn: ['Cancelado', 'Não compareceu'],
         },
       },
     },
     select: {
       date: true,
     },
-  });
+  })
 
   // Obtenha a disponibilidade de horários por dia da semana
   const schedules = await prisma.schedule.findMany({
@@ -493,7 +493,7 @@ export async function getBlockedDates(
       timeStartInMinutes: true,
       timeEndInMinutes: true,
     },
-  });
+  })
 
   // Processa os dados
   const blockedDatesRaw = schedulings
@@ -504,26 +504,26 @@ export async function getBlockedDates(
     .reduce(
       (acc, scheduling) => {
         // Conta o número de agendamentos por dia
-        acc[scheduling.date] = (acc[scheduling.date] || 0) + 1;
-        return acc;
+        acc[scheduling.date] = (acc[scheduling.date] || 0) + 1
+        return acc
       },
       {} as Record<number, number>,
-    );
+    )
 
   // Filtra os dias bloqueados
   const blockedDates = Object.entries(blockedDatesRaw)
     .map(([day, amount]) => {
-      const weekDay = ((new Date(year, month - 1, +day).getDay() + 6) % 7) + 1; // Ajusta para o padrão `WEEKDAY`
-      const schedule = schedules.find((s) => s.weekDay === weekDay);
+      const weekDay = ((new Date(year, month - 1, +day).getDay() + 6) % 7) + 1 // Ajusta para o padrão `WEEKDAY`
+      const schedule = schedules.find((s) => s.weekDay === weekDay)
 
       // Calcula o "size" como a duração em horas e compara com o "amount"
       const size = schedule
         ? (schedule.timeEndInMinutes - schedule.timeStartInMinutes) /
           serviceTimeInMinutes
-        : 0;
-      return amount >= size ? +day : null;
+        : 0
+      return amount >= size ? +day : null
     })
-    .filter((day) => day !== null);
+    .filter((day) => day !== null)
 
-  return { blockedWeekDays, blockedDates };
+  return { blockedWeekDays, blockedDates }
 }
