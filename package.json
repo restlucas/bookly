@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "migrate:deploy": "prisma migrate deploy",
-    "seed": "prisma db seed",
+    "seed": "if [ $NODE_ENV = 'development' ]; then ts-node --transpile-only prisma/seed.ts; fi",
     "start": "next start",
     "lint": "next lint"
   },
