@@ -40,7 +40,8 @@ export function ScheduleForm({ user }: { user: UserProps }) {
 
       setScheduleForm(response)
     },
-    [weekDays],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   )
 
   function handleChange(
