@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { AbsenceFormData } from '@/utils/validators'
 
 // Get absence by userId

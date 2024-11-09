@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { authOptions } from '@/utils/authOptions'
 import dayjs from 'dayjs'
 import { getServerSession } from 'next-auth'

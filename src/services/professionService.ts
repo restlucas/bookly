@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 // Get profession categories
 export async function getAllCategories() {
