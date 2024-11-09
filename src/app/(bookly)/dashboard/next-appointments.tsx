@@ -53,7 +53,7 @@ export function NextAppointments({ user }: SessionProps) {
   }, [user])
   return (
     <div className="grid w-full grid-cols-1 items-start gap-6 lg:grid-cols-2">
-      {nextProfessionalAppointments.length > 0 && (
+      {user.role === 'professional' && (
         <div className="w-full rounded-md bg-background-200 p-8">
           <div className="mb-4 flex flex-col items-start justify-start gap-1">
             <h2 className="text-xl font-bold text-vibrant-green-100">
@@ -142,7 +142,7 @@ export function NextAppointments({ user }: SessionProps) {
           <h2 className="text-xl font-bold text-vibrant-green-100">
             Agendamentos nas próximas 2 semanas
           </h2>
-          {nextProfessionalAppointments.length > 0 && (
+          {user.role === 'professional' && (
             <span className="italic text-slate-400">(Pessoal)</span>
           )}
         </div>
