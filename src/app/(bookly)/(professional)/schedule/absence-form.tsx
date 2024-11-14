@@ -55,7 +55,6 @@ export function AbsenceForm({ user }: { user: UserProps }) {
 
   const getAbsences = useCallback(async (userId: string) => {
     const response = await getAbsence(userId)
-    console.log(response)
     setAbsenceList(response)
   }, [])
 

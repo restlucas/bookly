@@ -89,13 +89,14 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
     setServiceTypes(response)
   }, [])
 
-  // Profession by categories fetch
+  // Occupation by categories fetch
   const fetchOccupations = useCallback(async () => {
     if (professionalProfile.categoryId) {
-      const fetchedProfessions = await getOccupationByCategory(
+      const fetchedOccupations = await getOccupationByCategory(
+        'id',
         professionalProfile.categoryId,
       )
-      setOccupations(fetchedProfessions)
+      setOccupations(fetchedOccupations)
     }
   }, [professionalProfile.categoryId])
 

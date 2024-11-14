@@ -62,7 +62,7 @@ export default function Filter({ searchParams }: FilterProps) {
   useEffect(() => {
     const fetchOccupation = async () => {
       if (filters.category) {
-        const response = await getOccupationByCategory(filters.category)
+        const response = await getOccupationByCategory('slug', filters.category)
         setOccupations(response)
       }
     }
