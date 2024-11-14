@@ -35,7 +35,7 @@ interface CalendarProps {
   professionalId: string
 }
 
-export interface SchedulingDateProps {
+export interface AppointmentDateProps {
   date: string
   hour: {
     time_formatted: string
@@ -91,7 +91,7 @@ export function Calendar({ professionalId }: CalendarProps) {
     }, [])
   }, [currentDate, blockedDates])
 
-  const [schedulingDate, setSchedulingDate] = useState<SchedulingDateProps>({
+  const [appointmentDate, setAppointmentDate] = useState<AppointmentDateProps>({
     date: '',
     hour: {
       time_formatted: '',
@@ -195,7 +195,7 @@ export function Calendar({ professionalId }: CalendarProps) {
       >
         {!isDateSelected ? (
           <h4 className="w-4/5 text-center text-sm text-slate-400/90">
-            Selecione uma data para ver os horários disponíveis 😊
+            Select a date to see available times 😊
           </h4>
         ) : (
           <div className="flex h-full flex-col">
@@ -212,12 +212,12 @@ export function Calendar({ professionalId }: CalendarProps) {
                       <button
                         key={index}
                         onClick={() =>
-                          setSchedulingDate({
+                          setAppointmentDate({
                             date: dayjs(selectedDate).format('YYYY-MM-DD'),
                             hour: item,
                           })
                         }
-                        className={`${schedulingDate.date === dayjs(selectedDate).format('YYYY-MM-DD') && schedulingDate.hour.time_in_minutes === item.time_in_minutes ? 'border-2 border-vibrant-green-100' : ''} cursor-pointer rounded-sm border-2 border-transparent bg-background-300 py-1 hover:bg-background-300/60`}
+                        className={`${appointmentDate.date === dayjs(selectedDate).format('YYYY-MM-DD') && appointmentDate.hour.time_in_minutes === item.time_in_minutes ? 'border-2 border-vibrant-green-100' : ''} cursor-pointer rounded-sm border-2 border-transparent bg-background-300 py-1 hover:bg-background-300/60`}
                       >
                         {item.time_formatted}
                       </button>
@@ -230,10 +230,10 @@ export function Calendar({ professionalId }: CalendarProps) {
       </div>
 
       <Link
-        href={`${professionalId}/request-schedule?selected_date=${schedulingDate.date}&hour=${schedulingDate.hour.time_formatted}&minutes=${schedulingDate.hour.time_in_minutes}`}
+        href={`${professionalId}/request-schedule?selected_date=${appointmentDate.date}&hour=${appointmentDate.hour.time_formatted}&minutes=${appointmentDate.hour.time_in_minutes}`}
         className="w-full cursor-pointer rounded-md bg-vibrant-green-100 p-4 text-center duration-150 hover:bg-vibrant-green-200"
       >
-        Solicitar agendamento
+        Request appointment
       </Link>
     </div>
   )

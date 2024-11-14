@@ -3,24 +3,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   AppointmentsProps,
-  SchedulingProps,
-  SelectedSchedulingProps,
+  AppointmentProps,
+  SelectedAppointmentProps,
 } from './page'
-import { updateSchedulingStatus } from '@/services/schedulingService'
+import { updateAppointmentStatus } from '@/services/appointmentService'
 import toastDefaultValues from '@/utils/toast-default-values'
 import { toast, ToastContainer } from 'react-toastify'
-import { getSchedulingByStatus } from '@/services/professionalService'
+import { getAppointmentsByStatus } from '@/services/professionalService'
 import { CommentsFormModal } from '@/components/modal/form/comments'
 import dayjs from 'dayjs'
 import { CheckSquare, Question, XSquare } from '@phosphor-icons/react'
 
 export const steps = {
-  'Aguardando aprovação': {
+  'Pending approval': {
     options: [
       {
         name: 'approve',
-        title: 'Aprovar',
-        nextStep: 'Em andamento',
+        title: 'Approve',
+        nextStep: 'In progress',
         element: (
           <CheckSquare
             className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -31,18 +31,18 @@ export const steps = {
       },
       {
         name: 'repprove',
-        title: 'Reprovar',
-        nextStep: 'Cancelado',
+        title: 'Repprove',
+        nextStep: 'Canceled',
         element: <XSquare className="fill-rose-400" size={32} weight="fill" />,
       },
     ],
   },
-  'Em andamento': {
+  'In progress': {
     options: [
       {
         name: 'conclude',
-        title: 'Concluir',
-        nextStep: 'Concluído',
+        title: 'Conclude',
+        nextStep: 'Completed',
         element: (
           <CheckSquare
             className="cursor-pointer fill-vibrant-green-100 duration-150 hover:fill-vibrant-green-200"
@@ -53,14 +53,14 @@ export const steps = {
       },
       {
         name: 'cancel',
-        title: 'Cancelar',
-        nextStep: 'Cancelado',
+        title: 'Cancel',
+        nextStep: 'Canceled',
         element: <XSquare className="fill-rose-400" size={32} weight="fill" />,
       },
       {
-        name: 'not-attend',
-        title: 'Não compareceu',
-        nextStep: 'Não compareceu',
+        name: 'not-show',
+        title: 'No-show',
+        nextStep: 'No-show',
         element: (
           <Question className="fill-orange-400" size={32} weight="fill" />
         ),
@@ -73,57 +73,57 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [selectedScheduling, setSelectedScheduling] =
-    useState<SelectedSchedulingProps>()
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<SelectedAppointmentProps>()
 
-  const [scheduling, setScheduling] = useState<SchedulingProps[]>()
-  const [isLoadingScheduling, setIsLoadingScheduling] = useState(true)
+  const [appointment, setAppointment] = useState<AppointmentProps[]>()
+  const [isLoadingAppointment, setIsLoadingAppointment] = useState(true)
 
-  // Handle filter in scheduling table
+  // Handle filter in appointment table
   const handleSelectedFilter = async (itemId: string) => {
     if (selectedStatus !== itemId) {
-      setIsLoadingScheduling(true)
+      setIsLoadingAppointment(true)
       setSelectedStatus(itemId)
     }
   }
 
   const handleStatus = async (
     operation: { name: string; title: string; nextStep: string },
-    schedulingId: string,
+    appointmentId: string,
   ) => {
     const rsp = confirm(
-      `Confirmar novo status do agendamento para: ${operation.title.toLowerCase()}?`,
+      `Confirm new appointment status for: ${operation.title.toLowerCase()}?`,
     )
 
     if (rsp) {
-      const response = await updateSchedulingStatus(operation, schedulingId)
-      setIsLoadingScheduling(true)
+      const response = await updateAppointmentStatus(operation, appointmentId)
+      setIsLoadingAppointment(true)
 
       toast[response.type](response.message, toastDefaultValues)
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      fetchScheduling()
+      fetchAppointment()
     }
   }
 
-  const fetchScheduling = useCallback(async () => {
+  const fetchAppointment = useCallback(async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const response = await getSchedulingByStatus(
+    const response = await getAppointmentsByStatus(
       'professional', // userRole passed to prisma where conditional
       user.id,
       selectedStatus,
     )
-    setScheduling(response)
+    setAppointment(response)
 
-    setIsLoadingScheduling(false)
+    setIsLoadingAppointment(false)
   }, [selectedStatus, user.id])
 
   const showCommentModal = async (
     scheduleId: string,
     scheduleObservations: string,
   ) => {
-    setSelectedScheduling({
+    setSelectedAppointment({
       id: scheduleId,
       observations: scheduleObservations,
     })
@@ -131,14 +131,14 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
   }
 
   useEffect(() => {
-    if (user.role) fetchScheduling()
-  }, [user, fetchScheduling])
+    if (user.role) fetchAppointment()
+  }, [user, fetchAppointment])
 
   useEffect(() => {
     if (status.length !== 0) {
       setIsLoading(false)
       const selectedStatusId = status.find(
-        (item) => item.name === 'Aguardando aprovação',
+        (item) => item.name === 'Pending approval',
       )?.id
 
       setSelectedStatus(selectedStatusId)
@@ -151,7 +151,7 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
         <div>
           <div className="mb-8 flex w-full flex-col items-start lg:flex-row lg:items-center lg:justify-between">
             <h2 className="mb-4 text-2xl text-vibrant-green-100 lg:mb-0">
-              Meus agendamentos (profissional)
+              My appointments (professional)
             </h2>
           </div>
 
@@ -178,24 +178,24 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
               <table className="font-regular w-full text-left text-sm shadow-md rtl:text-right">
                 <thead className="bg-background-300 text-xs uppercase">
                   <tr className="">
-                    <th className="px-6 py-3">Data</th>
-                    <th className="px-6 py-3">Cliente</th>
-                    <th className="px-6 py-3">Telefone</th>
-                    <th className="px-6 py-3">Observações</th>
-                    <th className="px-6 py-3">Valor</th>
-                    <th className="px-6 py-3">Tipo</th>
-                    <th className="px-6 py-3">Ações</th>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Client</th>
+                    <th className="px-6 py-3">Phone</th>
+                    <th className="px-6 py-3">Comments</th>
+                    <th className="px-6 py-3">Price</th>
+                    <th className="px-6 py-3">Type</th>
+                    <th className="px-6 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoadingScheduling ? (
+                  {isLoadingAppointment ? (
                     <tr>
                       <td colSpan={7} className="py-6 text-center">
-                        Buscando informações...
+                        Fetching appointments...
                       </td>
                     </tr>
-                  ) : scheduling.length > 0 ? (
-                    scheduling.map((schedule, index) => {
+                  ) : appointment.length > 0 ? (
+                    appointment.map((schedule, index) => {
                       return (
                         <tr
                           key={index}
@@ -216,7 +216,7 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
                               }
                               className={`flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20`}
                             >
-                              <span>Visualizar comentário</span>
+                              <span>View comment</span>
                             </button>
                           </td>
                           <td className="px-6 py-4">
@@ -257,7 +257,7 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
                   ) : (
                     <tr>
                       <td colSpan={7} className="py-6 text-center">
-                        Nenhum agendamento encontrado :(
+                        No appointments found :(
                       </td>
                     </tr>
                   )}
@@ -270,7 +270,7 @@ export function ProfessionalAppointments({ user, status }: AppointmentsProps) {
       <ToastContainer closeOnClick theme="dark" />
       {showModal && (
         <CommentsFormModal
-          selectedScheduling={selectedScheduling}
+          selectedAppointment={selectedAppointment}
           setShowModal={setShowModal}
         />
       )}

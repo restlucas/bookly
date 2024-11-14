@@ -6,7 +6,7 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Dashboard | Bookly',
-  description: 'Pagina dashboard',
+  description: 'Dashboard page',
 }
 
 export interface SessionProps {
@@ -56,7 +56,7 @@ export default async function Dashboard() {
         <main className="h-full space-y-6">
           <div className="w-full rounded-md bg-background-200 p-8">
             <h1 className="text-center text-xl">
-              Bem vindo novamente{' '}
+              Welcome{' '}
               <span className="font-bold text-vibrant-green-100">
                 {user.name}
               </span>

@@ -80,15 +80,15 @@ export async function createAbsence(data: AbsenceFormData) {
 
     return {
       type: 'success',
-      message: 'Ausência criada com sucesso!',
+      message: 'Absence created successfully!',
       data: response,
     }
   } catch (error) {
-    console.error('Erro ao criar ausência:', error)
+    console.error('Error on absence create:', error)
 
     return {
       type: 'error',
-      error: error.message || 'Erro ao criar ausência',
+      error: error.message || 'Error on absence create',
     }
   }
 }

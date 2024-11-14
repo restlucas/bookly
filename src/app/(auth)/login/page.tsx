@@ -3,7 +3,7 @@ import { LoginOptions } from './options'
 
 export const metadata: Metadata = {
   title: 'Login | Bookly',
-  description: 'Pagina de login',
+  description: 'Login page',
 }
 
 export default function Login() {
@@ -16,10 +16,10 @@ export default function Login() {
               Bookly
             </h1>
             <h2 className="text-title text-2xl font-bold">
-              Entre na sua conta
+              Log in to your account
             </h2>
             <p className="font-thin text-slate-500">
-              Bem-vindo de volta! Por favor, escolha o método de login
+              Welcome! Please choose your login method
             </p>
 
             <LoginOptions />

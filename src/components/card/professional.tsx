@@ -67,7 +67,7 @@ export function ProfessionalCard({ professional }: ProfessionalCardProps) {
 
         <div className="flex flex-col items-end justify-end gap-2">
           <span className="text-base md:text-xl">
-            A partir de:{' '}
+            Price:{' '}
             <span className="font-bold text-vibrant-green-100">
               {professional.professional.serviceValue
                 ? professional.professional.serviceValue
@@ -78,7 +78,7 @@ export function ProfessionalCard({ professional }: ProfessionalCardProps) {
             href={`professionals/${professional.id}`}
             className="cursor-pointer rounded-br-md rounded-tl-md bg-vibrant-green-100 px-6 py-3 font-bold duration-150 hover:bg-vibrant-green-200"
           >
-            Ver perfil
+            View profile
           </Link>
         </div>
       </div>

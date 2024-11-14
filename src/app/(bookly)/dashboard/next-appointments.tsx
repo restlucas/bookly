@@ -1,6 +1,6 @@
 'use client'
 
-import { getNextAppointmentsByUser } from '@/services/schedulingService'
+import { getNextAppointmentsByUser } from '@/services/appointmentService'
 import {
   BuildingOffice,
   CalendarDots,
@@ -41,7 +41,7 @@ export function NextAppointments({ user }: SessionProps) {
   >([])
 
   useEffect(() => {
-    const fetchNextSchedulings = async () => {
+    const fetchNextAppointments = async () => {
       if (user) {
         const response = await getNextAppointmentsByUser(user.role, user.id)
         setNextProfessionalAppointments(response.professionalAppointments)
@@ -49,7 +49,7 @@ export function NextAppointments({ user }: SessionProps) {
       }
     }
 
-    fetchNextSchedulings()
+    fetchNextAppointments()
   }, [user])
   return (
     <div className="grid w-full grid-cols-1 items-start gap-6 lg:grid-cols-2">
@@ -57,14 +57,14 @@ export function NextAppointments({ user }: SessionProps) {
         <div className="w-full rounded-md bg-background-200 p-8">
           <div className="mb-4 flex flex-col items-start justify-start gap-1">
             <h2 className="text-xl font-bold text-vibrant-green-100">
-              Agendamentos nas próximas 2 semanas
+              Appointments in the next 2 weeks
             </h2>
-            <span className="italic text-slate-400">(Profissional)</span>
+            <span className="italic text-slate-400">(Professional)</span>
           </div>
 
           <ul className="flex flex-col">
             {nextProfessionalAppointments.length > 0 ? (
-              nextProfessionalAppointments.map((scheduling, index) => {
+              nextProfessionalAppointments.map((appointment, index) => {
                 return (
                   <li
                     key={index}
@@ -77,12 +77,12 @@ export function NextAppointments({ user }: SessionProps) {
                             className="object-cover"
                             fill
                             alt={
-                              scheduling.user?.name ||
-                              scheduling.professional?.user.name
+                              appointment.user?.name ||
+                              appointment.professional?.user.name
                             }
                             src={
-                              scheduling.user?.image.replace('s96', 's200') ||
-                              scheduling.professional?.user.image.replace(
+                              appointment.user?.image.replace('s96', 's200') ||
+                              appointment.professional?.user.image.replace(
                                 's96',
                                 's200',
                               )
@@ -91,11 +91,11 @@ export function NextAppointments({ user }: SessionProps) {
                         </div>
                         <div className="flex flex-col">
                           <span>
-                            {scheduling.user?.name ||
-                              scheduling.professional.user.name}
+                            {appointment.user?.name ||
+                              appointment.professional.user.name}
                           </span>
                           <span className="text-xs">
-                            {scheduling.professional?.occupation?.name || ''}
+                            {appointment.professional?.occupation?.name || ''}
                           </span>
                         </div>
                       </div>
@@ -104,23 +104,23 @@ export function NextAppointments({ user }: SessionProps) {
                         <CalendarDots size={24} />
                         <div className="flex flex-col">
                           <span>
-                            {dayjs(scheduling.date).format('DD/MM/YYYY')}
+                            {dayjs(appointment.date).format('DD/MM/YYYY')}
                           </span>
                           <span>
-                            {`${String(dayjs(scheduling.date).hour()).padStart(2, '0')}:${String(dayjs(scheduling.date).minute()).padEnd(2, '0')}`}
+                            {`${String(dayjs(appointment.date).hour()).padStart(2, '0')}:${String(dayjs(appointment.date).minute()).padEnd(2, '0')}`}
                           </span>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-start gap-2">
                         <BuildingOffice size={24} />
-                        <span>{scheduling.serviceType.name}</span>
+                        <span>{appointment.serviceType.name}</span>
                       </div>
 
                       <div className="flex items-center justify-start gap-2">
                         <CurrencyDollar size={24} />
                         <span>
-                          {scheduling.professional?.serviceValue || ''}
+                          {appointment.professional?.serviceValue || ''}
                         </span>
                       </div>
                     </div>
@@ -129,7 +129,7 @@ export function NextAppointments({ user }: SessionProps) {
               })
             ) : (
               <div className="flex w-full flex-col items-center justify-center gap-1 fill-slate-400 text-slate-400">
-                <span>Nenhum agendamento em andamento</span>
+                <span>No appointments in progress</span>
                 <SmileySad size={32} />
               </div>
             )}
@@ -140,16 +140,16 @@ export function NextAppointments({ user }: SessionProps) {
       <div className="w-full rounded-md bg-background-200 p-8">
         <div className="mb-4 flex flex-col items-start justify-start gap-1">
           <h2 className="text-xl font-bold text-vibrant-green-100">
-            Agendamentos nas próximas 2 semanas
+            Appointments in the next 2 weeks
           </h2>
           {user.role === 'professional' && (
-            <span className="italic text-slate-400">(Pessoal)</span>
+            <span className="italic text-slate-400">(Personal)</span>
           )}
         </div>
 
         <ul className="flex flex-col">
           {nextPersonalAppointments.length > 0 ? (
-            nextPersonalAppointments.map((scheduling, index) => {
+            nextPersonalAppointments.map((appointment, index) => {
               return (
                 <li
                   key={index}
@@ -162,12 +162,12 @@ export function NextAppointments({ user }: SessionProps) {
                           className="object-cover"
                           fill
                           alt={
-                            scheduling.user?.name ||
-                            scheduling.professional?.user.name
+                            appointment.user?.name ||
+                            appointment.professional?.user.name
                           }
                           src={
-                            scheduling.user?.image.replace('s96', 's200') ||
-                            scheduling.professional?.user.image.replace(
+                            appointment.user?.image.replace('s96', 's200') ||
+                            appointment.professional?.user.image.replace(
                               's96',
                               's200',
                             )
@@ -176,11 +176,11 @@ export function NextAppointments({ user }: SessionProps) {
                       </div>
                       <div className="flex flex-col">
                         <span>
-                          {scheduling.user?.name ||
-                            scheduling.professional.user.name}
+                          {appointment.user?.name ||
+                            appointment.professional.user.name}
                         </span>
                         <span className="text-xs">
-                          {scheduling.professional?.occupation?.name || ''}
+                          {appointment.professional?.occupation?.name || ''}
                         </span>
                       </div>
                     </div>
@@ -189,22 +189,24 @@ export function NextAppointments({ user }: SessionProps) {
                       <CalendarDots size={24} />
                       <div className="flex flex-col">
                         <span>
-                          {dayjs(scheduling.date).format('DD/MM/YYYY')}
+                          {dayjs(appointment.date).format('DD/MM/YYYY')}
                         </span>
                         <span>
-                          {`${String(dayjs(scheduling.date).hour()).padStart(2, '0')}:${String(dayjs(scheduling.date).minute()).padEnd(2, '0')}`}
+                          {`${String(dayjs(appointment.date).hour()).padStart(2, '0')}:${String(dayjs(appointment.date).minute()).padEnd(2, '0')}`}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-start gap-2">
                       <BuildingOffice size={24} />
-                      <span>{scheduling.serviceType.name}</span>
+                      <span>{appointment.serviceType.name}</span>
                     </div>
 
                     <div className="flex items-center justify-start gap-2">
                       <CurrencyDollar size={24} />
-                      <span>{scheduling.professional?.serviceValue || ''}</span>
+                      <span>
+                        {appointment.professional?.serviceValue || ''}
+                      </span>
                     </div>
                   </div>
                 </li>
@@ -212,7 +214,7 @@ export function NextAppointments({ user }: SessionProps) {
             })
           ) : (
             <div className="flex w-full flex-col items-center justify-center gap-1 fill-slate-400 text-slate-400">
-              <span>Nenhum agendamento em andamento</span>
+              <span>No appointments in progress</span>
               <SmileySad size={32} />
             </div>
           )}

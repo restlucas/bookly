@@ -5,8 +5,8 @@ import { ScheduleForm } from './schedule-form'
 import { AbsenceForm } from './absence-form'
 
 export const metadata: Metadata = {
-  title: 'Minha programação | Bookly',
-  description: 'Pagina dashboard',
+  title: 'Schedule | Bookly',
+  description: 'Schedule page',
 }
 
 export interface UserProps {
@@ -26,7 +26,7 @@ export default async function ProfessionalSchedule() {
         {/* Page header */}
         <div className="flex w-full items-center justify-between gap-4 rounded-md bg-background-200 p-8 shadow-md">
           <h3 className="text-3xl font-bold text-vibrant-green-100 lg:text-xl">
-            Minha programação
+            My schedule
           </h3>
         </div>
 

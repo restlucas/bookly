@@ -59,11 +59,11 @@ export function SelectRole() {
         className="w-[400px] rounded-md border-2 border-background-200 bg-background-300 p-4"
       >
         <h2 className="mb-4 text-xl font-bold text-vibrant-green-100">
-          Selecione sua finalidade
+          Select your purpose
         </h2>
 
         <SelectInput
-          label="Tipo de perfil"
+          label="Profile type"
           name="userType"
           options={userTypes}
           value={selectedUserType}
@@ -73,7 +73,7 @@ export function SelectRole() {
         />
 
         <div className="mt-6 flex items-center justify-end">
-          <SubmitButton title="Salvar" isLoading={isLoading} />
+          <SubmitButton title="Save" isLoading={isLoading} />
         </div>
       </form>
       <ToastContainer closeOnClick theme="dark" />

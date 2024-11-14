@@ -1,11 +1,11 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { PrismaClient } from '@prisma/client'
 import GoogleProvider from 'next-auth/providers/google'
+import GithubProvider from 'next-auth/providers/github'
+import LinkedInProvider from 'next-auth/providers/linkedin'
 
-// Instanciando o Prisma Client
 const prisma = new PrismaClient()
 
-// Definindo as opções de configuração do NextAuth com tipos apropriados
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
@@ -19,6 +19,27 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    }),
+    LinkedInProvider({
+      clientId: process.env.LINKEDIN_CLIENT_ID as string,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+      issuer: 'https://www.linkedin.com/oauth',
+      jwks_endpoint: 'https://www.linkedin.com/oauth/openid/jwks',
+      profile(profile) {
+        const defaultImage =
+          'https://cdn-icons-png.flaticon.com/512/174/174857.png'
+
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture ?? defaultImage,
+        }
+      },
     }),
   ],
   callbacks: {
@@ -78,33 +99,32 @@ export const authOptions = {
       return session
     },
     async signIn({ user, account }) {
-      if (account.provider === 'google') {
-        let existingUser = await prisma.user.findUnique({
-          where: {
+      let existingUser = await prisma.user.findUnique({
+        where: {
+          email: user?.email ?? '',
+        },
+      })
+
+      if (!existingUser) {
+        existingUser = await prisma.user.create({
+          data: {
             email: user?.email ?? '',
+            name: user?.name ?? '',
+            image: user?.image ?? '',
           },
         })
 
-        if (!existingUser) {
-          existingUser = await prisma.user.create({
-            data: {
-              email: user?.email ?? '',
-              name: user?.name ?? '',
-              image: user?.image ?? '',
-            },
-          })
-
-          await prisma.account.create({
-            data: {
-              provider: account.provider,
-              type: account.type,
-              providerAccountId: account.providerAccountId,
-              accessToken: account.access_token,
-              userId: existingUser.id,
-            },
-          })
-        }
+        await prisma.account.create({
+          data: {
+            provider: account.provider,
+            type: account.type,
+            providerAccountId: account.providerAccountId,
+            accessToken: account.access_token,
+            userId: existingUser.id,
+          },
+        })
       }
+
       return true
     },
   },

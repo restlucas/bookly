@@ -5,9 +5,9 @@ export const formatTime = (value) => {
 
 export const formatCurrency = (inputValue: string) => {
   const numericValue = inputValue.replace(/\D/g, '')
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'BRL',
+    currency: 'USD',
   }).format(parseFloat(numericValue) / 100)
 }
 

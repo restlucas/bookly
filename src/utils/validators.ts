@@ -35,7 +35,7 @@ export interface AccountFormData {
   address?: string
 }
 
-export interface SchedulingFormData {
+export interface AppointmentFormData {
   userProfessionalId: string | string[]
   date?: string
   hour: number

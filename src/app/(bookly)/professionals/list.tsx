@@ -21,7 +21,7 @@ export default async function List({ searchParams }: ListProps) {
   return (
     <div className="flex-1 space-y-6 rounded-md bg-background-200 p-8">
       <h2 className="text-xl font-bold text-vibrant-green-100">
-        Resultados da busca: {list.count}
+        Search results: {list.count}
       </h2>
 
       {list ? (
@@ -39,10 +39,10 @@ export default async function List({ searchParams }: ListProps) {
         ) : (
           <div className="w-full text-center">
             <p className="text-lg text-vibrant-green-100">
-              Nenhum resultado encontrado 😪
+              No results found 😪
             </p>
             <p className="text-sm font-bold text-slate-400">
-              Tente redefinir os filtros!
+              Try resetting the filters!
             </p>
           </div>
         )

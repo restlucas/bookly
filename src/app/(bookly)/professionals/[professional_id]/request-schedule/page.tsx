@@ -8,11 +8,14 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { DateInput } from '@/components/input/date'
 import Image from 'next/image'
 import { UserContext } from '@/contexts/UserContext'
-import { createScheduling, getServiceType } from '@/services/schedulingService'
+import {
+  createAppointment,
+  getServiceType,
+} from '@/services/appointmentService'
 import { toast, ToastContainer } from 'react-toastify'
 import toastDefaultValues from '@/utils/toast-default-values'
 import SubmitButton from '@/components/button/submit'
-import { SchedulingFormData } from '@/utils/validators'
+import { AppointmentFormData } from '@/utils/validators'
 
 interface ServiceTypeOptionsProps {
   id: string
@@ -60,7 +63,7 @@ export default function FinishSchedule() {
     useState<SelectedProfessionalProps>()
   const [serviceTypeOptions, setServiceTypeOptions] =
     useState<ServiceTypeOptionsProps[]>()
-  const [scheduling, setScheduling] = useState<SchedulingFormData>({
+  const [appointment, setAppointment] = useState<AppointmentFormData>({
     userProfessionalId: professionalId,
     date: params.get('selected_date'),
     hour: Number(params.get('minutes')),
@@ -95,7 +98,7 @@ export default function FinishSchedule() {
   }, [professionalId, fetchServiceType, fetchData])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setScheduling((prevState) => ({
+    setAppointment((prevState) => ({
       ...prevState,
       serviceTypeSlug: e.target.value,
     }))
@@ -107,7 +110,7 @@ export default function FinishSchedule() {
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    const response = await createScheduling(user.id, scheduling)
+    const response = await createAppointment(user.id, appointment)
 
     toast[response.type](response.message, toastDefaultValues)
     setIsLoading(false)
@@ -144,22 +147,22 @@ export default function FinishSchedule() {
         <div className="flex max-w-[1090px] flex-col gap-6 p-8">
           <div className="flex flex-col gap-8 rounded-md bg-background-200 p-8">
             <h2 className="text-2xl font-bold text-vibrant-green-100 xl:col-span-2">
-              Solicitar agendamento
+              Request appointment
             </h2>
             <form
-              id="schedulingForm"
+              id="appointmentForm"
               onSubmit={handleSubmit}
               className="flex w-full flex-col gap-3"
             >
               <TextInput
                 name="serviceValue"
-                label="Valor"
+                label="Price"
                 readOnly={true}
                 value={selectedProfessional.professional.serviceValue || ''}
                 disabled
               />
               <div className="flex w-full flex-col gap-2">
-                <label>Data do agendamento</label>
+                <label>Appointment date</label>
                 <DateInput
                   name="selectedDate"
                   onChange={() => handleChange}
@@ -168,15 +171,15 @@ export default function FinishSchedule() {
                 />
               </div>
               <TextInput
-                label="Horário do agendamento"
+                label="Hour"
                 name="selectedHour"
                 value={params.get('hour')}
                 disabled={true}
               />
               <SelectInput
-                label="Tipo de atendimento"
+                label="Type of service"
                 name="serviceType"
-                value={scheduling.serviceTypeSlug || ''}
+                value={appointment.serviceTypeSlug || ''}
                 usingSlug={true}
                 options={serviceTypeOptions}
                 onChange={handleChange}
@@ -188,11 +191,11 @@ export default function FinishSchedule() {
               onClick={() => router.push('./')}
               className="hover: rounded-md border-2 border-vibrant-green-100 px-4 py-2 text-white duration-100 hover:bg-background-300"
             >
-              Cancelar
+              Cancel
             </button>
             <SubmitButton
-              form="schedulingForm"
-              title="Solicitar agendamento"
+              form="appointmentForm"
+              title="Request appointment"
               isLoading={isLoading}
             />
           </div>

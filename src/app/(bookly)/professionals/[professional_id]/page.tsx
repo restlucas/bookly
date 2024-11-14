@@ -19,7 +19,7 @@ export async function generateMetadata({
   const { name: professionalName } = await getProfessionalName(professionalId)
   return {
     title: `${professionalName} | Bookly`,
-    description: `Pagina de ${professionalName}`,
+    description: `${professionalName}'s page`,
   }
 }
 
@@ -108,13 +108,13 @@ export default async function ProfessionalProfile({
               </div>
               <div className="space-y-6 rounded-md bg-background-200 p-8">
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
-                  Sobre mim
+                  About me
                 </h2>
                 <p>{professional.profile.bio || ''}</p>
               </div>
               <div className="space-y-6 rounded-md bg-background-200 p-8">
                 <h2 className="text-2xl font-bold text-vibrant-green-100">
-                  Avaliações ({professional.profile.reviews.length})
+                  Reviews ({professional.profile.reviews.length})
                 </h2>
 
                 <div className="grid grid-cols-3 items-start gap-4">

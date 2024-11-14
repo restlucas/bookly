@@ -5,8 +5,8 @@ import { FavoritesList } from './list'
 import { SessionProps } from '../dashboard/page'
 
 export const metadata: Metadata = {
-  title: 'Favoritos | Bookly',
-  description: 'Pagina dashboard',
+  title: 'Favorites | Bookly',
+  description: 'Favorites page',
 }
 
 export default async function Favorites() {
@@ -17,7 +17,7 @@ export default async function Favorites() {
       <section className="mb-8 flex flex-col gap-6">
         <div className="w-full rounded-md bg-background-200 p-8">
           <h2 className="mb-8 text-2xl font-bold text-vibrant-green-100">
-            Salvos
+            Favorites
           </h2>
           <FavoritesList userId={user.id} />
         </div>

@@ -38,7 +38,7 @@ export function FavoritesList({ userId }: { userId: string }) {
           })
         ) : (
           <div className="col-span-full w-full text-center text-vibrant-green-100">
-            Nenhum profissional favoritado :({' '}
+            No favorites found :({' '}
           </div>
         )
       ) : (

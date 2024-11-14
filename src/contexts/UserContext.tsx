@@ -46,14 +46,13 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
           user.favorites = favoritesArrayFormatted
         }
-
-        setUser(user)
-        setIsLoading(false)
       }
+      setUser(user)
+      setIsLoading(false)
     }
 
     fetchUser()
-  }, [status, session])
+  }, [user, status, session])
 
   function updateRole(role: string) {
     setUser((prevState) => ({

@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   AppointmentsProps,
-  SchedulingProps,
-  SelectedSchedulingProps,
+  AppointmentProps,
+  SelectedAppointmentProps,
 } from './page'
-import { getSchedulingByStatus } from '@/services/professionalService'
+import { getAppointmentsByStatus } from '@/services/professionalService'
 import dayjs from 'dayjs'
 import { CommentsFormModal } from '@/components/modal/form/comments'
 
@@ -14,36 +14,37 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [selectedScheduling, setSelectedScheduling] =
-    useState<SelectedSchedulingProps>()
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<SelectedAppointmentProps>()
 
-  const [scheduling, setScheduling] = useState<SchedulingProps[]>([])
-  const [isLoadingScheduling, setIsLoadingScheduling] = useState<boolean>(true)
+  const [appointment, setAppointment] = useState<AppointmentProps[]>([])
+  const [isLoadingAppointment, setIsLoadingAppointment] =
+    useState<boolean>(true)
 
-  // Handle filter in scheduling table
+  // Handle filter in appointment table
   const handleSelectedFilter = async (itemId: string) => {
     if (selectedStatus !== itemId) {
-      setIsLoadingScheduling(true)
+      setIsLoadingAppointment(true)
       setSelectedStatus(itemId)
     }
   }
 
-  const fetchScheduling = useCallback(async () => {
+  const fetchAppointment = useCallback(async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const response = await getSchedulingByStatus(
+    const response = await getAppointmentsByStatus(
       'personal',
       user.id,
       selectedStatus,
     )
-    setScheduling(response)
+    setAppointment(response)
 
-    setIsLoadingScheduling(false)
+    setIsLoadingAppointment(false)
   }, [selectedStatus, user.id])
 
   useEffect(() => {
-    if (user.role) fetchScheduling()
-  }, [user, fetchScheduling])
+    if (user.role) fetchAppointment()
+  }, [user, fetchAppointment])
 
   useEffect(() => {
     if (status.length !== 0) {
@@ -62,7 +63,7 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
         <div>
           <div className="mb-8 flex w-full items-center justify-start">
             <h2 className="text-2xl text-vibrant-green-100">
-              Meus agendamentos {user.role === 'professional' && '(pessoal)'}
+              My appointments {user.role === 'professional' && '(personal)'}
             </h2>
           </div>
 
@@ -89,31 +90,31 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
               <table className="font-regular w-full text-left text-sm shadow-md rtl:text-right">
                 <thead className="bg-background-300 text-xs uppercase">
                   <tr className="">
-                    <th className="px-6 py-3">Data</th>
-                    <th className="px-6 py-3">Profissional</th>
-                    <th className="px-6 py-3">Ocupação</th>
-                    <th className="px-6 py-3">Telefone</th>
-                    <th className="px-6 py-3">Observações</th>
-                    <th className="px-6 py-3">Valor</th>
-                    <th className="px-6 py-3">Tipo</th>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Professional</th>
+                    <th className="px-6 py-3">Occupation</th>
+                    <th className="px-6 py-3">Phone</th>
+                    <th className="px-6 py-3">Comments</th>
+                    <th className="px-6 py-3">Price</th>
+                    <th className="px-6 py-3">Type</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoadingScheduling ? (
+                  {isLoadingAppointment ? (
                     <tr>
                       <td colSpan={7} className="py-6 text-center">
-                        Buscando informações...
+                        Fetching appointments...
                       </td>
                     </tr>
-                  ) : scheduling.length > 0 ? (
-                    scheduling.map((schedule, index) => {
+                  ) : appointment.length > 0 ? (
+                    appointment.map((schedule, index) => {
                       return (
                         <tr
                           key={schedule.id}
                           className={`${index === 4 ? '' : 'border-b'} border-background-300 hover:bg-background-300/50`}
                         >
                           <td className="px-6 py-4">
-                            {`${String(dayjs(schedule.date).format('DD/MM/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
+                            {`${String(dayjs(schedule.date).format('MM/DD/YYYY'))} ~ ${String(dayjs(schedule.date).hour()).padStart(2, '0')}:${String(dayjs(schedule.date).minute()).padEnd(2, '0')}`}
                           </td>
                           <td className="px-6 py-4">
                             {schedule.professional.user.name}
@@ -127,10 +128,10 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                           <td className="px-6 py-4">
                             <button
                               type="button"
-                              onClick={() => setSelectedScheduling(schedule)}
+                              onClick={() => setSelectedAppointment(schedule)}
                               className="flex cursor-pointer items-center justify-start gap-2 rounded-md border-[1px] border-slate-400 px-2 py-1 text-slate-400 duration-100 hover:bg-slate-300/20"
                             >
-                              <span>Visualizar comentário</span>
+                              <span>View comment</span>
                             </button>
                           </td>
                           <td className="px-6 py-4">
@@ -145,7 +146,7 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
                   ) : (
                     <tr>
                       <td colSpan={7} className="py-6 text-center">
-                        Nenhum agendamento encontrado :(
+                        No appointments found :(
                       </td>
                     </tr>
                   )}
@@ -157,7 +158,7 @@ export function PersonalAppointments({ user, status }: AppointmentsProps) {
       </div>
       {showModal && (
         <CommentsFormModal
-          selectedScheduling={selectedScheduling}
+          selectedAppointment={selectedAppointment}
           setShowModal={setShowModal}
         />
       )}

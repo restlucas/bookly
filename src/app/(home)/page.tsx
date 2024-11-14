@@ -1,14 +1,17 @@
-import { LoginButton } from '@/components/button/login'
+import { HomeButton } from '@/components/button/home'
 import { CommentsCard } from '@/components/card/comments'
 
 import { Metadata } from 'next'
+import { getServerSession } from 'next-auth'
 
 export const metadata: Metadata = {
   title: 'Home | Bookly',
-  description: 'Agende, gerencie e confirme, tudo em um só lugar.',
+  description: 'Schedule, manage, and confirm, all in one place.',
 }
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession()
+
   return (
     <>
       <div className="mb-16 flex flex-col gap-20 lg:mx-16">
@@ -17,7 +20,7 @@ export default function Home() {
           <h1 className="my-4 text-3xl font-bold text-vibrant-green-100">
             Bookly
           </h1>
-          <LoginButton />
+          <HomeButton session={session} />
         </div>
 
         {/* Title and slogan */}
@@ -25,21 +28,20 @@ export default function Home() {
           <div className="flex items-center justify-center">
             <div className="flex flex-col space-y-8">
               <h1 className="text-5xl font-bold">
-                <span className="bg-vibrant-green-100">Facilite</span> seu
-                dia-a-dia
+                <span className="bg-vibrant-green-100">Simplify</span> your
+                daily life
               </h1>
               <h3 className="">
-                Agende, gerencie e confirme, tudo em um só lugar. Venha fazer
-                parte da nossa comunidade e descubra profissionais em sua
-                região!
+                Schedule, manage, and confirm, all in one place. Join our
+                community and discover professionals in your area!
               </h3>
               <div className="flex items-center justify-start gap-4">
                 <div className="flex flex-col items-start justify-start">
-                  <span className="font-thin uppercase">Agendamentos</span>
+                  <span className="font-thin uppercase">Appointments</span>
                   <span className="text-3xl text-vibrant-green-100">1000+</span>
                 </div>
                 <div className="flex flex-col items-start justify-start">
-                  <span className="font-thin uppercase">Profissionais</span>
+                  <span className="font-thin uppercase">Professionals</span>
                   <span className="text-3xl text-vibrant-green-100">1000+</span>
                 </div>
               </div>
@@ -52,15 +54,14 @@ export default function Home() {
         <section className="flex w-full items-center justify-center rounded-3xl bg-background-200 p-4 lg:h-[400px] lg:p-8">
           <div className="flex flex-col items-center justify-center gap-4 lg:gap-8">
             <h1 className="text-center text-2xl font-bold text-vibrant-green-100 lg:text-4xl">
-              Objetivo do sistema
+              System Objective
             </h1>
             <h3 className="text-center text-base lg:w-2/4">
-              Projetado para conectar clientes a profissionais de diversas
-              áreas, como saúde, beleza e bem-estar, de forma simples e
-              eficiente. Com uma interface intuitiva e fácil de usar, os
-              usuários podem agendar consultas e serviços em apenas alguns
-              cliques, eliminando a necessidade de chamadas telefônicas e longas
-              esperas.
+              Designed to connect clients with professionals from various
+              fields, such as health, beauty, and wellness, in a simple and
+              efficient way. With an intuitive and easy-to-use interface, users
+              can schedule appointments and services in just a few clicks,
+              eliminating the need for phone calls and long waiting times.
             </h3>
           </div>
         </section>
@@ -69,7 +70,7 @@ export default function Home() {
         <section className="grid gap-4 lg:grid-rows-[200px_200px] lg:gap-0">
           <div className="grid grid-cols-1 overflow-hidden rounded-md lg:grid-cols-[30%_70%]">
             <div className="flex items-center justify-center bg-vibrant-green-100 py-3 text-2xl font-bold lg:py-0 lg:text-3xl">
-              Para clientes
+              For clients
             </div>
             <div className="grid grid-cols-1 items-center gap-8 bg-background-300 p-4 lg:grid-cols-3">
               <div className="flex flex-col gap-2 text-center">
@@ -77,11 +78,11 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     1
                   </div>
-                  <h5 className="font-bold">Facilidade de uso</h5>
+                  <h5 className="font-bold">Ease of use</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Navegue pelas categorias e encontre profissionais qualificados
-                  em sua área com apenas alguns cliques.
+                  Browse categories and find qualified professionals in your
+                  area with just a few clicks.
                 </p>
               </div>
               <div className="flex flex-col gap-2 text-center">
@@ -89,11 +90,11 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     2
                   </div>
-                  <h5 className="font-bold">Conveniência</h5>
+                  <h5 className="font-bold">Convenience</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Agende consultas a qualquer hora e de qualquer lugar, sem a
-                  necessidade de telefonemas ou idas pessoais.
+                  Schedule appointments anytime and anywhere, without the need
+                  for phone calls or in-person visits.
                 </p>
               </div>
               <div className="flex flex-col gap-2 text-center">
@@ -101,11 +102,11 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     3
                   </div>
-                  <h5 className="font-bold">Eficiência</h5>
+                  <h5 className="font-bold">Efficiency</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Receba lembretes automáticos sobre suas consultas, evitando
-                  esquecimentos e otimizando seu tempo.
+                  Receive automatic reminders about your appointments, avoiding
+                  forgetfulness and optimizing your time.
                 </p>
               </div>
             </div>
@@ -117,11 +118,11 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     1
                   </div>
-                  <h5 className="font-bold">Gerenciamento simplificado</h5>
+                  <h5 className="font-bold">Simplified management</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Acesse um painel de controle fácil de usar para gerenciar
-                  horários, serviços e clientes.
+                  Access an easy-to-use control panel to manage schedules,
+                  services, and clients.
                 </p>
               </div>
               <div className="flex flex-col gap-2 text-center">
@@ -129,12 +130,11 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     2
                   </div>
-                  <h5 className="font-bold">Visibilidade</h5>
+                  <h5 className="font-bold">Visibility</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Aumente sua visibilidade e atraia novos clientes através da
-                  nossa plataforma, exibindo suas especializações e
-                  disponibilidade.
+                  Increase your visibility and attract new clients through our
+                  platform by showcasing your specializations and availability.
                 </p>
               </div>
               <div className="flex flex-col gap-2 text-center">
@@ -142,16 +142,16 @@ export default function Home() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-vibrant-green-100 text-sm font-bold">
                     3
                   </div>
-                  <h5 className="font-bold">Relatórios e estatísticas:</h5>
+                  <h5 className="font-bold">Reports and statistics:</h5>
                 </div>
                 <p className="text-sm text-slate-300">
-                  Monitore seu desempenho com relatórios detalhados, ajudando a
-                  tomar decisões informadas sobre seu negócio.
+                  Track your performance with detailed reports, helping you make
+                  informed decisions about your business.
                 </p>
               </div>
             </div>
             <div className="flex items-center justify-center bg-vibrant-green-100 py-3 text-2xl font-bold lg:py-0 lg:text-3xl">
-              Para profissionais
+              For professionals
             </div>
           </div>
         </section>
@@ -159,9 +159,9 @@ export default function Home() {
         {/* Comments */}
         <section className="w-full">
           <h1 className="mb-5 text-center text-3xl">
-            O que as pessoas pensam{' '}
+            What people think{' '}
             <span className="bg-vibrant-green-100 font-bold text-background-300">
-              sobre nós
+              about us
             </span>
           </h1>
           <div className="flex items-center justify-center">

@@ -58,7 +58,7 @@ export default function ProfessionalCard({
           </h5>
         </div>
         <p className="">
-          A partir de:{' '}
+          Price:{' '}
           <span className="font-bold text-vibrant-green-100">
             {professional.profile.serviceValue
               ? professional.profile.serviceValue

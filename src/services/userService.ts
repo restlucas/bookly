@@ -105,19 +105,19 @@ export async function updateUser(
 
     return {
       type: 'success',
-      message: 'Informações salvas com sucesso!',
+      message: 'Information saved successfully!',
       data: updatedUser,
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error('Erro ao atualizar o usuário:', error)
+      console.error('Error on user update:', error)
 
       return {
         type: 'error',
-        message: 'Erro ao atualizar o usuário',
+        message: 'Error on user update',
       }
     } else {
-      console.error('Erro desconhecido', error)
+      console.error('Unknown error', error)
     }
   }
 }
@@ -162,7 +162,7 @@ export async function updateUserRole(
 
     return {
       type: 'success',
-      message: 'Sucesso ao atualizar role do usuário!',
+      message: 'Success on updating user role!',
       data: updatedUserRole,
     }
   } catch (error: unknown) {
@@ -171,10 +171,10 @@ export async function updateUserRole(
 
       return {
         type: 'error',
-        message: 'Error ao atualizar usuário',
+        message: 'Error on user update',
       }
     } else {
-      console.error('Erro desconhecido', error)
+      console.error('Unknown error', error)
     }
   }
 }
@@ -194,15 +194,15 @@ export async function updateUserFavorites(
 
     return {
       type: 'success',
-      message: 'Favoritos salvos com sucesso!',
+      message: 'Saved to favorites successfully!',
       data: updateUserFavorites,
     }
   } catch (error) {
-    console.error('Error on favorites user field:', error)
+    console.error('Error on favorites save:', error)
 
     return {
       type: 'error',
-      message: 'Erro ao atualizar usuário',
+      message: 'Error on find user',
     }
   }
 }

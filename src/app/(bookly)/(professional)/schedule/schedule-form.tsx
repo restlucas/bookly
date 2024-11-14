@@ -96,7 +96,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
       intervals: scheduleForm.intervals.map(({ name, ...rest }) => {
         console.log(name)
         return rest
-      }), // Desestruturando para remover 'name'
+      }), // Destructuring to remove 'name'
     }
 
     const validationErrors = validateScheduleForm(formattedSchedule)
@@ -134,7 +134,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
           >
             <div className="flex flex-col gap-4">
               <h3 className="text-xl text-vibrant-green-100 lg:col-span-full">
-                Dias de trabalho
+                Working days
               </h3>
               <div className="flex flex-col rounded-md border-[1px] border-slate-700">
                 {scheduleForm.intervals.map((interval, index) => {
@@ -186,11 +186,11 @@ export function ScheduleForm({ user }: { user: UserProps }) {
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-xl text-vibrant-green-100 lg:col-span-full">
-                Tempo médio cada atendimento
+                Average time per service
               </h3>
               <div className="w-1/2">
                 <TextInput
-                  label="Em minutos"
+                  label="In minutes"
                   name="serviceTime"
                   value={scheduleForm.serviceTime}
                   required
@@ -200,7 +200,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
             </div>
             <div className="col-span-full flex items-center justify-end">
               <SubmitButton
-                title="Salvar programação"
+                title="Save schedule"
                 isLoading={isLoading}
                 form="scheduleForm"
               />
@@ -210,7 +210,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
           <div className="grid grid-cols-1 gap-8 rounded-md bg-background-200 p-8 shadow-md lg:grid-cols-2">
             <div className="flex flex-col gap-4">
               <h3 className="text-xl text-vibrant-green-100 lg:col-span-full">
-                Dias de trabalho
+                Working days
               </h3>
               <div className="flex animate-pulse flex-col rounded-md border-[1px] border-slate-700">
                 {Array.from({ length: 6 }).map((_, index) => {
@@ -233,7 +233,7 @@ export function ScheduleForm({ user }: { user: UserProps }) {
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-xl text-vibrant-green-100 lg:col-span-full">
-                Tempo médio cada atendimento
+                Average time per service
               </h3>
               <div className="w-1/2">
                 <div className="h-[44px] animate-pulse rounded-md border-2 border-slate-700 bg-background-300 p-2 disabled:text-slate-400">

@@ -26,7 +26,7 @@ export function HeaderNavigation({ session }: { session: Session }) {
       {/* Desktop navigation */}
       <div className="hidden lg:block">
         <ul className="left-1/2 hidden -translate-x-1/2 transform space-x-8 py-4 md:absolute md:flex">
-          {menus.map((menu) => {
+          {menus.main.map((menu) => {
             return (
               menu.access.includes(user.role) && (
                 <li
@@ -55,31 +55,24 @@ export function HeaderNavigation({ session }: { session: Session }) {
 
             <div className="absolute bottom-0 right-0 top-full hidden w-48 duration-300 group-hover:block">
               <div className="flex flex-col rounded-md border-2 border-slate-700 bg-background-200">
-                <Link
-                  href="/my-account"
-                  className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
-                >
-                  Minha conta
-                </Link>
-                {user.role === 'professional' && (
-                  <Link
-                    href="/professional-profile"
-                    className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
-                  >
-                    Perfil profissional
-                  </Link>
-                )}
-                <Link
-                  href="/favorites"
-                  className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
-                >
-                  Favoritos
-                </Link>
+                {menus.aside.map((menu) => {
+                  return (
+                    menu.access.includes(user.role) && (
+                      <Link
+                        key={menu.id}
+                        href={menu.href}
+                        className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
+                      >
+                        {menu.name}
+                      </Link>
+                    )
+                  )
+                })}
                 <button
                   onClick={() => signOut({ callbackUrl: '/login' })}
                   className="flex cursor-pointer items-center justify-between gap-4 py-2 pl-4 pr-2 hover:bg-background-300"
                 >
-                  <span>Sair</span>
+                  <span>Logout</span>
                   <SignOut
                     className="text-slate-400 group-hover:text-white"
                     size={22}
@@ -108,7 +101,7 @@ export function HeaderNavigation({ session }: { session: Session }) {
                   </button>
                 </div>
                 <ul className="flex w-full flex-col items-start justify-center gap-8">
-                  {menus.map((menu) => {
+                  {menus.main.map((menu) => {
                     return (
                       menu.access.includes(user.role) && (
                         <li
@@ -124,32 +117,25 @@ export function HeaderNavigation({ session }: { session: Session }) {
                   })}
                 </ul>
                 <div className="mt-auto flex w-full flex-col gap-4 border-t-[2px] border-background-300 pt-6 text-lg">
-                  <button
-                    onClick={() => handleMenu('my-account')}
-                    className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
-                  >
-                    Minha conta
-                  </button>
-                  {user.role === 'professional' && (
-                    <button
-                      onClick={() => handleMenu('profile')}
-                      className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
-                    >
-                      Perfil profissional
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleMenu('favorites')}
-                    className="flex cursor-pointer items-center justify-start py-2 pl-4 pr-2 hover:bg-background-300"
-                  >
-                    Favoritos
-                  </button>
+                  {menus.aside.map((menu) => {
+                    return (
+                      menu.access.includes(user.role) && (
+                        <Link
+                          key={menu.id}
+                          href={menu.href}
+                          className="cursor-pointer py-2 pl-4 pr-2 hover:bg-background-300"
+                        >
+                          {menu.name}
+                        </Link>
+                      )
+                    )
+                  })}
 
                   <button
                     onClick={() => signOut({ callbackUrl: '/login' })}
                     className="flex cursor-pointer items-center justify-between gap-4 py-2 pl-4 pr-2 hover:bg-background-300"
                   >
-                    <span>Sair</span>
+                    <span>Logout</span>
                     <SignOut
                       className="text-slate-400 group-hover:text-white"
                       size={22}

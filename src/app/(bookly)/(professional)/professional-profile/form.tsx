@@ -16,8 +16,8 @@ import {
 import toastDefaultValues from '@/utils/toast-default-values'
 import { toast, ToastContainer } from 'react-toastify'
 import SubmitButton from '@/components/button/submit'
-import { X } from '@phosphor-icons/react'
-import { getServiceType } from '@/services/schedulingService'
+import { SealWarning, X } from '@phosphor-icons/react'
+import { getServiceType } from '@/services/appointmentService'
 import {
   ProfessionalProfileData,
   validateProfessionalProfileForm,
@@ -99,20 +99,20 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
     }
   }, [professionalProfile.categoryId])
 
-  useEffect(() => {
-    fetchProfessionalProfile()
-  }, [user.id, fetchProfessionalProfile])
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      setProfessionalProfile((prevState) => ({
+        ...prevState,
+        tags: prevState.tags
+          ? `${prevState.tags},${e.target.value}`
+          : e.target.value,
+      }))
+      setTagInput('')
+    }
+  }
 
-  useEffect(() => {
-    fetchCategories()
-    fetchServiceTypes()
-  }, [fetchCategories, fetchServiceTypes])
-
-  useEffect(() => {
-    fetchOccupations()
-  }, [professionalProfile.categoryId, fetchOccupations])
-
-  function handleTags() {
+  const handleTags = () => {
     setProfessionalProfile((prevState) => ({
       ...prevState,
       tags: prevState.tags ? `${prevState.tags},${tagInput}` : tagInput,
@@ -120,7 +120,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
     setTagInput('')
   }
 
-  function removeTag(index: number) {
+  const removeTag = (index: number) => {
     const newTags = professionalProfile.tags
       .split(',')
       .filter((_, tagIndex) => tagIndex !== index)
@@ -144,7 +144,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
     }))
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const validationErrors =
       validateProfessionalProfileForm(professionalProfile)
@@ -166,6 +166,19 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchProfessionalProfile()
+  }, [user.id, fetchProfessionalProfile])
+
+  useEffect(() => {
+    fetchCategories()
+    fetchServiceTypes()
+  }, [fetchCategories, fetchServiceTypes])
+
+  useEffect(() => {
+    fetchOccupations()
+  }, [professionalProfile.categoryId, fetchOccupations])
 
   return (
     <>
@@ -189,11 +202,11 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                 {/* About me */}
                 <div className="grid grid-cols-1 gap-4 text-lg lg:grid-cols-2">
                   <h3 className="col-span-full text-xl font-bold text-vibrant-green-100">
-                    Sobre mim
+                    About me
                   </h3>
 
                   <TextInput
-                    label="Nome completo"
+                    label="Full name"
                     name="fullname"
                     value={user.name}
                     onChange={handleChange}
@@ -202,21 +215,21 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                   <div className="col-span-1" />
 
                   <SelectInput
-                    label="Categoria da profissão"
+                    label="Category"
                     name="categoryId"
                     value={professionalProfile.categoryId || ''}
                     options={categories || []}
                     onChange={handleChange}
                   />
                   <SelectInput
-                    label="Profissão"
+                    label="Occupation"
                     name="occupationId"
                     value={professionalProfile.occupationId || ''}
                     options={occupations || []}
                     onChange={handleChange}
                   />
                   <SelectInput
-                    label="Tipo de atendimento"
+                    label="Type of service"
                     name="serviceTypeId"
                     value={professionalProfile.serviceTypeId || ''}
                     options={serviceTypes || []}
@@ -224,8 +237,8 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                   />
 
                   <TextInput
-                    label="Valor do atendimento"
-                    placeholder="R$000,00"
+                    label="Service value"
+                    placeholder="$000.00"
                     name="serviceValue"
                     value={professionalProfile.serviceValue || ''}
                     onChange={handleChange}
@@ -249,6 +262,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                         className="flex-1 rounded-md border-2 border-slate-400 bg-background-300 p-2 lg:flex-none"
                         type="text"
                         value={tagInput}
+                        onKeyDown={handleKeyDown}
                         onChange={(e) => setTagInput(e.target.value)}
                       />
                       <button
@@ -256,7 +270,7 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                         type="button"
                         className="flex w-[150px] cursor-pointer items-center justify-center rounded-md bg-vibrant-green-100 px-3 py-2 duration-100 hover:bg-vibrant-green-200"
                       >
-                        Inserir
+                        Add
                       </button>
                     </div>
                     <div className="flex w-full flex-wrap gap-2">
@@ -293,14 +307,25 @@ export function ProfessionalProfileForm({ user }: SessionProps) {
                     name="bio"
                     value={professionalProfile.bio || ''}
                     onChange={handleChange}
-                    placeholder="Conte um pouco sobre você"
+                    placeholder="Tell us a little about yourself"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="mt-2 flex items-center justify-end gap-4">
-              <SubmitButton title="Salvar alterações" isLoading={isLoading} />
+            <div className="mt-2 flex items-center justify-between gap-4">
+              <div className="flex items-center justify-start gap-1">
+                <SealWarning
+                  size={20}
+                  weight="fill"
+                  className="fill-slate-400"
+                />
+                <span className="text-sm italic text-slate-400">
+                  Your profile will only be displayed in the list of
+                  professionals if all fields are filled in!
+                </span>
+              </div>
+              <SubmitButton title="Save changes" isLoading={isLoading} />
             </div>
           </>
         ) : (

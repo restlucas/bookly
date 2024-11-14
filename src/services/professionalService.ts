@@ -54,7 +54,10 @@ export async function getProfessionals(filterQuery: FilterQueryProps) {
         serviceType: {
           slug: serviceType !== '' ? serviceType : { not: '' },
         },
+        bio: { not: '' },
+        serviceValue: { not: null },
       },
+      address: { not: '' },
       NOT: {
         id: session.user.id,
       },
@@ -172,7 +175,7 @@ export async function updateProfessionalProfile(
 
     return {
       type: 'success',
-      message: 'Perfil atualizado com sucesso!',
+      message: 'Profile update successfully!',
     }
   } catch (error) {
     console.error('Error on update user role:', error)
@@ -185,7 +188,7 @@ export async function updateProfessionalProfile(
 }
 
 // Get professional schedule by status
-export async function getSchedulingByStatus(
+export async function getAppointmentsByStatus(
   userRole: string,
   userId: string,
   statusId: string,
@@ -205,7 +208,7 @@ export async function getSchedulingByStatus(
     type = 'professionalId'
     userId = professionalId
   }
-  const response = await prisma.scheduling.findMany({
+  const response = await prisma.appointment.findMany({
     where: {
       [type]: userId,
       statusId,
@@ -329,16 +332,16 @@ export async function updateSchedule(
     )
     return {
       type: 'success',
-      message: 'Programação salva com sucesso!',
+      message: 'Schedule updated successfully!',
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
       return {
         type: 'error',
-        message: 'Erro ao atualizar programação',
+        message: 'Error on schedule update',
       }
     } else {
-      console.error('Erro desconhecido', error)
+      console.error('Unknown error', error)
     }
   }
 }
@@ -392,7 +395,7 @@ export async function getAvailability(userId: string, date: string) {
     currentTime += serviceTimeInMinutes
   }
 
-  const blockedTimes = await prisma.scheduling.findMany({
+  const blockedTimes = await prisma.appointment.findMany({
     select: {
       date: true,
     },
@@ -404,7 +407,7 @@ export async function getAvailability(userId: string, date: string) {
       },
       status: {
         name: {
-          notIn: ['Cancelado', 'Não compareceu'],
+          notIn: ['Canceled', 'No-show'],
         },
       },
     },
@@ -464,7 +467,7 @@ export async function getBlockedDates(
   })
 
   // Obtenha todos os agendamentos do perfil para o mês e ano especificados
-  const schedulings = await prisma.scheduling.findMany({
+  const appointments = await prisma.appointment.findMany({
     where: {
       professionalId,
       date: {
@@ -473,7 +476,7 @@ export async function getBlockedDates(
       },
       status: {
         name: {
-          notIn: ['Cancelado', 'Não compareceu'],
+          notIn: ['Canceled', 'No-show'],
         },
       },
     },
@@ -496,15 +499,15 @@ export async function getBlockedDates(
   })
 
   // Processa os dados
-  const blockedDatesRaw = schedulings
-    .map((scheduling) => ({
-      date: scheduling.date.getDate(),
-      weekDay: scheduling.date.getDay(),
+  const blockedDatesRaw = appointments
+    .map((appointment) => ({
+      date: appointment.date.getDate(),
+      weekDay: appointment.date.getDay(),
     }))
     .reduce(
-      (acc, scheduling) => {
+      (acc, appointment) => {
         // Conta o número de agendamentos por dia
-        acc[scheduling.date] = (acc[scheduling.date] || 0) + 1
+        acc[appointment.date] = (acc[appointment.date] || 0) + 1
         return acc
       },
       {} as Record<number, number>,

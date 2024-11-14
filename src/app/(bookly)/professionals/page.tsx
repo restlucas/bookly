@@ -11,8 +11,8 @@ interface SearchParamsProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Profissionais | Bookly',
-  description: 'Pagina de profissionais',
+  title: 'Professionals | Bookly',
+  description: 'Professionals page',
 }
 
 export default function Professionals({ searchParams }: SearchParamsProps) {

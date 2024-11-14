@@ -34,7 +34,7 @@ export function SelectInput({
         onChange={onChange}
         {...rest}
       >
-        <option value="">Selecione uma opção</option>
+        <option value="">Select an option</option>
         {options &&
           options.map((option) => {
             return (

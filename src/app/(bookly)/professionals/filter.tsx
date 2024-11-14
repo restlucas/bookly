@@ -5,7 +5,7 @@ import {
   getAllCategories,
   getOccupationByCategory,
 } from '@/services/professionService'
-import { getServiceType } from '@/services/schedulingService'
+import { getServiceType } from '@/services/appointmentService'
 import { Trash } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -91,23 +91,26 @@ export default function Filter({ searchParams }: FilterProps) {
 
       <SelectInput
         name="category"
-        label="Categoria"
+        label="Category"
         value={filters.category || ''}
         options={categories}
+        usingSlug={true}
         onChange={handleChange}
       />
       <SelectInput
         name="occupation"
-        label="Ocupação"
+        label="Occupation"
         value={filters.occupation || ''}
         options={occupations}
+        usingSlug={true}
         onChange={handleChange}
       />
       <SelectInput
         name="serviceType"
         value={filters.serviceType || ''}
-        label="Tipo de atendimento"
+        label="Type of service"
         options={serviceTypes}
+        usingSlug={true}
         onChange={handleChange}
       />
 
@@ -117,7 +120,7 @@ export default function Filter({ searchParams }: FilterProps) {
           onClick={applyFilters}
           className="flex items-center justify-center rounded-md border-2 border-transparent bg-vibrant-green-100 p-3 font-bold duration-150 hover:border-vibrant-green-100 hover:bg-background-300"
         >
-          <span>Aplicar filtro</span>
+          <span>Apply filters</span>
         </button>
 
         <button
@@ -125,7 +128,7 @@ export default function Filter({ searchParams }: FilterProps) {
           onClick={clearFilter}
           className="flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-transparent bg-background-300 p-3 duration-150 hover:border-vibrant-green-100"
         >
-          <span className="text-sm">Redefinir</span>
+          <span className="text-nowrap text-sm">Reset filters</span>
           <Trash size={22} weight="fill" className="fill-slate-400" />
         </button>
       </div>

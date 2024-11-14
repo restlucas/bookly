@@ -6,8 +6,8 @@ import { ProfessionalAppointments } from './professional-appointments'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Meus agendamentos | Bookly',
-  description: 'Pagina de agendamentos',
+  title: 'Appointments | Bookly',
+  description: 'Appointments page',
 }
 
 export interface StatusTypes {
@@ -21,7 +21,7 @@ export interface StatusTypes {
   }[]
 }
 
-export interface SchedulingProps {
+export interface AppointmentProps {
   date: Date
   id: string
   observations?: string
@@ -47,12 +47,12 @@ export interface SchedulingProps {
   }
 }
 
-export interface SchedulingTypes {
-  professional: SchedulingProps[]
-  personal: SchedulingProps[]
+export interface AppointmentTypes {
+  professional: AppointmentProps[]
+  personal: AppointmentProps[]
 }
 
-export interface SelectedSchedulingProps {
+export interface SelectedAppointmentProps {
   id: string
   observations?: string
 }
@@ -71,7 +71,7 @@ export interface AppointmentsProps {
   }[]
 }
 
-export default async function Scheduling() {
+export default async function Appointments() {
   const { user } = await getServerSession(authOptions)
   const status = await getStatus()
 

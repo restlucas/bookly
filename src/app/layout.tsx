@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 import './globals.css'
 import Providers from '../components/provider'
-
 export const metadata: Metadata = {
   title: 'Bookly',
   description: 'Bookly',

@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import { AccountForm } from './form'
 
 export const metadata: Metadata = {
-  title: 'Minha conta | Bookly',
-  description: 'Pagina dashboard',
+  title: 'My account | Bookly',
+  description: 'My account page',
 }
 
 export default function MyAccount() {
@@ -12,7 +12,7 @@ export default function MyAccount() {
       {/* Profile and preferences */}
       <div className="w-full rounded-md bg-background-200 p-8">
         <h2 className="mb-8 text-2xl font-bold text-vibrant-green-100">
-          Minha conta
+          My account
         </h2>
 
         <AccountForm />

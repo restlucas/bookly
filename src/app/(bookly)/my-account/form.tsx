@@ -90,7 +90,7 @@ export function AccountForm() {
                       className="object-cover"
                     />
                   ) : (
-                    <span>Sem imagem</span>
+                    <span>No image</span>
                   )}
                 </div>
               </div>
@@ -99,13 +99,13 @@ export function AccountForm() {
                 <div>
                   <div className="flex w-full items-center justify-between">
                     <h2 className="mb-4 text-xl font-bold text-vibrant-green-100">
-                      Informações pessoais
+                      Personal information
                     </h2>
                   </div>
 
                   <div className="grid grid-cols-1 gap-6 text-lg lg:grid-cols-2 lg:gap-4 lg:text-base">
                     <TextInput
-                      label="Nome completo"
+                      label="Full name"
                       name="name"
                       value={accountForm.name || ''}
                       onChange={handleChange}
@@ -118,33 +118,33 @@ export function AccountForm() {
                       disabled={true}
                     />
                     <TextInput
-                      label="Número de telefone"
+                      label="Phone number"
                       name="phone"
                       value={accountForm.phone || ''}
-                      placeholder="Não preenchido"
+                      placeholder="Not filled"
                       maxLength={15}
                       onChange={handleChange}
                     />
                     <TextInput
-                      label="Data de nascimento"
+                      label="Birth"
                       name="birth"
                       type="date"
                       value={accountForm.birth || ''}
-                      placeholder="11/11/2000"
+                      placeholder="MM/DD/YYYY"
                       onChange={handleChange}
                     />
                     <SelectInput
-                      label="Gênero"
+                      label="Gender"
                       name="gender"
                       value={accountForm.gender || ''}
                       options={gendersType}
                       onChange={handleChange}
                     />
                     <TextInput
-                      label="Endereço"
+                      label="Address"
                       name="address"
                       value={accountForm.address || ''}
-                      placeholder="Não preenchido"
+                      placeholder="Not filled"
                       onChange={handleChange}
                     />
                   </div>
@@ -153,17 +153,17 @@ export function AccountForm() {
                 {/* Preferences */}
                 <div className="lg:border-l-[1px] lg:border-background-300 lg:pl-8">
                   <h2 className="mb-4 text-xl font-bold text-vibrant-green-100">
-                    Preferências
+                    Preferences
                   </h2>
 
                   <div className="grid grid-cols-[1fr] items-start gap-6">
                     <div>
                       <h5>
-                        Deseja receber notificações sobre seus agendamentos por
-                        e-mail?
+                        Do you want to receive notifications about your
+                        appointments by email?
                       </h5>
                       <div className="flex flex-col items-start justify-start gap-4 py-2 lg:flex-row lg:items-center lg:gap-8">
-                        <CheckboxInput label="Sim" name="notifyByEmail" />
+                        <CheckboxInput label="Yes" name="notifyByEmail" />
                       </div>
                     </div>
                     <div />
@@ -172,7 +172,7 @@ export function AccountForm() {
               </div>
             </div>
             <div className="mt-2 flex items-center justify-end gap-4">
-              <SubmitButton title="Salvar alterações" isLoading={isLoading} />
+              <SubmitButton title="Save changes" isLoading={isLoading} />
             </div>
           </>
         ) : (

@@ -2,7 +2,7 @@
 
 import SubmitButton from '@/components/button/submit'
 import { TextAreaInput } from '@/components/input/textarea'
-import { updateSchedulingObservations } from '@/services/schedulingService'
+import { updateAppointmentObservations } from '@/services/appointmentService'
 import toastDefaultValues from '@/utils/toast-default-values'
 import { X } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom'
 import { toast, ToastContainer } from 'react-toastify'
 
 interface ModalProps {
-  selectedScheduling: {
+  selectedAppointment: {
     id: string
     observations?: string
   }
@@ -19,17 +19,17 @@ interface ModalProps {
 }
 
 export function CommentsFormModal({
-  selectedScheduling,
+  selectedAppointment,
   setShowModal,
 }: ModalProps) {
   const [comments, setComments] = useState<string>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    if (selectedScheduling.observations) {
-      setComments(selectedScheduling.observations)
+    if (selectedAppointment.observations) {
+      setComments(selectedAppointment.observations)
     }
-  }, [selectedScheduling])
+  }, [selectedAppointment])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setComments(e.target.value)
@@ -41,9 +41,9 @@ export function CommentsFormModal({
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    const response = await updateSchedulingObservations(
+    const response = await updateAppointmentObservations(
       comments,
-      selectedScheduling.id,
+      selectedAppointment.id,
     )
 
     toast[response.type](response.message, toastDefaultValues)
@@ -64,24 +64,24 @@ export function CommentsFormModal({
           <X size={28} className="fill-slate-400" />
         </button>
         <h2 className="mb-4 text-xl font-bold text-vibrant-green-100">
-          Adicionar comentário
+          Add comment
         </h2>
         <TextAreaInput
-          name="schedulingComments"
+          name="appointmentComments"
           value={comments}
           onChange={handleChange}
         />
         <div className="mt-6 flex items-center justify-start gap-4">
           <SubmitButton
             form="commentsForm"
-            title="Salvar"
+            title="Save"
             isLoading={isLoading}
           />
           <button
             onClick={() => setShowModal(false)}
             className="hover: rounded-md border-2 border-vibrant-green-100 px-4 py-2 text-white duration-100 hover:bg-background-300"
           >
-            Cancelar
+            Cancel
           </button>
         </div>
         <ToastContainer closeOnClick theme="dark" />

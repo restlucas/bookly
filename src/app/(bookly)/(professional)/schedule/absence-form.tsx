@@ -149,18 +149,18 @@ export function AbsenceForm({ user }: { user: UserProps }) {
         >
           <div className="flex flex-col gap-4">
             <h3 className="col-span-full text-xl text-vibrant-green-100">
-              Férias e ausências
+              Vacation and absences
             </h3>
             <div className="flex w-full flex-col items-start justify-center gap-6 lg:w-1/2">
               <SelectInput
-                label="Motivo da ausência"
+                label="Reason for absence"
                 name="absenceOptionId"
                 value={absenceForm.absenceOptionId}
                 options={absenceOptions}
                 onChange={(e) => handleChange(e)}
               />
               <div>
-                <label>Período ausência</label>
+                <label>Period of absence</label>
                 <div className="flex w-full items-center justify-start gap-4">
                   <DateInput
                     name="startTime"
@@ -177,7 +177,7 @@ export function AbsenceForm({ user }: { user: UserProps }) {
               </div>
               <div className="mt-6 flex items-start justify-start lg:mt-0">
                 <SubmitButton
-                  title="Inserir ausência"
+                  title="Add absence"
                   isLoading={isLoading.absence}
                   form="absenceForm"
                 />
@@ -188,15 +188,15 @@ export function AbsenceForm({ user }: { user: UserProps }) {
 
         <div className="flex flex-col gap-4">
           <h3 className="col-span-full text-xl text-vibrant-green-100">
-            Registros em andamento
+            Absences in progress
           </h3>
 
           <table className="font-regular w-full overflow-x-scroll text-left text-sm shadow-md rtl:text-right">
             <thead className="bg-background-300 text-xs uppercase">
               <tr>
-                <th className="px-6 py-3">Período</th>
-                <th className="px-6 py-3">Motivo</th>
-                <th className="px-6 py-3 text-center">Cancelar</th>
+                <th className="px-6 py-3">Period</th>
+                <th className="px-6 py-3">Absence</th>
+                <th className="px-6 py-3 text-center">Cancel</th>
               </tr>
             </thead>
             <tbody className="">
@@ -249,7 +249,7 @@ export function AbsenceForm({ user }: { user: UserProps }) {
               ) : (
                 <tr>
                   <td colSpan={3} className="py-6 text-center">
-                    Nenhum registro
+                    No absences found
                   </td>
                 </tr>
               )}
