@@ -31,7 +31,7 @@ interface UserContextProviderProps {
 export const UserContext = createContext({} as UserContextType)
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
-  const [user, setUser] = useState({} as User)
+  const [user, setUser] = useState<User | undefined>()
   const [isLoading, setIsLoading] = useState(true)
   const { data: session, status } = useSession()
 
@@ -46,13 +46,13 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
 
           user.favorites = favoritesArrayFormatted
         }
+        setUser(user)
+        setIsLoading(false)
       }
-      setUser(user)
-      setIsLoading(false)
     }
 
     fetchUser()
-  }, [user, status, session])
+  }, [status, session])
 
   function updateRole(role: string) {
     setUser((prevState) => ({
