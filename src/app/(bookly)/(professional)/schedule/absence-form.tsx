@@ -1,142 +1,142 @@
-"use client";
+'use client'
 
-import SubmitButton from "@/components/button/submit";
-import { DateInput } from "@/components/input/date";
-import { SelectInput } from "@/components/input/select";
+import SubmitButton from '@/components/button/submit'
+import { DateInput } from '@/components/input/date'
+import { SelectInput } from '@/components/input/select'
 import {
   createAbsence,
   deleteAbsence,
   getAbsence,
   getOptions,
-} from "@/services/absenceService";
-import toastDefaultValues from "@/utils/toast-default-values";
-import { AbsenceFormData, validateAbsenceForm } from "@/utils/validators";
-import { XSquare } from "@phosphor-icons/react";
-import { useCallback, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { UserProps } from "./page";
+} from '@/services/absenceService'
+import toastDefaultValues from '@/utils/toast-default-values'
+import { AbsenceFormData, validateAbsenceForm } from '@/utils/validators'
+import { XSquare } from '@phosphor-icons/react'
+import { useCallback, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import { UserProps } from './page'
 
 interface AbsenceOptionsProps {
-  id: string;
-  name: string;
-  description?: string;
-  slug?: string;
+  id: string
+  name: string
+  description?: string
+  slug?: string
 }
 
 interface AbsenceListProps {
-  id: string;
-  professionalId: string;
-  startTime: string;
-  endTime: string;
+  id: string
+  professionalId: string
+  startTime: string
+  endTime: string
   absenceOption: {
-    name: string;
-    description: string;
-  };
+    name: string
+    description: string
+  }
 }
 
 export function AbsenceForm({ user }: { user: UserProps }) {
-  const [absenceOptions, setAbsenceOptions] = useState<AbsenceOptionsProps[]>();
-  const [absenceList, setAbsenceList] = useState<AbsenceListProps[]>([]);
+  const [absenceOptions, setAbsenceOptions] = useState<AbsenceOptionsProps[]>()
+  const [absenceList, setAbsenceList] = useState<AbsenceListProps[]>([])
   const [isLoading, setIsLoading] = useState({
     absence: false,
     absenceList: true,
-  });
+  })
   const [absenceForm, setAbsenceForm] = useState<AbsenceFormData>({
-    userId: "",
-    absenceOptionId: "",
-    startTime: "",
-    endTime: "",
-  });
+    userId: '',
+    absenceOptionId: '',
+    startTime: '',
+    endTime: '',
+  })
 
   const getAbsenceOptions = useCallback(async () => {
-    const response = await getOptions();
-    setAbsenceOptions(response);
-  }, []);
+    const response = await getOptions()
+    setAbsenceOptions(response)
+  }, [])
 
   const getAbsences = useCallback(async (userId: string) => {
-    const response = await getAbsence(userId);
-    setAbsenceList(response);
-  }, []);
+    const response = await getAbsence(userId)
+    setAbsenceList(response)
+  }, [])
 
   const removeAbsence = async (absenceId: string, absenceName: string) => {
     const optionResponse = confirm(
       `Deseja cancelar a ausência por motivo de: ${absenceName}?`,
-    );
+    )
 
     if (optionResponse) {
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: true,
-      }));
+      }))
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      await deleteAbsence(user.id, absenceId);
+      await deleteAbsence(user.id, absenceId)
 
       setAbsenceList((prevState) =>
         prevState.filter((item) => item.id !== absenceId),
-      );
+      )
 
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: false,
-      }));
+      }))
     }
-  };
+  }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = event.target;
+    const { name, value } = event.target
 
     setAbsenceForm((prevState: AbsenceFormData) => ({
       ...prevState,
       [name]: value,
-    }));
+    }))
   }
 
   async function handleSubmitAbsence(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const validationErrors = validateAbsenceForm(absenceForm);
+    e.preventDefault()
+    const validationErrors = validateAbsenceForm(absenceForm)
 
     if (Object.keys(validationErrors).length > 0) {
       Object.values(validationErrors).forEach((error) => {
-        toast.error(error, toastDefaultValues);
-      });
+        toast.error(error, toastDefaultValues)
+      })
     } else {
       setIsLoading((prevState) => ({
         ...prevState,
         absence: true,
-      }));
+      }))
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const response = await createAbsence(absenceForm);
+      const response = await createAbsence(absenceForm)
 
-      setAbsenceList((prevState) => [...prevState, response.data]);
-      toast[response.type](response.message, toastDefaultValues);
+      setAbsenceList((prevState) => [...prevState, response.data])
+      toast[response.type](response.message, toastDefaultValues)
 
       setIsLoading((prevState) => ({
         ...prevState,
         absence: false,
-      }));
+      }))
     }
   }
 
   useEffect(() => {
     if (user.id) {
-      getAbsenceOptions();
-      getAbsences(user.id);
+      getAbsenceOptions()
+      getAbsences(user.id)
 
       setIsLoading((prevState) => ({
         ...prevState,
         absenceList: false,
-      }));
+      }))
 
       setAbsenceForm((prevState) => ({
         ...prevState,
         userId: user.id,
-      }));
+      }))
     }
-  }, [user, getAbsenceOptions, getAbsences]);
+  }, [user, getAbsenceOptions, getAbsences])
 
   return (
     <div>
@@ -243,7 +243,7 @@ export function AbsenceForm({ user }: { user: UserProps }) {
                         </button>
                       </td>
                     </tr>
-                  );
+                  )
                 })
               ) : (
                 <tr>
@@ -258,5 +258,5 @@ export function AbsenceForm({ user }: { user: UserProps }) {
       </div>
       <ToastContainer closeOnClick theme="dark" />
     </div>
-  );
+  )
 }
